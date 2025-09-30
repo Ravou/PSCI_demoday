@@ -5,12 +5,12 @@ function App() {
   return (
     <div className="app">
       <nav className="navbar">
-        <div className="logo">PSCI:wq
-	  </div>
-        <ul className="nav-links">
-          <li>Home</li>
-          <li>About us</li>
-          <li>Services</li>
+        <div className="logo">PSCI</div>
+      </nav>
+      <ul className="nav-links">
+        <li>Home</li>
+        <li>About us</li>
+        <li>Services</li>
           <li>Contact</li>
         </ul>
         <button className="btn-cta">Get Started</button>

@@ -1,0 +1,97 @@
+:root {
+  --vert-principal: #00ff00;        /* Vert fluo lumineux */
+  --vert-secondaire: #1aff1a;      /* Vert clair secondaire */
+  --noir-fonce: #0a0a0a;           /* Noir très foncé */
+  --gris-fonce: #1c1c1c;           /* Gris sombre */
+  --gris-clair: #4b4b4b;           /* Gris moyen */
+  --texte-blanc: #e0e0e0;          /* Blanc cassé */
+  --ombre-verte: rgba(0, 255, 0, 0.5); /* Ombre verte translucide */
+}
+
+/* Fond et texte */
+body {
+  background-color: var(--noir-fonce);
+  color: var(--texte-blanc);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 2rem;
+}
+
+/* Bouton vert fluo */
+button, .btn {
+  background-color: var(--vert-principal);
+  color: var(--noir-fonce);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover, .btn:hover {
+  background-color: var(--vert-secondaire);
+}
+
+/* Cartes et sections */
+.section, .card {
+  background-color: var(--gris-fonce);
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 0 15px var(--ombre-verte);
+  margin-bottom: 2rem;
+}
+
+/* Liens en vert */
+a {
+  color: var(--vert-principal);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Titres */
+h1, h2, h3 {
+  color: var(--texte-blanc);
+  margin-bottom: 1rem;
+}
+
+/* Texte secondaire gris clair */
+.text-muted {
+  color: var(--gris-clair);
+}
+
+/* Barre de navigation sombre */
+nav {
+  background-color: var(--gris-fonce);
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  margin-bottom: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo vert */
+.logo {
+  font-weight: 900;
+  color: var(--vert-principal);
+  font-size: 1.8rem;
+  text-transform: lowercase;
+}
+
+/* Navigation menu */
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+nav ul li {
+  cursor: pointer;
+  font-weight: 600;
+}

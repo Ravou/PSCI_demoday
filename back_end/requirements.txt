@@ -1,0 +1,3 @@
+Flask
+FLask-SQLAlchemy
+psycopg2-binary

@@ -1,4 +1,9 @@
+import sys
+import os
 from datetime import datetime
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from back_end.app.api.audits import Audit
 
 class Audit:
     def __init__(self, target: str, userid: int, consenttype: str, ipaddress: str):

@@ -560,18 +560,23 @@ main {
 /* Container cartes zigzag */
 .cards-container {
   display: flex;
-  flex-direction: column;
-  gap: 40px;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
 }
 
 /* Card commune */
 .card {
-  padding: 25px 30px;
-  border-radius: var(--cyber-radius);
+  width: 500px; /* 2 cartes par ligne */
+  height: 550px;
+  padding: 20px;
+  border-radius: 10px;
   box-shadow: var(--cyber-shadow);
   transition: var(--cyber-transition);
   color: var(--cyber-white);
-  max-width: 600px;
+  text-align: center;
+  background: var(--cyber-gray-800);
+  box-sizing: border-box; /* Pour inclure padding dans la largeur */
 }
 
 /* Hover léger */

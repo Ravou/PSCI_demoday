@@ -8,7 +8,7 @@ from back_end.api.audit import api as audit_ns
 
 bcrypt = Bcrypt()
 
-def create_app():(config_class="config.DevelopmentConfig"):
+def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
     app.config.from_object(config_class)
 

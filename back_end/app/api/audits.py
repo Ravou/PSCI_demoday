@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
-from api.models import Audit, ConsentLog  # À adapter selon ton arborescence réelle
+from models import Audit, ConsentLog,User  # À adapter selon ton arborescence réelle
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:password@localhost/rgpd'

@@ -1,136 +1,62 @@
-<<<<<<< HEAD
 from __future__ import annotations
-from typing import List, Optional
+from typing import Optional
 from datetime import datetime
+import uuid
+
 from app.models.base_model import BaseModel
-import bcrypt
+from app import db
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class User(BaseModel):
-    """Represents a user with mandatory consent and integrated GDPR-friendly archival system."""
+    """
+    SQLAlchemy model representing a user with GDPR-friendly relations and utilities.
+    """
+    __tablename__ = 'users'
 
-    # In-memory storage for active users and archived consents
-    _users: List['User'] = []
-    _archived_consents: List[dict] = []
+    id = db.Column(db.Integer, primary_key=True)
+    userid = db.Column(db.String(36), unique=True, nullable=False, default=lambda: str(uuid.uuid4()))
+    email = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    password_hash = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(100))
+    organization = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+    last_login = db.Column(db.DateTime, nullable=True)
+    is_active = db.Column(db.Boolean, default=True)
 
-    allowed_update_fields = ['name', 'email', 'password']
+    # Relations with cascade delete for GDPR-compliant removals
+    audits = db.relationship('Audit', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    consents = db.relationship('ConsentLog', backref='user', lazy='dynamic', cascade='all, delete-orphan')
 
-    def __init__(self, name: str, email: str, password: str, consent_ip: str):
-        super().__init__()
-        self.name = name
+    def __init__(self, email: str, password: str, name: Optional[str] = None, organization: Optional[str] = None):
+        """Initialize a new user with a hashed password."""
         self.email = email
-        self._password_hash = self._hash_password(password)
-        self.account_created_at = datetime.utcnow()
-
-        # Consent (mandatory to create an account)
-        self.consent_given = True
-        self.consent_date = datetime.utcnow()
-        self.consent_ip = consent_ip
-        self.consent_summary = (
-            "Consent granted for site scraping and temporary data processing."
-        )
-
-        # Relationships (to be linked later)
-        self.audits: List['Audit'] = []
-        self.scraped_data: List['dict'] = []
-
-        User._users.append(self)
-
-    # -----------------------
-    # Password management
-    # -----------------------
-    def _hash_password(self, password: str) -> str:
-        """Hashes the password before storing it."""
-        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-    def verify_password(self, password: str) -> bool:
-        """Checks if the provided password matches the stored hash."""
-        return bcrypt.checkpw(password.encode('utf-8'), self._password_hash.encode('utf-8'))
-
-    # -----------------------
-    # Consent archival and account deletion
-    # -----------------------
-    def _archive_consent(self):
-        """Archives minimal consent data for legal traceability (GDPR)."""
-        record = {
-            "email": self.email,
-            "consent_date": self.consent_date,
-            "consent_ip": self.consent_ip,
-            "archived_at": datetime.utcnow(),
-        }
-        User._archived_consents.append(record)
-        print(f"Consent archived for {self.email} at {record['archived_at']}")
-
-    def delete_account(self, archive_consent: bool = True):
-        """Deletes the user's account and all associated data, optionally archiving consent."""
-        if archive_consent:
-            self._archive_consent()
-
-        # Delete linked audits and raw data
-        for audit in getattr(self, 'audits', []):
-            audit.delete()
-        for data in getattr(self, 'scraped_data', []):
-            data.delete()
-
-        # Remove the user from active records
-        User._users = [u for u in User._users if u.id != self.id]
-        print(f"Account deleted and consent revoked for {self.email}.")
-
-    # -----------------------
-    # Class methods
-    # -----------------------
-    @classmethod
-    def get_by_email(cls, email: str) -> Optional['User']:
-        """Finds a user by email."""
-        return next((user for user in cls._users if user.email == email), None)
-
-    @classmethod
-    def get_by_id(cls, id: str) -> Optional['User']:
-        """Finds a user by ID."""
-        return next((user for user in cls._users if user.id == id), None)
-
-    @classmethod
-    def list_all(cls) -> List['User']:
-        """Returns all active users."""
-        return cls._users
-
-    @classmethod
-    def list_archived_consents(cls) -> List[dict]:
-        """Returns all archived consents."""
-        return cls._archived_consents
-
-    # -----------------------
-    # Representation
-    # -----------------------
-    def __repr__(self):
-        return (
-            f"User(id='{self.id}', email='{self.email}', "
-            f"consent_given={self.consent_given}, created='{self.account_created_at}')"
-        )
-
-=======
-from .base import BaseModel
-
-class User(BaseModel):
-    def __init__(self, name: str, email: str, password_hash: str):
-        super().__init__()
+        self.password_hash = generate_password_hash(password)
         self.name = name
-        self.email = email
-        self.password_hash = password_hash
+        self.organization = organization
 
-    def check_password(self, password: str) -> bool :
-        # Logic to check password validity
-        pass
+    def check_password(self, password: str) -> bool:
+        """Verify the provided password against stored hash."""
+        return check_password_hash(self.password_hash, password)
 
-    def update_email(self, new_email: str):
-        self.email = new_email
-        # Logic to send confirmation email
+    def set_password(self, password: str):
+        """Update the user's password (hashed)."""
+        self.password_hash = generate_password_hash(password)
 
-    def get_profile(self) -> dict:
-        # Return a  dictionary with user profile information
+    def to_dict(self) -> dict:
+        """Return a dict representation without sensitive password data."""
         return {
+            "userid": self.userid,
             "name": self.name,
             "email": self.email,
             "id": str(self.id),
+            "organization": self.organization,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "last_login": self.last_login.isoformat() if self.last_login else None,
+            "is_active": self.is_active
         }
->>>>>>> e000c369 (Save WIP before pull)
+
+    def __repr__(self):
+        return f'<User {self.email}>'

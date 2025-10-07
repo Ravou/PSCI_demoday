@@ -1,7 +1,6 @@
-# Import des modèles pour les rendre accessibles depuis api.models
-from .audit import Audit
-from .consent_log import ConsentLog
+from .base import db, BaseModel
 from .user import User
+from .consent_log import ConsentLog
+from .audit import Audit
 
-# Liste des modèles exportés
-__all__ = ['Audit', 'ConsentLog', 'User']
+__all__ = ['db', 'BaseModel', 'User', 'ConsentLog', 'Audit']

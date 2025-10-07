@@ -1,25 +1,19 @@
 from flask import Flask, request, jsonify, abort
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
-from models import User, Audit, ConsentLog
+from app.models import db, User, Audit, ConsentLog
+from config import Config
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:password@localhost/rgpd'
-db = SQLAlchemy(app)
+
 
 @app.route('/apiregister', methods=['POST'])
 def register_user():
-    """
-    Création d'un nouveau compte utilisateur.
-    Paramètres: email, password, (optionnel: name, organization)
-    """
+    """Création d'un nouveau compte utilisateur."""
     data = request.json
     
     # Validation des paramètres requis
     for field in ['email', 'password']:
         if field not in data:
-            abort(400, description=f'Missing required field: {field}')
+            abort(400, description=f'Champ requis manquant: {field}')
     
     # Vérifier si l'email existe déjà
     existing_user = User.query.filter_by(email=data['email']).first()
@@ -29,14 +23,11 @@ def register_user():
     # Créer le nouvel utilisateur
     user = User(
         email=data['email'],
-        password_hash=generate_password_hash(data['password']),
+        password=data['password'],
         name=data.get('name', ''),
-        organization=data.get('organization', ''),
-        created_at=datetime.utcnow()
+        organization=data.get('organization', '')
     )
-    
-    db.session.add(user)
-    db.session.commit()
+    user.save()
     
     return jsonify({
         'message': 'Utilisateur créé avec succès',
@@ -45,27 +36,24 @@ def register_user():
 
 @app.route('/apilogin', methods=['POST'])
 def login_user():
-    """
-    Authentification utilisateur.
-    Paramètres: email, password
-    Retourne: profil utilisateur si authentification réussie
-    """
+    """Authentification utilisateur."""
     data = request.json
     
     # Validation des paramètres requis
     for field in ['email', 'password']:
         if field not in data:
-            abort(400, description=f'Missing required field: {field}')
+            abort(400, description=f'Champ requis manquant: {field}')
     
     # Rechercher l'utilisateur
     user = User.query.filter_by(email=data['email']).first()
     
-    if not user or not check_password_hash(user.password_hash, data['password']):
+    if not user or not user.check_password(data['password']):
         abort(401, description='Email ou mot de passe incorrect')
     
     # Mettre à jour la dernière connexion
+    from datetime import datetime
     user.last_login = datetime.utcnow()
-    db.session.commit()
+    user.save()
     
     return jsonify({
         'message': f'Bienvenue, {user.name or user.email}',
@@ -74,14 +62,11 @@ def login_user():
 
 @app.route('/apiuserprofile', methods=['GET'])
 def get_user_profile():
-    """
-    Récupération du profil utilisateur.
-    Paramètre Query: userid (UUID)
-    """
+    """Récupération du profil utilisateur via query parameter."""
     userid = request.args.get('userid')
     
     if not userid:
-        abort(400, description='Missing userid parameter')
+        abort(400, description='Paramètre userid manquant')
     
     user = User.query.filter_by(userid=userid).first()
     
@@ -92,10 +77,7 @@ def get_user_profile():
 
 @app.route('/apiuserprofile/<userid>', methods=['PUT'])
 def update_user_profile(userid):
-    """
-    Mise à jour du profil utilisateur.
-    Paramètres: name, organization, email (optionnels)
-    """
+    """Mise à jour du profil utilisateur."""
     user = User.query.filter_by(userid=userid).first()
     
     if not user:
@@ -115,34 +97,23 @@ def update_user_profile(userid):
             abort(409, description='Cet email est déjà utilisé')
         user.email = data['email']
     
-    user.updated_at = datetime.utcnow()
-    db.session.commit()
+    user.save()
     
     return jsonify({
-        'message': 'Profil mis à jour',
+        'message': 'Profil mis à jour avec succès',
         'user': user.to_dict()
     }), 200
 
 @app.route('/apiuser/<userid>', methods=['DELETE'])
 def delete_user(userid):
-    """
-    Suppression d'un utilisateur (droit à l'oubli RGPD).
-    Supprime également tous les audits et consentements associés.
-    """
+    """Suppression complète d'un utilisateur (droit à l'oubli RGPD)."""
     user = User.query.filter_by(userid=userid).first()
     
     if not user:
         abort(404, description='Utilisateur non trouvé')
     
-    # Supprimer tous les audits associés
-    Audit.query.filter_by(userid=userid).delete()
-    
-    # Supprimer tous les consentements associés
-    ConsentLog.query.filter_by(userid=userid).delete()
-    
-    # Supprimer l'utilisateur
-    db.session.delete(user)
-    db.session.commit()
+    # Les audits et consentements seront supprimés automatiquement (cascade)
+    user.delete()
     
     return jsonify({
         'message': 'Utilisateur et toutes ses données supprimés (droit à l\'oubli RGPD)'
@@ -150,10 +121,7 @@ def delete_user(userid):
 
 @app.route('/apiuser/<userid>/audits', methods=['GET'])
 def get_user_audits(userid):
-    """
-    Récupération de tous les audits d'un utilisateur.
-    Utile pour la traçabilité et l'historique RGPD.
-    """
+    """Récupération de tous les audits d'un utilisateur."""
     user = User.query.filter_by(userid=userid).first()
     
     if not user:
@@ -169,10 +137,7 @@ def get_user_audits(userid):
 
 @app.route('/apiuser/<userid>/consents', methods=['GET'])
 def get_user_consents(userid):
-    """
-    Récupération de tous les consentements d'un utilisateur.
-    Traçabilité complète pour conformité RGPD.
-    """
+    """Récupération de tous les consentements d'un utilisateur."""
     user = User.query.filter_by(userid=userid).first()
     
     if not user:
@@ -185,6 +150,3 @@ def get_user_consents(userid):
         'total_consents': len(consents),
         'consents': [consent.to_dict() for consent in consents]
     }), 200
-
-if __name__ == '__main__':
-    app.run(debug=True)

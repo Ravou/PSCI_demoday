@@ -1,115 +1,140 @@
-from flask import Flask, request, jsonify, abort
-from app.models import db, ConsentLog, User
-from config import Config
-from datetime import datetime
+from flask_restx import Namespace, Resource, fields
+from app.services.facade import facade
 
-app = Flask(__name__)
+api = Namespace('consents', description='Consent management operations')
+
+# Modèle Swagger pour les consentements
+consent_model = api.model('Consent', {
+    'user_id': fields.String(required=True, description='User ID'),
+    'consenttype': fields.String(required=True, description='Type of consent (audit, data_collection, analysis, marketing)'),
+    'ipaddress': fields.String(required=True, description='IP address of the user'),
+    'consent_text': fields.String(description='Text of the consent')
+})
+
+consent_revoke_model = api.model('ConsentRevoke', {
+    'user_id': fields.String(required=True, description='User ID'),
+    'consenttype': fields.String(required=True, description='Type of consent to revoke')
+})
+
+consent_verify_model = api.model('ConsentVerify', {
+    'user_id': fields.String(required=True, description='User ID'),
+    'consenttype': fields.String(required=True, description='Type of consent to verify')
+})
 
 
-@app.route('/apiconsent', methods=['POST'])
-def record_consent():
-    """Enregistrement d'un consentement utilisateur."""
-    data = request.json
-    
-    # Validation des paramètres requis
-    for field in ['userid', 'consenttype', 'ipaddress']:
-        if field not in data:
-            abort(400, description=f'Champ requis manquant: {field}')
-    
-    # Vérifier que l'utilisateur existe
-    user = User.query.filter_by(userid=data['userid']).first()
-    if not user:
-        abort(404, description='Utilisateur non trouvé')
-    
-    # Validation du type de consentement
-    valid_consent_types = ['audit', 'data_collection', 'analysis', 'marketing']
-    if data['consenttype'] not in valid_consent_types:
-        abort(400, description=f'Type de consentement invalide. Types valides: {valid_consent_types}')
-    
-    # Créer et enregistrer le consentement
-    consent = ConsentLog(
-        userid=data['userid'],
-        consenttype=data['consenttype'],
-        ipaddress=data['ipaddress'],
-        consent_text=data.get('consent_text', f'Consentement pour {data["consenttype"]}')
-    )
-    consent.save()
-    
-    return jsonify({
-        'message': 'Consentement enregistré avec succès',
-        'consent': consent.to_dict()
-    }), 201
+@api.route('/')
+class ConsentList(Resource):
+    @api.expect(consent_model, validate=True)
+    @api.response(201, 'Consent recorded successfully')
+    @api.response(400, 'Invalid consent type or missing fields')
+    @api.response(404, 'User not found')
+    def post(self):
+        """Record a new consent"""
+        consent_data = api.payload
+        
+        # Vérifier que l'utilisateur existe
+        user = facade.get_user(consent_data['user_id'])
+        if not user:
+            return {'error': 'User not found'}, 404
+        
+        # Valider le type de consentement
+        valid_types = ['audit', 'data_collection', 'analysis', 'marketing']
+        if consent_data['consenttype'] not in valid_types:
+            return {'error': f'Invalid consent type. Valid types: {valid_types}'}, 400
+        
+        # Créer le consentement
+        consent = facade.create_consent(
+            user_id=consent_data['user_id'],
+            consenttype=consent_data['consenttype'],
+            ipaddress=consent_data['ipaddress'],
+            consent_text=consent_data.get('consent_text', f'Consent for {consent_data["consenttype"]}')
+        )
+        
+        return {
+            'message': 'Consent recorded successfully',
+            'consent': {
+                'id': consent.id,
+                'user_id': consent.user_id,
+                'consenttype': consent.consenttype,
+                'is_active': consent.is_active,
+                'created_at': consent.created_at.isoformat()
+            }
+        }, 201
 
-@app.route('/apiconsent-revoke', methods=['POST'])
-def revoke_consent():
-    """Révocation d'un consentement utilisateur."""
-    data = request.json
-    
-    # Validation des paramètres requis
-    for field in ['userid', 'consenttype']:
-        if field not in data:
-            abort(400, description=f'Champ requis manquant: {field}')
-    
-    # Vérifier que l'utilisateur existe
-    user = User.query.filter_by(userid=data['userid']).first()
-    if not user:
-        abort(404, description='Utilisateur non trouvé')
-    
-    # Rechercher le consentement actif
-    consent = ConsentLog.query.filter_by(
-        userid=data['userid'],
-        consenttype=data['consenttype'],
-        is_active=True
-    ).first()
-    
-    if not consent:
-        abort(404, description='Aucun consentement actif trouvé pour ce type')
-    
-    # Révoquer le consentement
-    consent.revoke()
-    consent.save()
-    
-    return jsonify({
-        'message': 'Consentement révoqué avec succès',
-        'consent': consent.to_dict()
-    }), 200
 
-@app.route('/apiconsent/<userid>', methods=['GET'])
-def get_user_consents(userid):
-    """Récupération de tous les consentements d'un utilisateur."""
-    # Vérifier que l'utilisateur existe
-    user = User.query.filter_by(userid=userid).first()
-    if not user:
-        abort(404, description='Utilisateur non trouvé')
-    
-    consents = ConsentLog.query.filter_by(userid=userid).all()
-    
-    # Séparer les consentements actifs et révoqués
-    active_consents = [c for c in consents if c.is_active]
-    revoked_consents = [c for c in consents if not c.is_active]
-    
-    return jsonify({
-        'userid': userid,
-        'total_consents': len(consents),
-        'active_consents': len(active_consents),
-        'revoked_consents': len(revoked_consents),
-        'consents': [consent.to_dict() for consent in consents]
-    }), 200
+@api.route('/revoke')
+class ConsentRevoke(Resource):
+    @api.expect(consent_revoke_model, validate=True)
+    @api.response(200, 'Consent revoked successfully')
+    @api.response(404, 'User not found or no active consent')
+    def post(self):
+        """Revoke an active consent"""
+        revoke_data = api.payload
+        
+        user = facade.get_user(revoke_data['user_id'])
+        if not user:
+            return {'error': 'User not found'}, 404
+        
+        # Révoquer le consentement
+        success = facade.revoke_consent(
+            user_id=revoke_data['user_id'],
+            consenttype=revoke_data['consenttype']
+        )
+        
+        if not success:
+            return {'error': 'No active consent found for this type'}, 404
+        
+        return {'message': 'Consent revoked successfully'}, 200
 
-@app.route('/apiconsent/verify', methods=['POST'])
-def verify_consent():
-    """Vérification qu'un consentement actif existe."""
-    data = request.json
-    
-    # Validation des paramètres requis
-    for field in ['userid', 'consenttype']:
-        if field not in data:
-            abort(400, description=f'Champ requis manquant: {field}')
-    
-    has_consent = ConsentLog.has_active_consent(data['userid'], data['consenttype'])
-    
-    return jsonify({
-        'userid': data['userid'],
-        'consenttype': data['consenttype'],
-        'has_active_consent': has_consent
-    }), 200
+
+@api.route('/verify')
+class ConsentVerify(Resource):
+    @api.expect(consent_verify_model, validate=True)
+    @api.response(200, 'Consent verification result')
+    def post(self):
+        """Verify if a consent is active"""
+        verify_data = api.payload
+        
+        has_consent = facade.verify_consent(
+            user_id=verify_data['user_id'],
+            consenttype=verify_data['consenttype']
+        )
+        
+        return {
+            'user_id': verify_data['user_id'],
+            'consenttype': verify_data['consenttype'],
+            'has_active_consent': has_consent
+        }, 200
+
+
+@api.route('/<string:user_id>')
+class UserConsents(Resource):
+    @api.response(200, 'Consents retrieved successfully')
+    @api.response(404, 'User not found')
+    def get(self, user_id):
+        """Get all consents for a specific user"""
+        user = facade.get_user(user_id)
+        if not user:
+            return {'error': 'User not found'}, 404
+        
+        consents = facade.list_consents(user_id)
+        
+        active_consents = [c for c in consents if c.is_active]
+        revoked_consents = [c for c in consents if not c.is_active]
+        
+        return {
+            'user_id': user_id,
+            'total_consents': len(consents),
+            'active_consents': len(active_consents),
+            'revoked_consents': len(revoked_consents),
+            'consents': [
+                {
+                    'id': c.id,
+                    'consenttype': c.consenttype,
+                    'is_active': c.is_active,
+                    'created_at': c.created_at.isoformat(),
+                    'revoked_at': c.revoked_at.isoformat() if c.revoked_at else None
+                }
+                for c in consents
+            ]
+        }, 200

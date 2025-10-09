@@ -54,7 +54,7 @@ class ConsentList(Resource):
             'message': 'Consent recorded successfully',
             'consent': {
                 'id': consent.id,
-                'user_id': consent.user_id,
+                'user_id': consent.userid,
                 'consenttype': consent.consenttype,
                 'is_active': consent.is_active,
                 'created_at': consent.created_at.isoformat()

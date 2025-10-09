@@ -1,12 +1,13 @@
 """
 Modèles de données
+Ordre d'import: BaseModel -> User -> ConsentLog -> Audit
 """
-from flask_sqlalchemy import SQLAlchemy
+from .base import db, BaseModel
 
-db = SQLAlchemy()
-
-# Import des modèles
+# Import dans l'ordre des dépendances
 from .user import User
 from .consent_log import ConsentLog
 from .audit import Audit
 
+# Export explicite
+__all__ = ['db', 'BaseModel', 'User', 'ConsentLog', 'Audit']

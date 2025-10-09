@@ -22,7 +22,7 @@ audit_response = api.model('AuditResponse', {
 @api.route('/<string:user_id>/audits')
 class UserAudits(Resource):
     
-    @api.expect(audit_model, validate=True)  # ✅ Corrigé : validate au lieu de valiate
+    @api.expect(audit_model, validate=True)
     @api.response(201, 'Audit created successfully')
     @api.response(404, 'User or consent not found')
     @api.response(403, 'Consent does not belong to user')
@@ -41,7 +41,8 @@ class UserAudits(Resource):
         if not consent:
             return {'error': 'Consent not found'}, 404
         
-        if consent.user_id != user_id:
+        # CORRECTION : userid au lieu de user_id
+        if consent.userid != user_id:
             return {'error': 'Consent does not belong to user'}, 403
 
         # Créer l'audit
@@ -51,7 +52,7 @@ class UserAudits(Resource):
             target=target
         )
         
-        # ✅ Corrigé : retourner un seul objet, pas une liste
+
         return {
             'message': 'Audit created successfully',
             'audit': {
@@ -64,7 +65,7 @@ class UserAudits(Resource):
             }
         }, 201
 
-    # ✅ Corrigé : Pas de @api.expect sur un GET
+
     @api.response(200, 'Audits retrieved successfully')
     @api.response(404, 'User not found')
     def get(self, user_id):
@@ -83,7 +84,7 @@ class UserAudits(Resource):
                     'audit_id': a.id,
                     'target': a.target,
                     'status': a.status,
-                    'compliance_score': a.compliance_score,
+                    'score': a.score,  # CORRECTION : score au lieu de compliance_score
                     'timestamp': a.created_at.isoformat()
                 }
                 for a in audits
@@ -113,7 +114,7 @@ class AuditRun(Resource):
             'audit': {
                 'audit_id': audit.id,
                 'status': audit.status,
-                'compliance_score': audit.compliance_score
+                'score': audit.score  # CORRECTION : score au lieu de compliance_score
             }
         }, 200
 
@@ -134,7 +135,7 @@ class AuditSummary(Resource):
             'audit_id': audit_id,
             'target': audit.target,
             'status': audit.status,
-            'compliance_score': audit.compliance_score,
+            'score': audit.score,  # CORRECTION : score au lieu de compliance_score
             'violations': summary.get('violations', []),
             'recommendations': summary.get('recommendations', []),
             'summary_text': summary.get('summary_text', '')

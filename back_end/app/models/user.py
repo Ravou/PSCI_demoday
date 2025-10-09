@@ -19,8 +19,8 @@ class User(BaseModel):
     is_active = db.Column(db.Boolean, default=True)
     
     # Relations avec cascade pour suppression RGPD
-    audits = db.relationship('Audit', backref='user', lazy='dynamic', cascade='all, delete-orphan')
-    consents = db.relationship('ConsentLog', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    audits = db.relationship('Audit', back_populates='user', lazy='dynamic', cascade='all, delete-orphan')
+    consents = db.relationship('ConsentLog', back_populates='user', lazy='dynamic', cascade='all, delete-orphan')
     
     def __init__(self, email, password, name=None, organization=None):
         """Initialise un nouvel utilisateur avec mot de passe hashé"""

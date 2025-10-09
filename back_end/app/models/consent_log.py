@@ -16,6 +16,9 @@ class ConsentLog(BaseModel):
     revoked_at = db.Column(db.DateTime, nullable=True)
     consent_text = db.Column(db.Text, nullable=True)  # Texte du consentement donné
     
+    # Relation bidirectionnelle avec User (AJOUT ICI)
+    user = db.relationship('User', back_populates='consents')
+    
     # Index composite pour recherches rapides
     __table_args__ = (
         db.Index('idx_userid_consenttype', 'userid', 'consenttype'),

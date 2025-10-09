@@ -1,11 +1,18 @@
 from app.models import db, User, ConsentLog, Audit
 
+
 class Facade:
     """Façade pour gérer la logique métier de l'application"""
     
     # ==================== USERS ====================
-    def create_user(self, name, email, password):
-        user = User(email=email, password=password, name=name)
+    def create_user(self, name, email, password, organisation=None):
+        """Créer un utilisateur avec organisation optionnelle"""
+        user = User(
+            email=email,
+            password=password,
+            name=name,
+            organization=organisation  # Ajouter l'organisation
+        )
         user.save()
         return user
     
@@ -26,6 +33,8 @@ class Facade:
             user.name = updated_data['name']
         if 'email' in updated_data:
             user.email = updated_data['email']
+        if 'organization' in updated_data:
+            user.organization = updated_data['organization']
         user.save()
         return user
     
@@ -70,11 +79,11 @@ class Facade:
     
     # ==================== AUDITS ====================
     def create_audit(self, user_id, consent_id, target):
+        """Créer un nouvel audit"""
         audit = Audit(
             target=target,
-            userid=user_id,
-            consenttype='audit',
-            ipaddress='127.0.0.1'
+            user_id=user_id,  # Correction: user_id au lieu de userid
+            consent_id=consent_id
         )
         audit.save()
         return audit
@@ -83,7 +92,7 @@ class Facade:
         return Audit.query.get(audit_id)
     
     def list_audits(self, user_id):
-        return Audit.query.filter_by(userid=user_id).all()
+        return Audit.query.filter_by(user_id=user_id).all()  # Correction: user_id
     
     def run_audit(self, audit_id):
         audit = self.get_audit(audit_id)
@@ -100,6 +109,7 @@ class Facade:
             'violations': audit.violations or [],
             'recommendations': audit.recommendations or []
         }
+
 
 # Instance unique de la façade
 facade = Facade()

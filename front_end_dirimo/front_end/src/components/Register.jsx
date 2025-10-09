@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { userService } from '../services/apiService';
+import { useNavigate } from 'react-router-dom';
 
 const Register = ({ onRegisterSuccess }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -9,6 +11,7 @@ const Register = ({ onRegisterSuccess }) => {
     organization: ''
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -21,29 +24,51 @@ const Register = ({ onRegisterSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
       const response = await userService.register(formData);
-      console.log('Inscription réussie:', response);
+      console.log('✓ Inscription réussie:', response);
       
-      if (onRegisterSuccess) {
-        onRegisterSuccess(response.user);
-      }
+      setSuccess('Compte créé avec succès ! Redirection...');
+      
+      setTimeout(() => {
+        if (onRegisterSuccess) {
+          onRegisterSuccess(response.user);
+        }
+        navigate('/login');
+      }, 1500);
+      
     } catch (err) {
-      setError(err.description || 'Erreur d\'inscription');
-      console.error('Erreur inscription:', err);
-    } finally {
+      console.error('✗ Erreur inscription:', err);
+      setError(err.description || err.message || 'Erreur lors de l\'inscription');
       setLoading(false);
     }
   };
 
   return (
-    <div className="register-container">
+    <div className="container">
       <h2>Inscription</h2>
+      {error && <div className="error-message">{error}</div>}
+      {success && <div className="success-message">{success}</div>}
+      
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Email:*</label>
+          <label>Nom complet *</label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            disabled={loading}
+            placeholder="John Doe"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Email *</label>
           <input
             type="email"
             name="email"
@@ -51,11 +76,12 @@ const Register = ({ onRegisterSuccess }) => {
             onChange={handleChange}
             required
             disabled={loading}
+            placeholder="votre@email.com"
           />
         </div>
         
         <div className="form-group">
-          <label>Mot de passe:*</label>
+          <label>Mot de passe *</label>
           <input
             type="password"
             name="password"
@@ -63,37 +89,33 @@ const Register = ({ onRegisterSuccess }) => {
             onChange={handleChange}
             required
             disabled={loading}
+            placeholder="••••••••"
+            minLength="6"
           />
         </div>
 
         <div className="form-group">
-          <label>Nom:</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            disabled={loading}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Organisation:</label>
+          <label>Organisation</label>
           <input
             type="text"
             name="organization"
             value={formData.organization}
             onChange={handleChange}
             disabled={loading}
+            placeholder="Nom de votre entreprise"
           />
         </div>
 
-        {error && <div className="error-message">{error}</div>}
-        
+
+
         <button type="submit" disabled={loading}>
           {loading ? 'Inscription...' : 'S\'inscrire'}
         </button>
       </form>
+      
+      <div className="link">
+        Déjà inscrit ? <a href="/login">Se connecter</a>
+      </div>
     </div>
   );
 };

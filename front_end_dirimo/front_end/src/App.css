@@ -474,5 +474,119 @@ h1, h2, h3 {
   button[type="submit"] {
     padding: 14px;
     font-size: 15px;
+
+    /* ============================================
+   NOUVEAUX STYLES POUR LANDING PAGE ET FOOTER
+   ============================================ */
+
+/* === LAYOUT WRAPPER === */
+.main-content-wrapper {
+  min-height: calc(100vh - 70px - 200px);
+}
+
+.main-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  min-height: calc(100vh - 70px - 200px);
+}
+
+/* === NAV LINK === */
+.nav-link {
+  color: var(--vert-principal);
+  text-decoration: none;
+  font-weight: 600;
+  margin-right: 20px;
+  transition: all 0.3s;
+}
+
+.nav-link:hover {
+  text-shadow: 0 0 10px var(--ombre-verte);
+}
+
+/* === FOOTER RICH === */
+.footer-rich {
+  background: linear-gradient(90deg, var(--gris-fonce) 0%, var(--gris-moyen) 100%);
+  border-top: 2px solid var(--vert-principal);
+  padding: 60px 40px 20px;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.footer-column h3 {
+  color: var(--vert-principal);
+  font-size: 20px;
+  margin-bottom: 16px;
+  font-weight: 800;
+}
+
+.footer-column h4 {
+  color: var(--vert-secondaire);
+  font-size: 16px;
+  margin-bottom: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.footer-column p {
+  color: var(--gris-clair);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-column ul li {
+  margin-bottom: 12px;
+}
+
+.footer-column ul li a {
+  color: var(--gris-clair);
+  text-decoration: none;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.footer-column ul li a:hover {
+  color: var(--vert-principal);
+  text-shadow: 0 0 10px var(--ombre-verte);
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--gris-clair);
+  padding-top: 20px;
+  text-align: center;
+}
+
+.footer-bottom p {
+  color: var(--gris-clair);
+  font-size: 14px;
+}
+
+/* === RESPONSIVE FOOTER === */
+@media (max-width: 1024px) {
+  .footer-content {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+  }
+}
   }
 }

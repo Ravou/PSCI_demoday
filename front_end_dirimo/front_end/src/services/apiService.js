@@ -7,7 +7,7 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  timeout: 10000
+  timeout: 30000 // 30 secondes pour les audits
 });
 
 // Intercepteur pour ajouter des headers
@@ -42,36 +42,68 @@ export const userService = {
   // Inscription
   register: async (userData) => {
     try {
+      console.log('=== DEBUG FRONTEND REGISTER ===');
+      console.log('Data being sent:', userData);
+      console.log('JSON stringified:', JSON.stringify(userData));
+      console.log('API endpoint:', API_CONFIG.ENDPOINTS.REGISTER);
+      console.log('Full URL:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REGISTER}`);
+      
       const response = await apiClient.post(API_CONFIG.ENDPOINTS.REGISTER, userData);
+      
+      console.log('Response received:', response.data);
+      console.log('Status:', response.status);
+      console.log('================================\n');
+      
       return response.data;
     } catch (error) {
+      console.error('=== ERROR FRONTEND REGISTER ===');
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      console.error('Error message:', error.message);
+      console.error('Full error:', error);
+      console.error('================================\n');
+      
       throw error.response?.data || { description: error.message };
     }
   },
 
-  // Connexion (ADAPTÉ pour Flask-RESTX)
+  // Connexion (adapté pour Flask-RESTX)
   login: async (credentials) => {
     try {
-      // Flask-RESTX n'a pas de route /login, on récupère tous les users et on filtre
+      console.log('=== DEBUG FRONTEND LOGIN ===');
+      console.log('Credentials:', { email: credentials.email, password: '***' });
+      
       const response = await apiClient.get(API_CONFIG.ENDPOINTS.LOGIN);
       const users = response.data;
+      
+      console.log('Users retrieved:', users.length);
+      
       const user = users.find(u => u.email === credentials.email);
       
       if (user) {
-        // Simuler une réponse de connexion
+        console.log('User found:', user.email);
+        
         const loginResponse = {
           message: 'Connexion réussie',
           userprofile: user
         };
         
-        // Sauvegarder le profil utilisateur
+
         localStorage.setItem('userProfile', JSON.stringify(user));
+        
+        console.log('Login successful');
+        console.log('============================\n');
         
         return loginResponse;
       } else {
+        console.error('User not found with email:', credentials.email);
+        console.log('============================\n');
         throw { description: 'Email ou mot de passe incorrect' };
       }
     } catch (error) {
+      console.error('=== ERROR FRONTEND LOGIN ===');
+      console.error('Error:', error);
+      console.error('============================\n');
       throw error.response?.data || { description: error.message };
     }
   },
@@ -79,48 +111,7 @@ export const userService = {
   // Récupérer profil
   getProfile: async (userid) => {
     try {
-      const response = await apiClient.get(`${API_CONFIG.ENDPOINTS.USER_PROFILE}/${userid}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { description: error.message };
-    }
-  },
-
-  // Mettre à jour profil
-  updateProfile: async (userid, updates) => {
-    try {
-      const response = await apiClient.put(`${API_CONFIG.ENDPOINTS.UPDATE_PROFILE}/${userid}`, updates);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { description: error.message };
-    }
-  },
-
-  // Supprimer compte
-  deleteAccount: async (userid) => {
-    try {
-      const response = await apiClient.delete(`${API_CONFIG.ENDPOINTS.DELETE_USER}/${userid}`);
-      localStorage.clear();
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { description: error.message };
-    }
-  },
-
-  // Récupérer les audits de l'utilisateur
-  getUserAudits: async (userid) => {
-    try {
-      const response = await apiClient.get(`${API_CONFIG.ENDPOINTS.USER_AUDITS}/${userid}/audits`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { description: error.message };
-    }
-  },
-
-  // Récupérer les consentements de l'utilisateur
-  getUserConsents: async (userid) => {
-    try {
-      const response = await apiClient.get(`${API_CONFIG.ENDPOINTS.USER_CONSENTS}/${userid}`);
+      const response = await apiClient.get(`${API_CONFIG.ENDPOINTS.USER_PROFILE}${userid}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { description: error.message };
@@ -133,7 +124,50 @@ export const consentService = {
   // Enregistrer un consentement
   record: async (consentData) => {
     try {
+      console.log('=== DEBUG CONSENT RECORD ===');
+      console.log('Consent data:', consentData);
+      
       const response = await apiClient.post(API_CONFIG.ENDPOINTS.CONSENT_RECORD, consentData);
+      
+      console.log('Consent recorded:', response.data);
+      console.log('============================\n');
+      
+      return response.data;
+    } catch (error) {
+      console.error('=== ERROR CONSENT RECORD ===');
+      console.error('Error:', error.response?.data);
+      console.error('============================\n');
+      throw error.response?.data || { description: error.message };
+    }
+  },
+
+  // ✅ AJOUT : Lister les consentements d'un utilisateur
+  list: async (userId) => {
+    try {
+      console.log('=== DEBUG CONSENT LIST ===');
+      console.log('User ID:', userId);
+      
+      const response = await apiClient.get(`${API_CONFIG.ENDPOINTS.CONSENT_LIST}/${userId}`);
+      
+      console.log('Consents retrieved:', response.data);
+      console.log('==========================\n');
+      
+      return response.data;
+    } catch (error) {
+      console.error('=== ERROR CONSENT LIST ===');
+      console.error('Error:', error.response?.data);
+      console.error('==========================\n');
+      throw error.response?.data || { description: error.message };
+    }
+  },
+
+  // Vérifier un consentement actif
+  verify: async (userid, consenttype) => {
+    try {
+      const response = await apiClient.post(API_CONFIG.ENDPOINTS.CONSENT_VERIFY, {
+        user_id: userid,
+        consenttype: consenttype
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || { description: error.message };
@@ -151,30 +185,8 @@ export const consentService = {
     } catch (error) {
       throw error.response?.data || { description: error.message };
     }
-  },
-
-  // Lister les consentements
-  list: async (userid) => {
-    try {
-      const response = await apiClient.get(`${API_CONFIG.ENDPOINTS.CONSENT_LIST}/${userid}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { description: error.message };
-    }
-  },
-
-  // Vérifier un consentement actif
-  verify: async (userid, consenttype) => {
-    try {
-      const response = await apiClient.post(API_CONFIG.ENDPOINTS.CONSENT_VERIFY, {
-        user_id: userid,
-        consenttype
-      });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { description: error.message };
-    }
   }
+
 };
 
 // ==================== AUDITS API ====================
@@ -182,22 +194,33 @@ export const auditService = {
   // Créer un audit
   create: async (auditData) => {
     try {
-      const response = await apiClient.post(`${API_CONFIG.ENDPOINTS.AUDIT_CREATE}/${auditData.userid}/audits`, {
-        target: auditData.target,
-        consent_id: '1'
-      });
+      console.log('=== DEBUG AUDIT CREATE ===');
+      console.log('Audit data:', auditData);
+      
+      const response = await apiClient.post(
+        `${API_CONFIG.ENDPOINTS.AUDIT_CREATE}/${auditData.userid}/audits`,
+        {
+          target: auditData.target,
+          consent_id: auditData.consent_id
+        }
+      );
+      
+      console.log('Audit created:', response.data);
+      console.log('==========================\n');
+      
       return response.data;
     } catch (error) {
+      console.error('=== ERROR AUDIT CREATE ===');
+      console.error('Error:', error.response?.data);
+      console.error('==========================\n');
       throw error.response?.data || { description: error.message };
     }
   },
 
-  // Lister les audits (avec filtres optionnels)
-  list: async (filters = {}) => {
+  // Lister les audits d'un utilisateur
+  list: async (userid) => {
     try {
-      const params = new URLSearchParams(filters).toString();
-      const url = params ? `${API_CONFIG.ENDPOINTS.AUDIT_LIST}?${params}` : API_CONFIG.ENDPOINTS.AUDIT_LIST;
-      const response = await apiClient.get(url);
+      const response = await apiClient.get(`${API_CONFIG.ENDPOINTS.AUDIT_LIST}/${userid}/audits`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { description: error.message };
@@ -217,9 +240,19 @@ export const auditService = {
   // Exécuter un audit
   run: async (auditId) => {
     try {
+      console.log('=== DEBUG AUDIT RUN ===');
+      console.log('Running audit ID:', auditId);
+      
       const response = await apiClient.post(`${API_CONFIG.ENDPOINTS.AUDIT_RUN}/${auditId}/run`);
+      
+      console.log('Audit completed:', response.data);
+      console.log('=======================\n');
+      
       return response.data;
     } catch (error) {
+      console.error('=== ERROR AUDIT RUN ===');
+      console.error('Error:', error.response?.data);
+      console.error('=======================\n');
       throw error.response?.data || { description: error.message };
     }
   },
@@ -245,17 +278,6 @@ export const auditService = {
   }
 };
 
-// ==================== SYSTEM API ====================
-export const systemService = {
-  // Vérifier l'état du serveur
-  healthCheck: async () => {
-    try {
-      const response = await apiClient.get(API_CONFIG.ENDPOINTS.HEALTH);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { description: error.message };
-    }
-  }
-};
+
 
 export default apiClient;

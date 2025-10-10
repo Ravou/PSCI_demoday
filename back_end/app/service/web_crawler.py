@@ -1,10 +1,9 @@
-from app.models.user import User
 from content_scraper import ContentScraper
 from extract_ssl import get_certificate_info
 import requests
 from bs4 import BeautifulSoup
 import time
-
+import json
 
 class WebCrawler:
     def __init__(self, start_url, max_depth=2, delay=1):
@@ -77,7 +76,13 @@ if __name__ == "__main__":
             "dynamic": dynamic_data
         })
 
-    print("\n=== Résultats pour toutes les pages ===")
-    for result in all_results:
-        print(result)
+    # ===== Export JSON =====
+    output_json = json.dumps(all_results, ensure_ascii=False, indent=4)
+    
+    # Affiche dans la console
+    print(output_json)
+
+    # Optionnel : sauvegarde dans un fichier
+    with open("crawler_results.json", "w", encoding="utf-8") as f:
+        f.write(output_json)
 

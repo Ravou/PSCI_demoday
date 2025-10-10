@@ -31,7 +31,7 @@ class User(BaseModel):
 
         # Relationships (to be linked later)
         self.audits: List['Audit'] = []
-        self.scraped_data: List['ScrapedData'] = []
+        self.scraped_data: List['dict'] = []
 
         User._users.append(self)
 

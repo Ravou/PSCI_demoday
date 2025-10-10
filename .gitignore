@@ -1,0 +1,44 @@
+# ---- Python ----
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+
+# ---- Environnements ----
+.env
+*.env
+
+# ---- IA / Hugging Face / Models ----
+*.pt
+*.bin
+*.h5
+*.onnx
+*.model
+*.weights
+*.ckpt
+
+# ---- Node / React ----
+node_modules/
+build/
+dist/
+*.lock
+
+# ---- OS Files ----
+.DS_Store
+Thumbs.db
+
+# ---- IDE / Editor ----
+.vscode/
+.idea/
+
+# ---- Jupyter / Temp ----
+.ipynb_checkpoints/
+*.ipynb
+
+# ---- Others ----
+*.bak
+*.swp
+

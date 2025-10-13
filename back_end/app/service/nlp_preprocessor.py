@@ -1,6 +1,6 @@
 import re
 import json
-from langdetect import detect
+from langdetect import detect, DetectorFactory
 from unidecode import unidecode
 import nltk
 import spacy
@@ -11,8 +11,7 @@ import torch
 # =====================================
 # 📥 Téléchargement NLTK
 # =====================================
-nltk.download("punkt")
-nltk.download("punkt_tab")
+nltk.download("punkt", quiet=True)
 nltk.download("stopwords", quiet=True)
 
 # =====================================
@@ -20,50 +19,59 @@ nltk.download("stopwords", quiet=True)
 # =====================================
 nlp_fr = spacy.load("fr_core_news_sm")
 nlp_en = spacy.load("en_core_web_sm")
+nlp_fallback = spacy.load("xx_ent_wiki_sm")  # Multilingue fallback
 
 # =====================================
 # 🔍 Détection de langue
 # =====================================
+DetectorFactory.seed = 0  # Pour rendre les résultats reproductibles
+
 def detect_lang(text):
+    if not text or not text.strip():
+        return "unknown"
+    text = text.strip()
+    if len(text.split()) < 5:
+        doc = nlp_fallback(text)
+        return doc.lang_ if doc.lang_ else "unknown"
     try:
         return detect(text)
     except:
-        return "unknown"
+        doc = nlp_fallback(text)
+        return doc.lang_ if doc.lang_ else "unknown"
 
 # =====================================
 # 🧼 Nettoyage / regex + métadonnées
 # =====================================
 def clean_text_with_metadata(text):
+    if not text:
+        return "", {}
+
     text = unidecode(text)
+
     metadata = {
-        "emails": re.findall(r"\S+@\S+", text),
+        "emails": re.findall(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", text),
         "phones": re.findall(r"\b\d{10,}\b", text),
-        "urls": re.findall(r"http\S+|www\S+", text)
+        "urls": re.findall(r"https?://[^\s]+|www\.[^\s]+", text)
     }
+
     text = re.sub(r"<.*?>", " ", text)
-    text = re.sub(r"\d+", "", text)
-    text = re.sub(r"[^\w\s]", " ", text)
+    text = re.sub(r"\d+", "<NUM>", text)
+    text = re.sub(r"[^\w\s'-]", " ", text)
     text = re.sub(r"\s+", " ", text)
+
     return text.strip().lower(), metadata
 
 # =====================================
 # ✂️ Tokenisation (NLTK)
 # =====================================
 def sentence_tokenize(text, lang="fr"):
-    """
-    Tokenise un texte en phrases selon la langue.
-    Langue supportée : 'fr' pour français, 'en' pour anglais.
-    """
     language_map = {"fr": "french", "en": "english"}
-    language = language_map.get(lang, "french")  # fallback sur français
-    
+    language = language_map.get(lang, "french")
     try:
         return nltk.sent_tokenize(text, language=language)
     except LookupError:
-        # Télécharger punkt si manquant
-        nltk.download("punkt")
+        nltk.download("punkt", quiet=True)
         return nltk.sent_tokenize(text, language=language)
-
 
 def tokenize_text(text, lang="fr"):
     tokens = []
@@ -75,23 +83,19 @@ def tokenize_text(text, lang="fr"):
 # 🧹 Lemmatisation / POS (spaCy)
 # =====================================
 def spacy_processing(text, lang="fr"):
-    nlp = nlp_fr if lang == "fr" else nlp_en
+    nlp = nlp_fr if lang=="fr" else nlp_en
     doc = nlp(text)
     processed = []
     for token in doc:
         if not token.is_stop and not token.is_punct and not token.like_num:
-            processed.append({
-                "text": token.text,
-                "lemma": token.lemma_,
-                "pos": token.pos_
-            })
+            processed.append({"text": token.text, "lemma": token.lemma_, "pos": token.pos_})
     return processed
 
 # =====================================
 # 🧠 NER (spaCy)
 # =====================================
 def extract_entities(text, lang="fr"):
-    nlp = nlp_fr if lang == "fr" else nlp_en
+    nlp = nlp_fr if lang=="fr" else nlp_en
     doc = nlp(text)
     return [(ent.text, ent.label_) for ent in doc.ents]
 
@@ -105,8 +109,7 @@ sentiment_analyzer = pipeline(
 
 def sentiment_analysis(text):
     try:
-        result = sentiment_analyzer(text[:512])
-        return result[0]
+        return sentiment_analyzer(text[:512])[0]
     except:
         return {"label": "neutral", "score": 0.0}
 
@@ -133,7 +136,6 @@ def nlp_pipeline(text):
     entities = extract_entities(cleaned, lang)
     sentiment = sentiment_analysis(cleaned)
     vector = vectorize_text(cleaned)
-    
     return {
         "lang": lang,
         "cleaned_text": cleaned,
@@ -148,15 +150,7 @@ def nlp_pipeline(text):
 # =====================================
 # 🧪 Traitement des fichiers JSON
 # =====================================
-# =====================================
-# 🧪 Traitement des fichiers JSON (robuste)
-# =====================================
-# ...existing code...
 def process_rgpd_json(file_path):
-    """
-    Traite rgpd_structure.json :
-    - Analyse le texte de chaque article RGPD
-    """
     with open(file_path, "r", encoding="utf-8") as f:
         rgpd = json.load(f)
     chapitres = rgpd.get("reglement", {}).get("dispositif_normatif", {}).get("chapitres", [])
@@ -166,40 +160,40 @@ def process_rgpd_json(file_path):
             if texte.strip():
                 print(f"\n=== {article.get('numero')} - {chapitre.get('titre')} ===")
                 print(texte[:300], "...\n")
-                nlp_result = nlp_pipeline(texte)
-                print("NLP RGPD :", nlp_result)
+                print("NLP RGPD :", nlp_pipeline(texte))
 
 def process_crawler_json(file_path):
-    """
-    Traite crawler_results.json :
-    - Analyse le texte principal de chaque page
-    - Analyse tous les textes RGPD de chaque page
-    """
     with open(file_path, "r", encoding="utf-8") as f:
         data = json.load(f)
-
     for idx, item in enumerate(data):
-        # 1️⃣ Texte principal (static > text)
-        main_text = item.get("static", {}).get("text", "")
         print(f"\n=== Page #{idx+1} : {item.get('url')} ===")
-        print("Texte principal :")
-        print(main_text[:300], "...\n")
-        nlp_result = nlp_pipeline(main_text)
-        print("NLP principal :", nlp_result)
 
-        # 2️⃣ Textes RGPD (static > textes_rgpd)
+        # 🔹 Texte principal dynamique
+        main_text = item.get("dynamic", {}).get("resultats", {}).get("html_text_snippet", "")
+        if main_text.strip():
+            print("Texte principal dynamique :")
+            print(main_text[:300], "...\n")
+            print("NLP principal :", nlp_pipeline(main_text))
+        else:
+            print("Texte principal dynamique vide.\n")
+
+        # 🔹 Textes RGPD statiques
         textes_rgpd = item.get("static", {}).get("textes_rgpd", {})
-        for rgpd_url, rgpd_text in textes_rgpd.items():
-            if rgpd_text.strip():
-                print(f"\n--- RGPD ({rgpd_url}) ---")
-                print(rgpd_text[:300], "...\n")
-                nlp_result_rgpd = nlp_pipeline(rgpd_text)
-                print("NLP RGPD :", nlp_result_rgpd)
+        if textes_rgpd:
+            for rgpd_url, rgpd_text in textes_rgpd.items():
+                if rgpd_text.strip():
+                    print(f"\n--- RGPD ({rgpd_url}) ---")
+                    print(rgpd_text[:300], "...\n")
+                    print("NLP RGPD :", nlp_pipeline(rgpd_text))
+                else:
+                    print(f"\n--- RGPD ({rgpd_url}) vide ---\n")
+        else:
+            print("Pas de textes RGPD statiques.\n")
 
+# =====================================
+# 🔹 Main
+# =====================================
 if __name__ == "__main__":
-    # 1️⃣ Traiter RGPD JSON
     process_rgpd_json("rgpd_structure.json")
-
-    # 2️⃣ Traiter Crawler JSON (texte principal + textes RGPD)
     process_crawler_json("crawler_results.json")
 

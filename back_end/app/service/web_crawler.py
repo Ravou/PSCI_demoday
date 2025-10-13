@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import json
+from urllib.parse import urljoin
 
 class WebCrawler:
     def __init__(self, start_url, max_depth=2, delay=1):
@@ -15,7 +16,6 @@ class WebCrawler:
         self.start_url = start_url
         self.max_depth = max_depth
         self.delay = delay
-        
         self.visited = set()
 
     def crawl(self, url=None, depth=1):
@@ -43,13 +43,11 @@ class WebCrawler:
         # Parcours tous les liens internes et externes
         for link in soup.find_all('a', href=True):
             next_url = link['href']
-            if next_url.startswith('http'):
-                self.crawl(next_url, depth + 1)
-            elif next_url.startswith('/'):
-                # Forme complète de l'URL pour liens relatifs
-                base_url = self.start_url.rstrip('/')
-                full_url = base_url + next_url
-                self.crawl(full_url, depth + 1)
+            full_url = urljoin(url, next_url)  # Résout les liens relatifs
+            # Filtrer uniquement les URLs HTTP/HTTPS
+            if full_url.startswith("http://") or full_url.startswith("https://"):
+                if full_url not in self.visited:
+                    self.crawl(full_url, depth + 1)
 
         # Pause pour ne pas surcharger le serveur
         time.sleep(self.delay)
@@ -67,8 +65,11 @@ if __name__ == "__main__":
 
     scraper = ContentScraper()
     all_results = []
+
     for page_url in visited_pages:
+        # Scraping statique
         static_data = scraper.scrape_static(page_url)
+        # Scraping dynamique
         dynamic_data = scraper.scrape_dynamic(page_url)
         all_results.append({
             "url": page_url,
@@ -85,4 +86,3 @@ if __name__ == "__main__":
     # Optionnel : sauvegarde dans un fichier
     with open("crawler_results.json", "w", encoding="utf-8") as f:
         f.write(output_json)
-

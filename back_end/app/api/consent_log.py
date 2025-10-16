@@ -1,9 +1,11 @@
 from flask_restx import Namespace, Resource, fields
+from flask import request
 from app.services.facade import facade
+from app.security.decorators import jwt_required
 
 api = Namespace('consents', description='Consent management operations')
 
-# Modèle Swagger pour les consentements
+
 consent_model = api.model('Consent', {
     'user_id': fields.String(required=True, description='User ID'),
     'consenttype': fields.String(required=True, description='Type of consent (audit, data_collection, analysis, marketing)'),
@@ -24,25 +26,30 @@ consent_verify_model = api.model('ConsentVerify', {
 
 @api.route('/')
 class ConsentList(Resource):
+    method_decorators = [jwt_required]
+
     @api.expect(consent_model, validate=True)
     @api.response(201, 'Consent recorded successfully')
     @api.response(400, 'Invalid consent type or missing fields')
     @api.response(404, 'User not found')
     def post(self):
-        """Record a new consent"""
+
         consent_data = api.payload
+        payload = getattr(request, "jwt_payload", {})
+        if payload.get("sub") != consent_data['user_id']:
+            return {'error': 'Forbidden'}, 403
         
-        # Vérifier que l'utilisateur existe
+
         user = facade.get_user(consent_data['user_id'])
         if not user:
             return {'error': 'User not found'}, 404
         
-        # Valider le type de consentement
+
         valid_types = ['audit', 'data_collection', 'analysis', 'marketing']
         if consent_data['consenttype'] not in valid_types:
             return {'error': f'Invalid consent type. Valid types: {valid_types}'}, 400
         
-        # Créer le consentement
+
         consent = facade.create_consent(
             user_id=consent_data['user_id'],
             consenttype=consent_data['consenttype'],
@@ -64,18 +71,23 @@ class ConsentList(Resource):
 
 @api.route('/revoke')
 class ConsentRevoke(Resource):
+    method_decorators = [jwt_required]
+
     @api.expect(consent_revoke_model, validate=True)
     @api.response(200, 'Consent revoked successfully')
     @api.response(404, 'User not found or no active consent')
     def post(self):
-        """Revoke an active consent"""
+
         revoke_data = api.payload
+        payload = getattr(request, "jwt_payload", {})
+        if payload.get("sub") != revoke_data['user_id']:
+            return {'error': 'Forbidden'}, 403
         
         user = facade.get_user(revoke_data['user_id'])
         if not user:
             return {'error': 'User not found'}, 404
         
-        # Révoquer le consentement
+
         success = facade.revoke_consent(
             user_id=revoke_data['user_id'],
             consenttype=revoke_data['consenttype']
@@ -89,11 +101,16 @@ class ConsentRevoke(Resource):
 
 @api.route('/verify')
 class ConsentVerify(Resource):
+    method_decorators = [jwt_required]
+
     @api.expect(consent_verify_model, validate=True)
     @api.response(200, 'Consent verification result')
     def post(self):
-        """Verify if a consent is active"""
+
         verify_data = api.payload
+        payload = getattr(request, "jwt_payload", {})
+        if payload.get("sub") != verify_data['user_id']:
+            return {'error': 'Forbidden'}, 403
         
         has_consent = facade.verify_consent(
             user_id=verify_data['user_id'],
@@ -109,16 +126,21 @@ class ConsentVerify(Resource):
 
 @api.route('/<string:user_id>')
 class UserConsents(Resource):
+    method_decorators = [jwt_required]
+
     @api.response(200, 'Consents retrieved successfully')
     @api.response(404, 'User not found')
     def get(self, user_id):
-        """Get all consents for a specific user"""
+        payload = getattr(request, "jwt_payload", {})
+        if payload.get("sub") != user_id:
+            return {'error': 'Forbidden'}, 403
+        
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
         
         consents = facade.list_consents(user_id)
-        
+
         active_consents = [c for c in consents if c.is_active]
         revoked_consents = [c for c in consents if not c.is_active]
         

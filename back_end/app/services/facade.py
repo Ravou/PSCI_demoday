@@ -6,13 +6,13 @@ class Facade:
 
     # ==================== USERS ====================
     def create_user(self, name, email, password, organisation=None):
-        """Create user and hash password"""
+
         user = User(
             email=email,
             name=name,
             organization=organisation
         )
-        user.set_password(password)  # hash here
+        user.set_password(password)
         user.save()
         return user
 
@@ -93,7 +93,7 @@ class Facade:
 
     # ==================== AUDITS ====================
     def create_audit(self, user_id, consent_id, target):
-        """Create a new audit"""
+        
         audit = Audit(
             target=target,
             user_id=user_id,
@@ -124,5 +124,5 @@ class Facade:
             'recommendations': audit.recommendations or []
         }
 
-# Singleton instance
+
 facade = Facade()

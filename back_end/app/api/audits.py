@@ -1,33 +1,32 @@
 from flask_restx import Namespace, Resource, fields
+from flask import request
 from app.services.facade import facade
+from app.security.decorators import jwt_required
 
 api = Namespace('audits', description='Audit operations for GDPR compliance')
 
-# Modèle Swagger pour les audits
+
 audit_model = api.model('Audit', {
     'target': fields.String(required=True, description='Target URL to audit'),
     'consent_id': fields.String(required=True, description='Consent ID for this audit')
 })
 
-audit_response = api.model('AuditResponse', {
-    'audit_id': fields.String(description='Audit ID'),
-    'user_id': fields.String(description='User ID'),
-    'target': fields.String(description='Target URL'),
-    'status': fields.String(description='Audit status'),
-    'compliance_score': fields.Float(description='Compliance score percentage'),
-    'timestamp': fields.DateTime(description='Audit creation timestamp')
-})
+
 
 
 @api.route('/<string:user_id>/audits')
 class UserAudits(Resource):
-    
+    method_decorators = [jwt_required]
+
     @api.expect(audit_model, validate=True)
     @api.response(201, 'Audit created successfully')
     @api.response(404, 'User or consent not found')
     @api.response(403, 'Consent does not belong to user')
     def post(self, user_id):
-        """Create an audit for a user"""
+        payload = getattr(request, "jwt_payload", {})
+        if payload.get("sub") != user_id:
+            return {'error': 'Forbidden'}, 403
+
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
@@ -36,22 +35,22 @@ class UserAudits(Resource):
         consent_id = audit_data['consent_id']
         target = audit_data['target']
 
-        # Vérifier que le consentement existe et appartient à l'utilisateur
+
         consent = facade.get_consent(consent_id)
         if not consent:
             return {'error': 'Consent not found'}, 404
         
-        # CORRECTION : userid au lieu de user_id
+
         if consent.userid != user_id:
             return {'error': 'Consent does not belong to user'}, 403
 
-        # Créer l'audit
+
         audit = facade.create_audit(
             user_id=user_id,
             consent_id=consent_id,
             target=target
         )
-        
+
 
         return {
             'message': 'Audit created successfully',
@@ -69,7 +68,10 @@ class UserAudits(Resource):
     @api.response(200, 'Audits retrieved successfully')
     @api.response(404, 'User not found')
     def get(self, user_id):
-        """Get all audits for a user"""
+        payload = getattr(request, "jwt_payload", {})
+        if payload.get("sub") != user_id:
+            return {'error': 'Forbidden'}, 403
+
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
@@ -84,7 +86,7 @@ class UserAudits(Resource):
                     'audit_id': a.id,
                     'target': a.target,
                     'status': a.status,
-                    'score': a.score,  # CORRECTION : score au lieu de compliance_score
+                    'score': a.score,
                     'timestamp': a.created_at.isoformat()
                 }
                 for a in audits
@@ -94,11 +96,13 @@ class UserAudits(Resource):
 
 @api.route('/<string:audit_id>/run')
 class AuditRun(Resource):
+    method_decorators = [jwt_required]
+
     @api.response(200, 'Audit executed successfully')
     @api.response(404, 'Audit not found')
     @api.response(400, 'Audit already completed')
     def post(self, audit_id):
-        """Execute an audit"""
+
         audit = facade.get_audit(audit_id)
         if not audit:
             return {'error': 'Audit not found'}, 404
@@ -106,7 +110,7 @@ class AuditRun(Resource):
         if audit.status not in ['pending', 'failed']:
             return {'error': f'Cannot execute audit with status: {audit.status}'}, 400
         
-        # Exécuter l'audit
+
         facade.run_audit(audit_id)
         
         return {
@@ -114,17 +118,19 @@ class AuditRun(Resource):
             'audit': {
                 'audit_id': audit.id,
                 'status': audit.status,
-                'score': audit.score  # CORRECTION : score au lieu de compliance_score
+                'score': audit.score
             }
         }, 200
 
 
 @api.route('/<string:audit_id>/summary')
 class AuditSummary(Resource):
+    method_decorators = [jwt_required]
+
     @api.response(200, 'Audit summary retrieved successfully')
     @api.response(404, 'Audit not found')
     def get(self, audit_id):
-        """Get summary of an audit"""
+
         audit = facade.get_audit(audit_id)
         if not audit:
             return {'error': 'Audit not found'}, 404
@@ -135,7 +141,7 @@ class AuditSummary(Resource):
             'audit_id': audit_id,
             'target': audit.target,
             'status': audit.status,
-            'score': audit.score,  # CORRECTION : score au lieu de compliance_score
+            'score': audit.score,
             'violations': summary.get('violations', []),
             'recommendations': summary.get('recommendations', []),
             'summary_text': summary.get('summary_text', '')

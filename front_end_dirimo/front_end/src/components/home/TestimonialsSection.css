@@ -1,0 +1,205 @@
+/* ===================================================================
+   TESTIMONIALS SECTION STYLES
+   =================================================================== */
+
+.testimonials-section {
+  padding: var(--spacing-5xl) 0;
+  background: var(--bg-secondary);
+  position: relative;
+  overflow: hidden;
+}
+
+.testimonials-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-xl);
+}
+
+/* === HEADER === */
+
+.testimonials-header {
+  text-align: center;
+  margin-bottom: var(--spacing-4xl);
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.testimonials-badge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-lg);
+  background: rgba(196, 255, 13, 0.1);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-full);
+  color: var(--accent-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: var(--spacing-lg);
+}
+
+.testimonials-rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.rating-number {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 900;
+  color: var(--accent-primary);
+}
+
+.rating-stars {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+/* === CAROUSEL === */
+
+.testimonials-carousel {
+  position: relative;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-xl);
+}
+
+/* === TESTIMONIAL CARD === */
+
+.testimonial-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.testimonial-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.testimonial-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  color: var(--bg-primary);
+  flex-shrink: 0;
+}
+
+.testimonial-info {
+  flex: 1;
+}
+
+.testimonial-name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs);
+}
+
+.testimonial-role {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.testimonial-text {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-style: italic;
+  margin: 0;
+}
+
+.testimonial-footer {
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-secondary);
+}
+
+.testimonial-rating {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.star {
+  color: var(--text-dim);
+  font-size: var(--text-lg);
+}
+
+.star-filled {
+  color: var(--accent-primary);
+  filter: drop-shadow(0 0 4px rgba(196, 255, 13, 0.4));
+}
+
+.rating-value {
+  margin-left: var(--spacing-xs);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* === CAROUSEL DOTS === */
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-2xl);
+}
+
+.carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border-secondary);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  padding: 0;
+}
+
+.carousel-dot:hover {
+  background: var(--accent-primary);
+  transform: scale(1.2);
+}
+
+.carousel-dot-active {
+  background: var(--accent-primary);
+  width: 30px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 10px rgba(196, 255, 13, 0.5);
+}
+
+/* === RESPONSIVE === */
+
+@media (max-width: 1024px) {
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 640px) {
+  .testimonials-section {
+    padding: var(--spacing-4xl) 0;
+  }
+
+  .rating-number {
+    font-size: var(--text-2xl);
+  }
+}
+

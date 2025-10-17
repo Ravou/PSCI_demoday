@@ -1,0 +1,130 @@
+/* ===================================================================
+   CTA SECTION STYLES
+   =================================================================== */
+
+.cta-section {
+  position: relative;
+  padding: var(--spacing-5xl) 0;
+  margin: var(--spacing-5xl) 0;
+  overflow: hidden;
+}
+
+.cta-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(196, 255, 13, 0.05) 30%,
+    rgba(127, 255, 0, 0.08) 50%,
+    rgba(196, 255, 13, 0.05) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.cta-container {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-5xl) var(--spacing-xl);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xl);
+  background: linear-gradient(
+    135deg,
+    rgba(22, 27, 34, 0.4),
+    rgba(22, 27, 34, 0.6)
+  );
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-2xl);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-glow);
+}
+
+.cta-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 900;
+  line-height: 1.2;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cta-subtitle {
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 700px;
+  margin: 0;
+}
+
+.cta-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--spacing-md);
+}
+
+/* === DECORATIVE GLOWS === */
+
+.cta-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+}
+
+.cta-glow-1 {
+  width: 600px;
+  height: 600px;
+  top: -200px;
+  left: -100px;
+  background: radial-gradient(circle, rgba(196, 255, 13, 0.25), transparent 70%);
+  animation: float-glow 8s ease-in-out infinite;
+}
+
+.cta-glow-2 {
+  width: 500px;
+  height: 500px;
+  bottom: -150px;
+  right: -100px;
+  background: radial-gradient(circle, rgba(127, 255, 0, 0.2), transparent 70%);
+  animation: float-glow 10s ease-in-out infinite reverse;
+}
+
+@keyframes float-glow {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.1);
+    opacity: 0.5;
+  }
+}
+
+/* === RESPONSIVE === */
+
+@media (max-width: 768px) {
+  .cta-section {
+    margin: var(--spacing-4xl) 0;
+  }
+
+  .cta-container {
+    padding: var(--spacing-4xl) var(--spacing-lg);
+  }
+
+  .cta-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .cta-actions .btn {
+    width: 100%;
+  }
+}
+

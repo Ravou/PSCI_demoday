@@ -1,36 +1,37 @@
 const API_CONFIG = {
-  // URL de base de l'API
-  BASE_URL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
-  
+  // URL de base de l'API (avec le préfixe /api)
+  BASE_URL: (process.env.REACT_APP_API_URL || 'http://localhost:5000') + '/api',
+
   // Endpoints de l'API Flask-RESTX
   ENDPOINTS: {
     // System
     HEALTH: '/health',
-    
-    // Users (Flask-RESTX : /users/)
-    REGISTER: '/users/',
-    LOGIN: '/users/',  // Pas de route /login dans Flask-RESTX, on utilise GET /users/
-    USER_PROFILE: '/users/',
-    UPDATE_PROFILE: '/users',
-    DELETE_USER: '/users',
-    USER_AUDITS: '/audits',  // GET /audits/{userid}/audits
-    USER_CONSENTS: '/consents',  // GET /consents/{userid}
-    
-    // Consents (Flask-RESTX : /consents/)
-    CONSENT_RECORD: '/consents/',
+
+    // Users
+    REGISTER: '/users/register',       // POST /api/users/register
+    LOGIN: '/users/login',             // POST /api/users/login
+    USER_PROFILE: '/users/',           // GET /api/users/{user_id}
+    UPDATE_PROFILE: '/users',          // PUT /api/users/{user_id} (compléter dans l'appel)
+    DELETE_USER: '/users',             // DELETE /api/users/{user_id}
+    USER_AUDITS: '/audits',            // GET /api/audits/{user_id}/audits
+    USER_CONSENTS: '/consents',        // GET /api/consents/{user_id}
+
+    // Consents
+    CONSENT_RECORD: '/consents/',      // POST /api/consents/
     CONSENT_REVOKE: '/consents/revoke',
-    CONSENT_LIST: '/consents',
+    CONSENT_LIST: '/consents',         // GET /api/consents/{user_id}
     CONSENT_VERIFY: '/consents/verify',
-    
-    // Audits (Flask-RESTX : /audits/)
-    AUDIT_CREATE: '/audits',  // POST /audits/{userid}/audits
-    AUDIT_LIST: '/audits',
-    AUDIT_DETAIL: '/audits',
-    AUDIT_RUN: '/audits',  // POST /audits/{auditId}/run
-    AUDIT_SUMMARY: '/audits',  // GET /audits/{auditId}/summary
-    AUDIT_DELETE: '/audits'
+
+    // Audits
+    AUDIT_CREATE: '/audits',           // POST /api/audits/{user_id}/audits
+    AUDIT_LIST: '/audits',             // GET /api/audits/{user_id}/audits
+    AUDIT_DETAIL: '/audits',           // GET /api/audits/{audit_id} si implémenté
+    AUDIT_RUN: '/audits',              // POST /api/audits/{audit_id}/run
+    AUDIT_SUMMARY: '/audits',          // GET /api/audits/{audit_id}/summary
+    AUDIT_DELETE: '/audits'            // DELETE /api/audits/{audit_id} si implémenté
   }
 };
 
 export default API_CONFIG;
+
 

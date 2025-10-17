@@ -1,19 +1,117 @@
 <!DOCTYPE html>
 <html lang="fr">
   <head>
+    <!-- Meta tags essentiels -->
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+   
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#00ff00" />
+    <meta name="theme-color" content="#c4ff0d" />
+    
+    <!-- SEO et description -->
     <meta
       name="description"
-      content="PSCI - Solution d'audit RGPD automatisé pour entreprises"
+      content="PSCI - Solution d'audit RGPD automatisé avec conformité, gestion des consentements et rapports en temps réel. Protégez vos données avec confiance."
     />
-    <title>PSCI </title>
+    <meta name="keywords" content="RGPD, audit, conformité, GDPR, protection des données, consentement, sécurité" />
+    <meta name="author" content="PSCI" />
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="PSCI - Audit RGPD Automatisé" />
+    <meta property="og:description" content="Solution complète de conformité RGPD pour entreprises" />
+    <meta property="og:url" content="https://psci.com" />
+    
+    <!-- Favicon -->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    
+    <!-- Preconnect pour optimiser le chargement des polices Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Polices Google Fonts - Space Grotesk & Inter -->
+    <link 
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" 
+      rel="stylesheet" 
+    />
+    
+    <!-- Titre de la page -->
+    <title>PSCI - GDPR Audit Automation</title>
+    
+    <!-- Styles inline critiques pour éviter le flash of unstyled content -->
+    <style>
+      /* Critical CSS - Loading state */
+      #root {
+        min-height: 100vh;
+        background: #0a0f1a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(196, 255, 13, 0.2);
+        border-top-color: #c4ff0d;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      
+      /* Hide spinner once React loads */
+      #root:not(:empty) .loading-spinner {
+        display: none;
+      }
+    </style>
   </head>
+  
   <body>
-    <noscript>Vous devez activer JavaScript pour utiliser PSCI.</noscript>
-    <div id="root"></div>
+    <!-- Fallback pour navigateurs sans JavaScript -->
+    <noscript>
+      <div style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: #0a0f1a;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        text-align: center;
+        padding: 20px;
+      ">
+        <div>
+          <h1 style="color: #c4ff0d; margin-bottom: 16px;">Require JavaScript</h1>
+          <p style="color: #c9d1d9;">
+            Please enable JavaScript to continue.
+          </p>
+          <p style="color: #8b949e; margin-top: 12px; font-size: 14px;">
+            This application relies on JavaScript to function properly.
+          </p>
+        </div>
+      </div>
+    </noscript>
+    
+    <!-- Point de montage React -->
+    <div id="root">
+      <!-- Loading spinner affiché avant le chargement de React -->
+      <div class="loading-spinner"></div>
+    </div>
+    
+    <!-- 
+      This HTML file is a template if you open it directly in the browser without a web server.
+      
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+      
+      To begin the development, run `npm start` or `yarn start`.
+    -->
   </body>
 </html>
 

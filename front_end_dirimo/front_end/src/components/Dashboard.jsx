@@ -1,237 +1,297 @@
-import React, { useState, useEffect } from 'react';
-import { auditService } from '../services/apiService';
-import AuditForm from './AuditForm';
+import React, { useState } from 'react';
 
 const Dashboard = ({ userid }) => {
-  const [audits, setAudits] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
+  const [url, setUrl] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    loadAudits();
-  }, [userid]);
+  // Données fictives pour l'exemple
+  const stats = {
+    auditsCompleted: 2,
+    auditsInProgress: 1,
+    averageScore: 8
+  };
 
-  const loadAudits = async () => {
+  const auditHistory = [
+    {
+      url: 'https://www.carrefour.fr',
+      date: '13 oct. 2025, 09:57',
+      score: 0,
+      status: 'Non conforme'
+    }
+  ];
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
     try {
-      setLoading(true);
-      const response = await auditService.list(userid);
-      setAudits(response.audits || []);
-    } catch (error) {
-      console.error('Erreur chargement audits:', error);
+      const response = await fetch('http://localhost:5000/api/audit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url, userid }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Audit lancé avec succès !');
+        setUrl('');
+      } else {
+        setError(data.error || 'Audit failed');
+      }
+    } catch (err) {
+      setError('Connection error. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAuditCompleted = () => {
-    setShowForm(false);
-    loadAudits(); // Recharger la liste
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const getScoreColor = (score) => {
-    if (score >= 70) return 'var(--vert-principal)';
-    if (score >= 40) return 'var(--orange-warning)';
-    return 'var(--rouge-erreur)';
-  };
-
-  const getScoreLabel = (score) => {
-    if (score >= 70) return '✓ Conforme';
-    if (score >= 40) return '⚠️ Partiellement conforme';
-    return '✗ Non conforme';
-  };
-
+  
   return (
-    <div className="container" style={{maxWidth: '1200px', padding: '20px'}}>
+    <div style={{
+      maxWidth: '1400px',
+      margin: '0 auto',
+      padding: '60px 40px'
+    }}>
       {/* Header */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '30px'
-      }}>
-        <h1 style={{color: 'var(--vert-principal)', margin: 0}}>
-          📊 Tableau de bord
+      <div style={{marginBottom: '50px'}}>
+        <h1 style={{
+          fontSize: 'clamp(32px, 4vw, 48px)',
+          fontWeight: '900',
+          color: 'var(--texte-blanc)',
+          marginBottom: '10px'
+        }}>
+          Dashboard
         </h1>
-        <button 
-          onClick={() => setShowForm(!showForm)}
-          className="btn btn-primary"
-          style={{
-            padding: '12px 24px',
-            background: 'var(--vert-principal)',
-            color: 'var(--noir-fonce)',
-            border: 'none',
-            borderRadius: '8px',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            cursor: 'pointer'
-          }}
-        >
-          {showForm ? '❌ Annuler' : '➕ Nouvel audit'}
-        </button>
+        <p style={{
+          fontSize: '16px',
+          color: 'var(--texte-gris)'
+        }}>
+          Monitor your GDPR compliance audits
+        </p>
       </div>
 
-      {/* Formulaire d'audit (si affiché) */}
-      {showForm && (
-        <div style={{marginBottom: '40px'}}>
-          <AuditForm userid={userid} onAuditCompleted={handleAuditCompleted} />
-        </div>
-      )}
-
-      {/* Statistiques */}
+      {/* Stats Cards */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '20px',
-        marginBottom: '40px'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: '30px',
+        marginBottom: '50px'
       }}>
-        <div className="card" style={{textAlign: 'center', padding: '30px'}}>
-          <div style={{fontSize: '48px', fontWeight: 'bold', color: 'var(--vert-principal)'}}>
-            {audits.length}
+        <div style={{
+          background: 'rgba(26, 31, 46, 0.6)',
+          border: '1px solid rgba(0, 255, 136, 0.2)',
+          borderRadius: '16px',
+          padding: '30px',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <div style={{
+            fontSize: '48px',
+            fontWeight: '900',
+            color: 'var(--vert-neon)',
+            marginBottom: '10px'
+          }}>
+            {stats.auditsCompleted}
           </div>
-          <div style={{color: 'var(--gris-clair)', marginTop: '10px'}}>
-            Audits réalisés
+          <div style={{
+            fontSize: '14px',
+            color: 'var(--texte-gris)',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
+          }}>
+            Audits Completed
           </div>
         </div>
 
-        <div className="card" style={{textAlign: 'center', padding: '30px'}}>
-          <div style={{fontSize: '48px', fontWeight: 'bold', color: 'var(--vert-secondaire)'}}>
-            {audits.filter(a => a.status === 'completed').length}
+        <div style={{
+          background: 'rgba(26, 31, 46, 0.6)',
+          border: '1px solid rgba(0, 255, 136, 0.2)',
+          borderRadius: '16px',
+          padding: '30px',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <div style={{
+            fontSize: '48px',
+            fontWeight: '900',
+            color: 'var(--texte-blanc)',
+            marginBottom: '10px'
+          }}>
+            {stats.auditsInProgress}
           </div>
-          <div style={{color: 'var(--gris-clair)', marginTop: '10px'}}>
-            Audits terminés
+          <div style={{
+            fontSize: '14px',
+            color: 'var(--texte-gris)',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
+          }}>
+            Audits In Progress
           </div>
         </div>
 
-        <div className="card" style={{textAlign: 'center', padding: '30px'}}>
-          <div style={{fontSize: '48px', fontWeight: 'bold', color: getScoreColor(
-            audits.length > 0 
-              ? Math.round(audits.reduce((sum, a) => sum + (a.score || 0), 0) / audits.length)
-              : 0
-          )}}>
-            {audits.length > 0 
-              ? Math.round(audits.reduce((sum, a) => sum + (a.score || 0), 0) / audits.length)
-              : 0}/100
+        <div style={{
+          background: 'rgba(26, 31, 46, 0.6)',
+          border: '1px solid rgba(0, 255, 136, 0.2)',
+          borderRadius: '16px',
+          padding: '30px',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <div style={{
+            fontSize: '48px',
+            fontWeight: '900',
+            color: 'var(--texte-blanc)',
+            marginBottom: '10px'
+          }}>
+            {stats.averageScore}/100
           </div>
-          <div style={{color: 'var(--gris-clair)', marginTop: '10px'}}>
-            Score moyen
+          <div style={{
+            fontSize: '14px',
+            color: 'var(--texte-gris)',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
+          }}>
+            Average Score
           </div>
         </div>
       </div>
 
-      {/* Historique des audits */}
+      {/* New Audit Section */}
+      <div style={{
+        background: 'rgba(26, 31, 46, 0.6)',
+        border: '1px solid rgba(0, 255, 136, 0.2)',
+        borderRadius: '16px',
+        padding: '40px',
+        backdropFilter: 'blur(10px)',
+        marginBottom: '50px'
+      }}>
+        <h3 style={{
+          fontSize: '24px',
+          fontWeight: '700',
+          color: 'var(--texte-blanc)',
+          marginBottom: '20px'
+        }}>
+          Launch New Audit
+        </h3>
+
+        {error && <div className="error-message">{error}</div>}
+
+        <form onSubmit={handleSubmit} style={{
+          display: 'flex',
+          gap: '15px',
+          flexWrap: 'wrap'
+        }}>
+          <input
+            type="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://example.com"
+            required
+            style={{
+              flex: '1 1 300px',
+              padding: '14px 18px',
+              background: 'var(--gris-fonce)',
+              border: '1px solid rgba(0, 255, 136, 0.2)',
+              borderRadius: '8px',
+              color: 'var(--texte-blanc)',
+              fontSize: '15px'
+            }}
+          />
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="btn btn-primary"
+            style={{
+              padding: '14px 40px'
+            }}
+          >
+            {loading ? 'Launching...' : '+ New Audit'}
+          </button>
+        </form>
+      </div>
+
+      {/* Audit History */}
       <div>
-        <h2 style={{color: 'var(--vert-secondaire)', marginBottom: '20px'}}>
-          📋 Historique des audits
-        </h2>
+        <h3 style={{
+          fontSize: '24px',
+          fontWeight: '700',
+          color: 'var(--texte-blanc)',
+          marginBottom: '25px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          📋 Audit History
+        </h3>
 
-        {loading ? (
-          <div className="card" style={{textAlign: 'center', padding: '40px'}}>
-            <p style={{color: 'var(--gris-clair)'}}>⏳ Chargement...</p>
-          </div>
-        ) : audits.length === 0 ? (
-          <div className="card" style={{textAlign: 'center', padding: '40px'}}>
-            <p style={{color: 'var(--gris-clair)', marginBottom: '20px'}}>
-              Aucun audit réalisé pour le moment
-            </p>
-            <button 
-              onClick={() => setShowForm(true)}
-              className="btn btn-primary"
-            >
-              🚀 Lancer votre premier audit
-            </button>
-          </div>
-        ) : (
-          <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
-            {audits.map((audit) => (
-              <div 
-                key={audit.audit_id} 
-                className="card"
-                style={{
-                  padding: '20px',
-                  display: 'grid',
-                  gridTemplateColumns: '1fr auto auto',
-                  gap: '20px',
-                  alignItems: 'center',
-                  transition: 'transform 0.2s',
-                  cursor: 'pointer'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateX(5px)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateX(0)'}
-              >
-                {/* Info audit */}
-                <div>
-                  <h3 style={{
-                    color: 'var(--vert-principal)',
-                    margin: '0 0 8px 0',
-                    fontSize: '18px'
-                  }}>
-                    {audit.target}
-                  </h3>
-                  <p style={{
-                    color: 'var(--gris-clair)',
-                    margin: 0,
-                    fontSize: '14px'
-                  }}>
-                    🕒 {formatDate(audit.timestamp)}
-                  </p>
-                </div>
-
-                {/* Score */}
-                <div style={{textAlign: 'center'}}>
-                  <div style={{
-                    fontSize: '32px',
-                    fontWeight: 'bold',
-                    color: getScoreColor(audit.score || 0)
-                  }}>
-                    {audit.score || 0}/100
-                  </div>
-                  <div style={{
-                    fontSize: '12px',
-                    color: 'var(--gris-clair)',
-                    marginTop: '5px'
-                  }}>
-                    {getScoreLabel(audit.score || 0)}
-                  </div>
-                </div>
-
-                {/* Statut */}
-                <div>
-                  <span style={{
-                    padding: '8px 16px',
-                    borderRadius: '20px',
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                    background: audit.status === 'completed' 
-                      ? 'var(--vert-principal)' 
-                      : audit.status === 'pending'
-                      ? 'var(--orange-warning)'
-                      : 'var(--rouge-erreur)',
-                    color: 'var(--noir-fonce)'
-                  }}>
-                    {audit.status === 'completed' ? '✓ Terminé' :
-                     audit.status === 'pending' ? '⏳ En cours' :
-                     '✗ Échoué'}
-                  </span>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '15px'
+        }}>
+          {auditHistory.map((audit, index) => (
+            <div key={index} style={{
+              background: 'rgba(26, 31, 46, 0.6)',
+              border: '1px solid rgba(0, 255, 136, 0.2)',
+              borderRadius: '12px',
+              padding: '25px 30px',
+              backdropFilter: 'blur(10px)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '20px'
+            }}>
+              <div style={{flex: '1 1 300px'}}>
+                <a href={audit.url} target="_blank" rel="noopener noreferrer" style={{
+                  color: 'var(--vert-neon)',
+                  textDecoration: 'none',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  display: 'block',
+                  marginBottom: '8px',
+                  transition: 'all 0.3s'
+                }}>
+                  {audit.url}
+                </a>
+                <div style={{
+                  color: 'var(--texte-gris)',
+                  fontSize: '13px'
+                }}>
+                  🕐 {audit.date}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+
+              <div style={{
+                textAlign: 'right'
+              }}>
+                <div style={{
+                  fontSize: '32px',
+                  fontWeight: '900',
+                  color: audit.score === 0 ? '#ff6b6b' : 'var(--vert-neon)',
+                  marginBottom: '5px'
+                }}>
+                  {audit.score}/100
+                </div>
+                <div style={{
+                  color: audit.score === 0 ? '#ff6b6b' : 'var(--texte-gris)',
+                  fontSize: '13px',
+                  textTransform: 'uppercase',
+                  fontWeight: '600'
+                }}>
+                  ✗ {audit.status}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 };
 
 export default Dashboard;
+
 

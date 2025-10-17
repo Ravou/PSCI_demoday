@@ -1,0 +1,311 @@
+/* ===================================================================
+   THEME CSS - Variables globales pour le design Secuby-style
+   Palette: noir profond + vert néon (jaune-vert lime)
+   Typographie: Space Grotesk + Inter
+   =================================================================== */
+
+/* Import des polices Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ===================================================================
+   VARIABLES CSS GLOBALES
+   =================================================================== */
+
+:root {
+  /* === COULEURS DE FOND === */
+  --bg-primary: #0a0f1a;        /* Fond principal (noir profond bleuté) */
+  --bg-secondary: #0d1117;      /* Fond secondaire */
+  --bg-panel: #161b22;          /* Panneaux/cards */
+  --bg-panel-hover: #1c2128;    /* Hover sur panneaux */
+  --bg-overlay: rgba(10, 15, 26, 0.85); /* Overlays */
+  
+  /* === COULEURS D'ACCENT (VERT NÉON) === */
+  --accent-primary: #c4ff0d;    /* Jaune-vert lime principal */
+  --accent-secondary: #7FFF00;  /* Chartreuse (vert néon doux) */
+  --accent-hover: #d4ff3d;      /* Hover sur accent */
+  --accent-blue: #00d9ff;       /* Bleu cyan (accents secondaires) */
+  
+  /* === COULEURS DE TEXTE === */
+  --text-primary: #ffffff;      /* Texte principal (blanc pur) */
+  --text-secondary: #c9d1d9;    /* Texte secondaire (gris clair) */
+  --text-muted: #8b949e;        /* Texte désactivé/secondaire */
+  --text-dim: #6e7681;          /* Texte très dim */
+  
+  /* === COULEURS DE BORDURES === */
+  --border-primary: rgba(196, 255, 13, 0.2);  /* Bordure néon subtile */
+  --border-secondary: rgba(255, 255, 255, 0.1); /* Bordure neutre */
+  --border-muted: rgba(255, 255, 255, 0.05);    /* Bordure très subtile */
+  
+  /* === TYPOGRAPHIE === */
+  --font-display: "Space Grotesk", "Inter", system-ui, -apple-system, 
+                  BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, BlinkMacSystemFont, 
+               "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  
+  /* === TAILLES DE POLICE === */
+  --text-xs: 0.75rem;      /* 12px */
+  --text-sm: 0.875rem;     /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg: 1.125rem;     /* 18px */
+  --text-xl: 1.25rem;      /* 20px */
+  --text-2xl: 1.5rem;      /* 24px */
+  --text-3xl: 1.875rem;    /* 30px */
+  --text-4xl: 2.25rem;     /* 36px */
+  --text-5xl: 3rem;        /* 48px */
+  --text-6xl: 3.75rem;     /* 60px */
+  --text-7xl: 4.5rem;      /* 72px */
+  
+  /* === ESPACEMENTS === */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 2.5rem;   /* 40px */
+  --spacing-3xl: 3rem;     /* 48px */
+  --spacing-4xl: 4rem;     /* 64px */
+  --spacing-5xl: 5rem;     /* 80px */
+  
+  /* === BORDER RADIUS === */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  
+  /* === OMBRES === */
+  --shadow-glow: 0 0 40px rgba(196, 255, 13, 0.25), 
+                 0 0 80px rgba(196, 255, 13, 0.12);
+  --shadow-glow-strong: 0 0 60px rgba(196, 255, 13, 0.4), 
+                        0 0 120px rgba(196, 255, 13, 0.2);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-medium: 0 12px 48px rgba(0, 0, 0, 0.5);
+  --shadow-strong: 0 20px 64px rgba(0, 0, 0, 0.6);
+  
+  /* === TRANSITIONS === */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+  
+  /* === Z-INDEX === */
+  --z-base: 0;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal: 30;
+  --z-popover: 40;
+  --z-tooltip: 50;
+}
+
+/* ===================================================================
+   RESET & BASE STYLES
+   =================================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* Fond avec dégradés radiaux subtils (comme le template) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: 
+    radial-gradient(1200px 800px at 80% -10%, rgba(196, 255, 13, 0.08), transparent),
+    radial-gradient(1000px 700px at -10% 30%, rgba(0, 217, 255, 0.06), transparent),
+    radial-gradient(800px 600px at 110% 80%, rgba(196, 255, 13, 0.05), transparent);
+  pointer-events: none;
+}
+
+/* ===================================================================
+   TYPOGRAPHIE
+   =================================================================== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+h1 { font-size: var(--text-6xl); }
+h2 { font-size: var(--text-5xl); }
+h3 { font-size: var(--text-4xl); }
+h4 { font-size: var(--text-3xl); }
+h5 { font-size: var(--text-2xl); }
+h6 { font-size: var(--text-xl); }
+
+p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+/* ===================================================================
+   UTILITAIRES DE TEXTE
+   =================================================================== */
+
+.text-gradient {
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(196, 255, 13, 0.3);
+}
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--accent-primary); }
+
+/* ===================================================================
+   CONTENEURS
+   =================================================================== */
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+.container-wide {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-xl);
+}
+
+.container-narrow {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+/* ===================================================================
+   SECTIONS
+   =================================================================== */
+
+.section {
+  padding: var(--spacing-5xl) 0;
+}
+
+.section-sm {
+  padding: var(--spacing-3xl) 0;
+}
+
+.section-lg {
+  padding: 6rem 0;
+}
+
+/* ===================================================================
+   RESPONSIVE
+   =================================================================== */
+
+@media (max-width: 1024px) {
+  :root {
+    --text-6xl: 3rem;    /* 48px */
+    --text-5xl: 2.5rem;  /* 40px */
+    --text-4xl: 2rem;    /* 32px */
+  }
+  
+  .container, .container-wide {
+    padding: 0 var(--spacing-md);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --text-6xl: 2.5rem;  /* 40px */
+    --text-5xl: 2rem;    /* 32px */
+    --text-4xl: 1.75rem; /* 28px */
+  }
+  
+  .section {
+    padding: var(--spacing-4xl) 0;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --text-6xl: 2rem;    /* 32px */
+    --text-5xl: 1.75rem; /* 28px */
+    --text-4xl: 1.5rem;  /* 24px */
+  }
+  
+  .section {
+    padding: var(--spacing-3xl) 0;
+  }
+}
+
+/* ===================================================================
+   SCROLLBAR CUSTOM (Optionnel)
+   =================================================================== */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-panel);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ===================================================================
+   SÉLECTION DE TEXTE
+   =================================================================== */
+
+::selection {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+}
+
+::-moz-selection {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+}
+

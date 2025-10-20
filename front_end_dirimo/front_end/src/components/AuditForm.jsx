@@ -4,18 +4,27 @@ import { auditService, consentService } from '../services/apiService';
 const AuditForm = ({ userid }) => {
   const [target, setTarget] = useState('');
   const [hasConsent, setHasConsent] = useState(false);
+<<<<<<< HEAD
   const [consentId, setConsentId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [auditResult, setAuditResult] = useState(null);
   const [currentAuditId, setCurrentAuditId] = useState(null);
+=======
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  // Vérifier le consentement au chargement
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
   useEffect(() => {
     checkConsent();
   }, [userid]);
 
   const checkConsent = async () => {
     try {
+<<<<<<< HEAD
       const response = await consentService.list(userid);
       
       const activeConsent = response.consents?.find(
@@ -34,11 +43,18 @@ const AuditForm = ({ userid }) => {
       console.error('Erreur vérification consentement:', err);
       setHasConsent(false);
       setConsentId(null);
+=======
+      const response = await consentService.verify(userid, 'audit');
+      setHasConsent(response.has_active_consent);
+    } catch (err) {
+      console.error('Erreur vérification consentement:', err);
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
     }
   };
 
   const requestConsent = async () => {
     try {
+<<<<<<< HEAD
       const response = await consentService.record({
         user_id: userid,
         consenttype: 'audit',
@@ -52,6 +68,18 @@ const AuditForm = ({ userid }) => {
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err.description || 'Erreur consentement');
+=======
+      await consentService.record({
+        userid,
+        consenttype: 'audit',
+        ipaddress: '127.0.0.1', // À remplacer par l'IP réelle
+        consent_text: 'J\'accepte l\'analyse RGPD de mon site web'
+      });
+      setHasConsent(true);
+      setSuccess('Consentement enregistré avec succès');
+    } catch (err) {
+      setError(err.description || 'Erreur d\'enregistrement du consentement');
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
     }
   };
 
@@ -59,16 +87,24 @@ const AuditForm = ({ userid }) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+<<<<<<< HEAD
     setAuditResult(null);
     setLoading(true);
 
     if (!hasConsent || !consentId) {
       setError('⚠️ Consentement requis');
+=======
+    setLoading(true);
+
+    if (!hasConsent) {
+      setError('Vous devez donner votre consentement avant de créer un audit');
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
       setLoading(false);
       return;
     }
 
     try {
+<<<<<<< HEAD
       // 1. Créer l'audit
       const createResponse = await auditService.create({
         target,
@@ -128,12 +164,35 @@ const AuditForm = ({ userid }) => {
    
       console.error('Erreur audit:', err);
       setError(err.description || err.message || 'Erreur lors de l\'audit');
+=======
+      // Créer l'audit
+      const auditResponse = await auditService.create({
+        target,
+        userid,
+        consenttype: 'audit',
+        ipaddress: '127.0.0.1'
+      });
+
+      console.log('Audit créé:', auditResponse);
+      const auditId = auditResponse.audit.id;
+
+      // Exécuter l'audit automatiquement
+      const runResponse = await auditService.run(auditId);
+      console.log('Audit exécuté:', runResponse);
+
+      setSuccess(`Audit créé et exécuté avec succès! ID: ${auditId}`);
+      setTarget('');
+    } catch (err) {
+      setError(err.description || 'Erreur lors de la création de l\'audit');
+      console.error('Erreur audit:', err);
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
     } finally {
       setLoading(false);
     }
   };
 
   return (
+<<<<<<< HEAD
     <div className="container" style={{maxWidth: '900px'}}>
       <h2>🔍 Créer un audit RGPD</h2>
       
@@ -143,12 +202,25 @@ const AuditForm = ({ userid }) => {
           <button onClick={requestConsent} className="btn btn-primary" style={{marginTop: '10px'}}>
             Donner mon consentement
           </button>
+=======
+    <div className="audit-form-container">
+      <h2>Créer un audit RGPD</h2>
+      
+      {!hasConsent && (
+        <div className="consent-warning">
+          <p>⚠️ Vous devez donner votre consentement pour effectuer des audits</p>
+          <button onClick={requestConsent}>Donner mon consentement</button>
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
         </div>
       )}
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
+<<<<<<< HEAD
           <label>URL du site à auditer *</label>
+=======
+          <label>URL du site à auditer:*</label>
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
           <input
             type="url"
             value={target}
@@ -163,6 +235,7 @@ const AuditForm = ({ userid }) => {
         {success && <div className="success-message">{success}</div>}
         
         <button type="submit" disabled={loading || !hasConsent}>
+<<<<<<< HEAD
           {loading ? '⏳ Analyse en cours...' : '🚀 Lancer l\'audit'}
         </button>
       </form>
@@ -286,6 +359,11 @@ const AuditForm = ({ userid }) => {
           )}
         </div>
       )}
+=======
+          {loading ? 'Analyse en cours...' : 'Lancer l\'audit'}
+        </button>
+      </form>
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
     </div>
   );
 };

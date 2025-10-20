@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import { Link, useNavigate } from 'react-router-dom';
 import { userService } from '../services/apiService';
 
@@ -20,12 +21,23 @@ const Login = ({ onLoginSuccess }) => {
     });
   };
 
+=======
+import { userService } from '../services/apiService';
+
+const Login = ({ onLoginSuccess }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
+<<<<<<< HEAD
       // Appelle le vrai endpoint /api/users/login via apiService (Axios)
       const data = await userService.login({
         email: formData.email,
@@ -44,12 +56,25 @@ const Login = ({ onLoginSuccess }) => {
       // Unifier le message d'erreur
       const msg = err?.error || err?.description || 'Login failed. Please check your credentials.';
       setError(msg);
+=======
+      const response = await userService.login({ email, password });
+      console.log('Connexion réussie:', response);
+      
+      // Appeler le callback de succès
+      if (onLoginSuccess) {
+        onLoginSuccess(response.userprofile);
+      }
+    } catch (err) {
+      setError(err.description || 'Erreur de connexion');
+      console.error('Erreur login:', err);
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
     } finally {
       setLoading(false);
     }
   };
 
   return (
+<<<<<<< HEAD
     <div style={{
       minHeight: '80vh',
       display: 'flex',
@@ -154,10 +179,46 @@ const Login = ({ onLoginSuccess }) => {
           </p>
         </div>
       </div>
+=======
+    <div className="login-container">
+      <h2>Connexion</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            disabled={loading}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label>Mot de passe:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            disabled={loading}
+          />
+        </div>
+
+        {error && <div className="error-message">{error}</div>}
+        
+        <button type="submit" disabled={loading}>
+          {loading ? 'Connexion...' : 'Se connecter'}
+        </button>
+      </form>
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
     </div>
   );
 };
 
 export default Login;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)

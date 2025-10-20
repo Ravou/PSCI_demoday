@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import { Link, useNavigate } from 'react-router-dom';
 import { userService } from '../services/apiService';
 
@@ -17,6 +18,19 @@ const Register = ({ onRegisterSuccess }) => {
  
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+=======
+import { userService } from '../services/apiService';
+
+const Register = ({ onRegisterSuccess }) => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    name: '',
+    organization: ''
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
 
   const handleChange = (e) => {
     setFormData({
@@ -25,6 +39,7 @@ const Register = ({ onRegisterSuccess }) => {
     });
   };
 
+<<<<<<< HEAD
   const validate = () => {
     if (!formData.name.trim()) return 'Name is required';
     if (!formData.email.trim()) return 'Email is required';
@@ -69,12 +84,30 @@ const Register = ({ onRegisterSuccess }) => {
       // Affiche le message backend si fourni
       const msg = err?.error || err?.description || 'Registration failed. Please try again.';
       setError(msg);
+=======
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await userService.register(formData);
+      console.log('Inscription réussie:', response);
+      
+      if (onRegisterSuccess) {
+        onRegisterSuccess(response.user);
+      }
+    } catch (err) {
+      setError(err.description || 'Erreur d\'inscription');
+      console.error('Erreur inscription:', err);
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
     } finally {
       setLoading(false);
     }
   };
 
   return (
+<<<<<<< HEAD
     <div style={{
       minHeight: '80vh',
       display: 'flex',
@@ -205,10 +238,70 @@ const Register = ({ onRegisterSuccess }) => {
           </p>
         </div>
       </div>
+=======
+    <div className="register-container">
+      <h2>Inscription</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Email:*</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            disabled={loading}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label>Mot de passe:*</label>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            disabled={loading}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Nom:</label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            disabled={loading}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Organisation:</label>
+          <input
+            type="text"
+            name="organization"
+            value={formData.organization}
+            onChange={handleChange}
+            disabled={loading}
+          />
+        </div>
+
+        {error && <div className="error-message">{error}</div>}
+        
+        <button type="submit" disabled={loading}>
+          {loading ? 'Inscription...' : 'S\'inscrire'}
+        </button>
+      </form>
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)
     </div>
   );
 };
 
 export default Register;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c1a3fa18 (adding some corrections of my front_end)

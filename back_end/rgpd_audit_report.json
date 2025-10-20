@@ -1,4 +1,50 @@
-{
-    "checklist_items": [],
-    "score": 0
-}
+[
+  {
+    "point": "Cookies et traceurs",
+    "status": "partiellement conforme",
+    "evidence": "La politique cookies mentionne 'Google Analytics pour mesurer l'audience' et propose 'Accepter/Refuser/Paramétrer', mais aucun bandeau de consentement n'est visible dans les extraits analysés",
+    "recommendation": "Implémenter un bandeau de consentement visible au premier accès, bloquant le dépôt de cookies non essentiels (Google Analytics) avant acceptation explicite de l'utilisateur"
+  },
+  {
+    "point": "Politique de confidentialité",
+    "status": "conforme",
+    "evidence": "Politique complète identifiant le responsable du traitement (AJOUID Adil), les données collectées, finalités, bases légales (contrat, obligation légale, consentement, intérêt légitime), durées de conservation (5 ans pour transport, 10 ans factures), destinataires et droits RGPD",
+    "recommendation": "Maintenir la politique à jour et informer les utilisateurs en cas de modification substantielle"
+  },
+  {
+    "point": "Mentions légales",
+    "status": "partiellement conforme",
+    "evidence": "Mentions légales complètes avec identification (AJOUID Adil, SIREN 934 243 817, adresse Paris), mais champs incomplets : 'Numéro TVA intracommunautaire : [À COMPLÉTER]', 'Carte professionnelle VTC : [À COMPLÉTER]', 'Immatriculation au registre VTC : [À COMPLÉTER]'",
+    "recommendation": "Compléter immédiatement les informations manquantes obligatoires : numéro TVA intracommunautaire, carte professionnelle VTC et immatriculation au registre VTC"
+  },
+  {
+    "point": "Formulaires et consentements",
+    "status": "non détecté",
+    "evidence": "Mention d'un formulaire newsletter ('Restez informé de nos actualités, événements et promotions exclusives. S'inscrire') mais aucun formulaire visible dans les extraits",
+    "recommendation": "Vérifier que tous les formulaires (réservation, devis, newsletter) incluent des cases à cocher non pré-cochées et un lien vers la politique de confidentialité"
+  },
+  {
+    "point": "Sécurité et transferts",
+    "status": "partiellement conforme",
+    "evidence": "La politique mentionne 'Nos prestataires techniques (hébergement, emailing) sous contrat' et 'Google Analytics pour les statistiques (données anonymisées)' mais aucune information sur les mesures de sécurité ou garanties de transfert",
+    "recommendation": "Ajouter une section décrivant les mesures de sécurité techniques et organisationnelles, et préciser les garanties pour les transferts de données hors UE (clauses contractuelles types pour Google Analytics)"
+  },
+  {
+    "point": "Mineurs",
+    "status": "non conforme",
+    "evidence": "Aucune mention concernant la protection des données des mineurs dans la politique de confidentialité analysée",
+    "recommendation": "Ajouter une clause indiquant que les services ne sont pas destinés aux mineurs de moins de 15 ans, ou qu'une autorisation parentale est requise conformément à l'article 8 du RGPD"
+  },
+  {
+    "point": "Documentation",
+    "status": "conforme",
+    "evidence": "Présence de trois documents accessibles via le footer : 'Mentions légales', 'Confidentialité', 'Cookies' avec contenu structuré et détaillé",
+    "recommendation": "Assurer que ces liens restent accessibles sur toutes les pages du site et envisager un registre des traitements interne"
+  },
+  {
+    "point": "Rapport final",
+    "status": "partiellement conforme",
+    "evidence": "Le site CaresaGroup présente une structure documentaire solide (3 politiques présentes) mais avec des lacunes techniques : bandeau cookies non visible, informations légales incomplètes, absence de clause mineurs",
+    "recommendation": "Priorités : 1) Implémenter un bandeau de consentement aux cookies conforme, 2) Compléter les mentions légales (TVA, licences VTC), 3) Ajouter une clause sur les mineurs et les mesures de sécurité dans la politique de confidentialité"
+  }
+]

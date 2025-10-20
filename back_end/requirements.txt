@@ -22,3 +22,7 @@ requests==2.31.0
 PyPDF2==3.0.3
 fake-useragent==1.1.0
 python-docx==0.8.11
+selenium==4.11.2
+unicode==14.0.0
+langdetect==1.0.9
+nltk.tokenizers==0.1.1

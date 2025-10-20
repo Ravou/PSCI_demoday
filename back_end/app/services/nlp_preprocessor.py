@@ -1,303 +1,250 @@
-"""
-NLP Preprocessor - Préparation et nettoyage de textes pour analyse RGPD
-
-Ce module fournit des fonctions pour :
-- Nettoyer le texte (ponctuation, caractères spéciaux)
-- Tokeniser (découper en mots)
-- Supprimer les stopwords (mots courants inutiles)
-- Identifier les entités nommées (personnes, organisations, dates)
-- Détecter des patterns RGPD (emails, numéros de téléphone, adresses IP)
-"""
-
 import re
-import string
-from typing import List, Dict, Tuple, Optional
+import json
+import os
+from app.models.base_model import BaseModel
+from langdetect import detect, DetectorFactory
+from unidecode import unidecode
+import nltk
 import spacy
-from collections import Counter
+from nltk.tokenize import word_tokenize
+from transformers import pipeline, AutoTokenizer, AutoModel
+import torch
+import math
 
-# Charger le modèle français de spaCy pour NER
-try:
-    nlp = spacy.load("fr_core_news_sm")
-except OSError:
-    print("⚠️ Modèle français spaCy non trouvé. Installation...")
-    import subprocess
-    subprocess.run(["python", "-m", "spacy", "download", "fr_core_news_sm"])
-    nlp = spacy.load("fr_core_news_sm")
+# ==========================
+# 📥 Préparations NLTK / spaCy
+# ==========================
+nltk.download("punkt", quiet=True)
+nltk.download("stopwords", quiet=True)
 
-# Stopwords français courants
-FRENCH_STOPWORDS = {
-    'le', 'la', 'les', 'un', 'une', 'des', 'de', 'du', 'et', 'ou', 'mais',
-    'donc', 'car', 'ni', 'que', 'qui', 'quoi', 'dont', 'où', 'ce', 'cet',
-    'cette', 'ces', 'mon', 'ton', 'son', 'ma', 'ta', 'sa', 'mes', 'tes',
-    'ses', 'notre', 'votre', 'leur', 'nos', 'vos', 'leurs', 'je', 'tu',
-    'il', 'elle', 'nous', 'vous', 'ils', 'elles', 'on', 'me', 'te', 'se',
-    'lui', 'moi', 'toi', 'soi', 'en', 'y', 'à', 'au', 'aux', 'dans', 'par',
-    'pour', 'sur', 'avec', 'sans', 'sous', 'vers', 'chez', 'être', 'avoir',
-    'faire', 'dire', 'aller', 'voir', 'savoir', 'pouvoir', 'falloir', 'vouloir'
-}
+nlp_fr = spacy.load("fr_core_news_sm")
+nlp_en = spacy.load("en_core_web_sm")
+nlp_fallback = spacy.load("xx_ent_wiki_sm")  # fallback multilingue
 
-# Patterns regex pour détecter des données RGPD sensibles
-PATTERNS_RGPD = {
-    'email': r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
-    'telephone': r'\b(?:0|\+33)[1-9](?:[0-9]{2}){4}\b',
-    'ip_address': r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b',
-    'carte_credit': r'\b(?:\d{4}[-\s]?){3}\d{4}\b',
-    'secu_sociale': r'\b[12]\d{2}(?:0[1-9]|1[0-2])\d{2}\d{3}\d{3}\d{2}\b',
-    'url': r'https?://(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&/=]*)'
-}
+DetectorFactory.seed = 0  # reproductibilité
 
+# Hugging Face pipelines
+sentiment_analyzer = pipeline(
+    "sentiment-analysis",
+    model="cardiffnlp/twitter-roberta-base-sentiment-latest"
+)
 
-class NLPPreprocessor:
-    """
-    Classe principale pour le preprocessing NLP
-    """
-    
+tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
+model = AutoModel.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
+
+# ==========================
+# 🌟 Classe NLPPreprocessor adaptée GPT-Neo
+# ==========================
+class NLPPreprocessor(BaseModel):
+    CHUNK_SIZE = 2000  # nombre de caractères par chunk pour GPT-Neo
+
     def __init__(self):
-        """Initialise le preprocessor avec le modèle spaCy"""
-        self.nlp = nlp
-        self.stopwords = FRENCH_STOPWORDS
-    
-    def clean_text(self, text: str) -> str:
-        """
-        Nettoie le texte brut
-        
-        Args:
-            text: Texte à nettoyer
-            
-        Returns:
-            Texte nettoyé (minuscules, sans ponctuation excessive)
-        """
+        super().__init__()
+        self.nlp_fr = nlp_fr
+        self.nlp_en = nlp_en
+        self.nlp_fallback = nlp_fallback
+        self.sentiment_analyzer = sentiment_analyzer
+        self.tokenizer = tokenizer
+        self.model = model
+
+    # ------------------
+    # Détection de langue
+    # ------------------
+    def detect_lang(self, text: str) -> str:
+        if not text or not text.strip():
+            return "unknown"
+        if len(text.split()) < 5:
+            doc = self.nlp_fallback(text)
+            return getattr(doc, "lang_", "unknown")
+        try:
+            return detect(text)
+        except:
+            doc = self.nlp_fallback(text)
+            return getattr(doc, "lang_", "unknown")
+
+    # ------------------
+    # Nettoyage et métadonnées
+    # ------------------
+    def clean_text_with_metadata(self, text: str):
         if not text:
-            return ""
-        
-        # Convertir en minuscules
-        text = text.lower()
-        
-        # Supprimer les URLs (on les détectera séparément si nécessaire)
-        text = re.sub(PATTERNS_RGPD['url'], ' URL ', text)
-        
-        # Supprimer les caractères spéciaux excessifs (garder les points, virgules)
-        text = re.sub(r'[^\w\s.,!?;:\-\'\"àâäéèêëïîôùûüÿçæœ]', ' ', text)
-        
-        # Supprimer les espaces multiples
-        text = re.sub(r'\s+', ' ', text)
-        
-        return text.strip()
-    
-    def tokenize(self, text: str, remove_stopwords: bool = False) -> List[str]:
-        """
-        Découpe le texte en tokens (mots)
-        
-        Args:
-            text: Texte à tokeniser
-            remove_stopwords: Si True, supprime les stopwords
-            
-        Returns:
-            Liste de tokens
-        """
-        # Utilise spaCy pour tokeniser intelligemment
-        doc = self.nlp(text)
-        
-        tokens = [token.text for token in doc if not token.is_space]
-        
-        if remove_stopwords:
-            tokens = [token for token in tokens if token.lower() not in self.stopwords]
-        
+            return "", {}
+        text = unidecode(text)
+        metadata = {
+            "emails": re.findall(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", text),
+            "phones": re.findall(r"\b\d{10,}\b", text),
+            "urls": re.findall(r"https?://[^\s]+|www\.[^\s]+", text)
+        }
+        text = re.sub(r"<.*?>", " ", text)
+        text = re.sub(r"\d+", "<NUM>", text)
+        text = re.sub(r"[^\w\s'-]", " ", text)
+        text = re.sub(r"\s+", " ", text)
+        return text.strip().lower(), metadata
+
+    # ------------------
+    # Tokenisation
+    # ------------------
+    def sentence_tokenize(self, text: str, lang="fr"):
+        language_map = {"fr": "french", "en": "english"}
+        language = language_map.get(lang, "french")
+        try:
+            return nltk.sent_tokenize(text, language=language)
+        except LookupError:
+            nltk.download("punkt", quiet=True)
+            return nltk.sent_tokenize(text, language=language)
+
+    def tokenize_text(self, text: str, lang="fr"):
+        tokens = []
+        for sent in self.sentence_tokenize(text, lang):
+            tokens.extend(word_tokenize(sent, language="french" if lang == "fr" else "english"))
         return tokens
-    
-    def extract_entities(self, text: str) -> Dict[str, List[str]]:
-        """
-        Extrait les entités nommées (NER - Named Entity Recognition)
-        
-        Args:
-            text: Texte à analyser
-            
-        Returns:
-            Dictionnaire avec les entités par type (PER, ORG, LOC, DATE, etc.)
-        """
-        doc = self.nlp(text)
-        
-        entities = {
-            'PERSON': [],      # Personnes
-            'ORG': [],         # Organisations
-            'LOC': [],         # Lieux
-            'DATE': [],        # Dates
-            'MISC': []         # Divers
-        }
-        
-        for ent in doc.ents:
-            entity_type = ent.label_
-            entity_text = ent.text
-            
-            if entity_type == 'PER':
-                entities['PERSON'].append(entity_text)
-            elif entity_type == 'ORG':
-                entities['ORG'].append(entity_text)
-            elif entity_type == 'LOC':
-                entities['LOC'].append(entity_text)
-            elif entity_type in ['DATE', 'TIME']:
-                entities['DATE'].append(entity_text)
-            else:
-                entities['MISC'].append(entity_text)
-        
-        # Supprimer les doublons
-        for key in entities:
-            entities[key] = list(set(entities[key]))
-        
-        return entities
-    
-    def detect_sensitive_data(self, text: str) -> Dict[str, List[str]]:
-        """
-        Détecte les données sensibles RGPD (emails, téléphones, IPs, etc.)
-        
-        Args:
-            text: Texte à analyser
-            
-        Returns:
-            Dictionnaire avec les données sensibles détectées
-        """
-        sensitive_data = {}
-        
-        for data_type, pattern in PATTERNS_RGPD.items():
-            matches = re.findall(pattern, text)
-            if matches:
-                sensitive_data[data_type] = list(set(matches))  # Supprimer doublons
-        
-        return sensitive_data
-    
-    def get_word_frequency(self, text: str, top_n: int = 20) -> List[Tuple[str, int]]:
-        """
-        Calcule la fréquence des mots (utile pour analyser le vocabulaire RGPD)
-        
-        Args:
-            text: Texte à analyser
-            top_n: Nombre de mots les plus fréquents à retourner
-            
-        Returns:
-            Liste de tuples (mot, fréquence)
-        """
-        # Tokenize et supprime stopwords
-        tokens = self.tokenize(text, remove_stopwords=True)
-        
-        # Compte les occurrences
-        word_freq = Counter(tokens)
-        
-        # Retourne les top_n plus fréquents
-        return word_freq.most_common(top_n)
-    
-    def analyze_text(self, text: str) -> Dict:
-        """
-        Analyse complète du texte
-        
-        Args:
-            text: Texte à analyser
-            
-        Returns:
-            Dictionnaire avec toutes les analyses
-        """
-        # Nettoie le texte
-        cleaned_text = self.clean_text(text)
-        
-        # Tokenize
-        tokens = self.tokenize(cleaned_text)
-        tokens_no_stop = self.tokenize(cleaned_text, remove_stopwords=True)
-        
-        # Extrait entités nommées
-        entities = self.extract_entities(text)
-        
-        # Détecte données sensibles
-        sensitive_data = self.detect_sensitive_data(text)
-        
-        # Calcule fréquence des mots
-        word_freq = self.get_word_frequency(cleaned_text)
-        
+
+    # ------------------
+    # Lemmatisation / POS
+    # ------------------
+    def spacy_processing(self, text: str, lang="fr"):
+        nlp = self.nlp_fr if lang == "fr" else self.nlp_en
+        doc = nlp(text)
+        return [{"text": t.text, "lemma": t.lemma_, "pos": t.pos_}
+                for t in doc if not t.is_stop and not t.is_punct and not t.like_num]
+
+    # ------------------
+    # NER
+    # ------------------
+    def extract_entities(self, text: str, lang="fr"):
+        nlp = self.nlp_fr if lang == "fr" else self.nlp_en
+        doc = nlp(text)
+        return [(ent.text, ent.label_) for ent in doc.ents]
+
+    # ------------------
+    # Sentiment HF
+    # ------------------
+    def sentiment_analysis(self, text: str):
+        try:
+            return self.sentiment_analyzer(text[:512])[0]
+        except:
+            return {"label": "neutral", "score": 0.0}
+
+    # ------------------
+    # Vectorisation HF
+    # ------------------
+    def vectorize_text(self, text: str):
+        inputs = self.tokenizer(text, return_tensors="pt", truncation=True, padding=True)
+        with torch.no_grad():
+            embeddings = self.model(**inputs).last_hidden_state.mean(dim=1).squeeze()
+        return embeddings.numpy()
+
+    # ------------------
+    # NLP complet + snippets pour GPT-Neo
+    # ------------------
+    def nlp_pipeline(self, text: str):
+        lang = self.detect_lang(text)
+        cleaned, metadata = self.clean_text_with_metadata(text)
+        tokens = self.tokenize_text(cleaned, lang)
+        lemmas_pos = self.spacy_processing(cleaned, lang)
+        entities = self.extract_entities(cleaned, lang)
+        sentiment = self.sentiment_analysis(cleaned)
+        vector = self.vectorize_text(cleaned)
+
+        # Découpage en chunks pour GPT-Neo
+        snippets = []
+        if len(cleaned) > self.CHUNK_SIZE:
+            for i in range(math.ceil(len(cleaned)/self.CHUNK_SIZE)):
+                start = i * self.CHUNK_SIZE
+                end = (i+1) * self.CHUNK_SIZE
+                snippets.append(cleaned[start:end])
+        else:
+            snippets.append(cleaned)
+
         return {
-            'original_text_length': len(text),
-            'cleaned_text': cleaned_text,
-            'cleaned_text_length': len(cleaned_text),
-            'total_tokens': len(tokens),
-            'tokens_without_stopwords': len(tokens_no_stop),
-            'entities': entities,
-            'sensitive_data': sensitive_data,
-            'word_frequency': word_freq,
-            'has_sensitive_data': len(sensitive_data) > 0,
-            'has_personal_data': len(entities['PERSON']) > 0 or 'email' in sensitive_data
+            "lang": lang,
+            "cleaned_text": cleaned,
+            "metadata": metadata,
+            "tokens": tokens,
+            "lemmas_pos": lemmas_pos,
+            "entities": entities,
+            "sentiment": sentiment,
+            "vector_shape": vector.shape,
+            "vector": vector.tolist(),
+            "snippets": snippets
         }
 
+    # ====================================================
+    # 🔹 Sauvegarde séparée : RGPD (statique) / Site (dynamique)
+    # ====================================================
+    def save_rgpd_embeddings(self, rgpd_path: str, cache_path="rgpd_embeddings.json"):
+        if os.path.exists(cache_path):
+            print(f"✅ Cache RGPD trouvé : {cache_path} — pas de recalcul.")
+            return
 
-# Instance globale du preprocessor
-preprocessor = NLPPreprocessor()
+        print(f"📘 Génération du cache RGPD à partir de {rgpd_path}...")
+        results = []
+        with open(rgpd_path, "r", encoding="utf-8") as f:
+            rgpd = json.load(f)
+        chapitres = rgpd.get("reglement", {}).get("dispositif_normatif", {}).get("chapitres", [])
+        for chapitre in chapitres:
+            for article in chapitre.get("articles", []):
+                texte = article.get("contenu", "")
+                if texte.strip():
+                    results.append({
+                        "numero": article.get("numero"),
+                        "titre_chapitre": chapitre.get("titre"),
+                        "contenu": texte,
+                        "embedding": self.vectorize_text(texte).tolist()
+                    })
+
+        with open(cache_path, "w", encoding="utf-8") as out:
+            json.dump(results, out, ensure_ascii=False, indent=2)
+        print(f"✅ Embeddings RGPD enregistrés dans {cache_path}")
+
+    def save_audit_nlp_output(self, crawler_path: str, output_path="nlp_output.json"):
+        site_results = []
+        with open(crawler_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        for item in data:
+            page_data = {"url": item.get("url"), "sections": []}
+
+            # Contenu dynamique
+            main_text = item.get("dynamic", {}).get("resultats", {}).get("html_text_snippet", "")
+            if main_text.strip():
+                page_data["sections"].append({
+                    "type": "dynamic",
+                    "contenu": main_text,
+                    "nlp": self.nlp_pipeline(main_text)
+                })
+
+            # Contenu statique RGPD
+            textes_rgpd = item.get("static", {}).get("textes_rgpd", {})
+            for rgpd_url, rgpd_text in textes_rgpd.items():
+                if rgpd_text.strip():
+                    page_data["sections"].append({
+                        "type": "static",
+                        "url_source": rgpd_url,
+                        "contenu": rgpd_text,
+                        "nlp": self.nlp_pipeline(rgpd_text)
+                    })
+
+            site_results.append(page_data)
+
+        rgpd_analysis = []
+        if os.path.exists("rgpd_embeddings.json"):
+            with open("rgpd_embeddings.json", "r", encoding="utf-8") as f:
+                rgpd_analysis = json.load(f)
+
+        nlp_output = {
+            "site_analysis": site_results,
+            "rgpd_analysis": rgpd_analysis
+        }
+
+        with open(output_path, "w", encoding="utf-8") as out:
+            json.dump(nlp_output, out, ensure_ascii=False, indent=2)
+        print(f"✅ NLP dynamique et RGPD enregistré dans {output_path}")
 
 
-def preprocess_text(text: str) -> Dict:
-    """
-    Fonction utilitaire pour préprocesser un texte
-    
-    Args:
-        text: Texte à préprocesser
-        
-    Returns:
-        Résultats de l'analyse NLP
-    """
-    return preprocessor.analyze_text(text)
-
-
-def extract_rgpd_keywords(text: str) -> List[str]:
-    """
-    Extrait les mots-clés liés au RGPD
-    
-    Args:
-        text: Texte à analyser
-        
-    Returns:
-        Liste de mots-clés RGPD trouvés
-    """
-    rgpd_keywords = [
-        'cookie', 'donnée', 'données', 'personnel', 'personnelle', 'vie privée',
-        'consentement', 'rgpd', 'gdpr', 'cnil', 'traitement', 'collecte',
-        'protection', 'confidentialité', 'politique', 'utilisateur', 'tracking',
-        'analytics', 'statistique', 'publicitaire', 'tracker', 'identifiant'
-    ]
-    
-    tokens = preprocessor.tokenize(text.lower())
-    found_keywords = [token for token in tokens if token in rgpd_keywords]
-    
-    return list(set(found_keywords))
-
-
-# Exemple d'utilisation si exécuté directement
+# ==========================
+# 🔹 Main
+# ==========================
 if __name__ == "__main__":
-    # Texte de test
-    test_text = """
-    Ce site collecte vos données personnelles via des cookies. 
-    Contactez-nous à contact@example.com ou au 01 23 45 67 89.
-    Notre organisation est située à Paris et respecte la CNIL.
-    Votre adresse IP 192.168.1.1 est enregistrée.
-    """
-    
-    print("=== Test du NLP Preprocessor ===\n")
-    
-    # Analyse complète
-    results = preprocessor.analyze_text(test_text)
-    
-    print(f"Longueur texte original : {results['original_text_length']}")
-    print(f"Longueur texte nettoyé : {results['cleaned_text_length']}")
-    print(f"Nombre de tokens : {results['total_tokens']}")
-    print(f"Tokens sans stopwords : {results['tokens_without_stopwords']}")
-    
-    print(f"\n=== Entités nommées ===")
-    for entity_type, entities in results['entities'].items():
-        if entities:
-            print(f"{entity_type}: {', '.join(entities)}")
-    
-    print(f"\n=== Données sensibles détectées ===")
-    for data_type, data_list in results['sensitive_data'].items():
-        print(f"{data_type}: {', '.join(data_list)}")
-    
-    print(f"\n=== Mots-clés RGPD ===")
-    keywords = extract_rgpd_keywords(test_text)
-    print(f"{', '.join(keywords)}")
-    
-    print(f"\n=== Mots les plus fréquents ===")
-    for word, freq in results['word_frequency'][:10]:
-        print(f"{word}: {freq}")
+    nlp_proc = NLPPreprocessor()
+    nlp_proc.save_rgpd_embeddings("rgpd_structure.json", cache_path="rgpd_embeddings.json")
+    nlp_proc.save_audit_nlp_output("crawler_results.json", output_path="nlp_output.json")

@@ -11,3 +11,5 @@ back_end/venv/lib/python3.12/site-packages/
 *.html
 *.pdf
 
+back_end/ollama_pull.sh
+

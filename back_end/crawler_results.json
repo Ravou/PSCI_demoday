@@ -177,7 +177,7 @@
         }
     },
     {
-        "url": "https://www.caresagroup.fr/politique-cookies",
+        "url": "https://www.instagram.com/caresagroup/",
         "ssl": {
             "url": "https://www.caresagroup.fr/contact",
             "hostname": "www.caresagroup.fr",
@@ -188,68 +188,33 @@
             "is_valid_now": true
         },
         "static": {
-            "url": "https://www.caresagroup.fr/politique-cookies",
-            "liens_rgpd": [
-                "/mentions-legales",
-                "/politique-confidentialite",
-                "/politique-cookies"
-            ],
-            "textes_rgpd": {
-                "https://www.caresagroup.fr/politique-cookies/mentions-legales": "",
-                "https://www.caresagroup.fr/politique-cookies/politique-confidentialite": "",
-                "https://www.caresagroup.fr/politique-cookies/politique-cookies": ""
-            }
+            "url": "https://www.instagram.com/caresagroup/",
+            "liens_rgpd": [],
+            "textes_rgpd": {}
         },
         "dynamic": {
-            "url": "https://www.caresagroup.fr/politique-cookies",
+            "url": "https://www.instagram.com/caresagroup/",
             "signals_detected": {
-                "cookies": true,
+                "cookies": false,
                 "confidentialite": false,
                 "mentions": false,
                 "formulaires": false,
-                "securite": true,
+                "securite": false,
                 "droits": false,
                 "prospection": false
             },
-            "html_text_snippet": "Politique de Cookies\nQu'est-ce qu'un cookie ?\nUn cookie est un petit fichier texte stocké sur votre ordinateur ou appareil mobile lors de votre visite sur notre site web.\nTypes de cookies utilisés\nCookies essentiels :\nCookies de session pour le fonctionnement du site\nCookies de sécurité\nCookies de préférences utilisateur\nCookies analytiques :\nGoogle Analytics pour mesurer l'audience et améliorer notre site\nDurée de conservation : 13 mois\nGestion des cookies\nAccepter tous les cookies\nRefuser les cookies non essentiels\nParamétrer vos choix\nVous pouvez également configurer votre navigateur pour refuser les cookies.\nDésactiver Google Analytics\nVous pouvez désactiver Google Analytics en installant le module complémentaire : https://tools.google.com/dlpage/gaoptout",
+            "html_text_snippet": "caresagroup\ncaresagroup\n0 posts\n12 followers\n15 following\nNo Posts Yet",
             "snippets_nlp": {
-                "0": "Politique de Cookies",
-                "1": "Qu'est-ce qu'un cookie ?",
-                "2": "Un cookie est un petit fichier texte stocké sur votre ordinateur ou appareil mobile lors de votre visite sur notre site web.",
-                "3": "Types de cookies utilisés",
-                "4": "Cookies essentiels :",
-                "5": "Cookies de session pour le fonctionnement du site",
-                "6": "Cookies de sécurité",
-                "7": "Cookies de préférences utilisateur",
-                "8": "Cookies analytiques :",
-                "9": "Google Analytics pour mesurer l'audience et améliorer notre site",
-                "10": "Durée de conservation : 13 mois",
-                "11": "Gestion des cookies",
-                "12": "Accepter tous les cookies",
-                "13": "Refuser les cookies non essentiels",
-                "14": "Paramétrer vos choix",
-                "15": "Vous pouvez également configurer votre navigateur pour refuser les cookies.",
-                "16": "Désactiver Google Analytics",
-                "17": "Vous pouvez désactiver Google Analytics en installant le module complémentaire : https://tools.google.com/dlpage/gaoptout"
+                "0": "caresagroup",
+                "1": "caresagroup",
+                "2": "0 posts",
+                "3": "12 followers",
+                "4": "15 following",
+                "5": "No Posts Yet"
             },
             "bandeau_cookie": {
-                "present": true,
-                "texts": [
-                    "Politique de Cookies",
-                    "Qu'est-ce qu'un cookie ?",
-                    "Un cookie est un petit fichier texte stocké sur votre ordinateur ou appareil mobile lors de votre visite sur notre site web.",
-                    "Types de cookies utilisés",
-                    "Cookies essentiels :",
-                    "Cookies de session pour le fonctionnement du site",
-                    "Cookies de sécurité",
-                    "Cookies de préférences utilisateur",
-                    "Cookies analytiques :",
-                    "Gestion des cookies",
-                    "Accepter tous les cookies",
-                    "Refuser les cookies non essentiels",
-                    "Vous pouvez également configurer votre navigateur pour refuser les cookies.",
-                    "Cookies"
-                ]
+                "present": false,
+                "texts": []
             },
             "privacy_sections": {
                 "present": false,
@@ -262,15 +227,13 @@
             "formulaires_detectes": 0,
             "formulaires_info": [],
             "security_info": {
-                "https": true,
-                "mentions": [
-                    "Mention de sécurité trouvée"
-                ]
+                "https": false,
+                "mentions": []
             }
         }
     },
     {
-        "url": "https://www.facebook.com",
+        "url": "https://www.caresagroup.fr/about",
         "ssl": {
             "url": "https://www.caresagroup.fr/avis",
             "hostname": "www.caresagroup.fr",
@@ -281,173 +244,49 @@
             "is_valid_now": true
         },
         "static": {
-            "url": "https://www.facebook.com",
+            "url": "https://www.caresagroup.fr/about",
             "liens_rgpd": [
-                "https://www.facebook.com/recover/initiate/?privacy_mutation_token=eyJ0eXBlIjowLCJjcmVhdGlvbl90aW1lIjoxNzYwOTY0NDUzLCJjYWxsc2l0ZV9pZCI6MzgxMjI5MDc5NTc1OTQ2fQ%3D%3D&ars=facebook_login&next",
-                "/privacy/policy/?entry_point=facebook_page_footer",
-                "/privacy/center/?entry_point=facebook_page_footer",
-                "/policies/cookies/",
-                "/allactivity?privacy_source=activity_log_top_menu"
+                "/mentions-legales",
+                "/politique-confidentialite",
+                "/politique-cookies"
             ],
             "textes_rgpd": {
-                "https://www.facebook.com/recover/initiate/?privacy_mutation_token=eyJ0eXBlIjowLCJjcmVhdGlvbl90aW1lIjoxNzYwOTY0NDUzLCJjYWxsc2l0ZV9pZCI6MzgxMjI5MDc5NTc1OTQ2fQ%3D%3D&ars=facebook_login&next": "Mot de passe oublié | Connexion impossible | Facebook\n\n\n\n\n\n\n\n\n\n\n\n\nTrouvez votre compte\nTrouvez votre compte\nVeuillez entrer votre e-mail ou votre numéro de mobile pour rechercher votre compte.\nAnnuler\nRechercher\nFrançais (France)\nEnglish (US)\nEspañol\nTürkçe\nPortuguês (Portugal)\nالعربية\nItaliano\nDeutsch\nहिन्दी\n中文(简体)\n日本語\nS’inscrire\nSe connecter\nMessenger\nFacebook Lite\nVidéo\nMeta Pay\nBoutique Meta\nMeta Quest\nRay-Ban Meta\nMeta AI\nPlus de contenu Meta AI\nInstagram\nThreads\nCentre d’information sur les élections\nPolitique de confidentialité\nCentre de confidentialité\nRésilier votre contrat ici\nÀ propos\nCréer une publicité\nCréer une Page\nDéveloppeurs\nEmplois\nCookies\nChoisir sa publicité\nConditions générales\nAide\nImportation des contacts et non-utilisateurs\nParamètres\nHistorique d’activité\n Meta © 2025",
-                "https://www.facebook.com/privacy/policy/?entry_point=facebook_page_footer": "Politique de confidentialité de Meta : comment Meta recueille et utilise les données utilisateur(ice)",
-                "https://www.facebook.com/privacy/center/?entry_point=facebook_page_footer": "Facebook",
-                "https://www.facebook.com/policies/cookies/": "Politique d’utilisation des cookies de Meta",
-                "https://www.facebook.com/allactivity?privacy_source=activity_log_top_menu": "Facebook\n\n\n\n\n\n\n\n\n\n\n\n\nFacebook\nAdresse e-mail ou téléphone\nMot de passe\nInformations de compte oubliées ?\nS’inscrire\nNotice\nVous devez vous connecter pour continuer.\nSe connecter à Facebook\nSe connecter\nInformations de compte oubliées ?\nCréer un nouveau compte\nFrançais (France)\nEnglish (US)\nEspañol\nTürkçe\nPortuguês (Portugal)\nالعربية\nItaliano\nDeutsch\nहिन्दी\n中文(简体)\n日本語\nS’inscrire\nSe connecter\nMessenger\nFacebook Lite\nVidéo\nMeta Pay\nBoutique Meta\nMeta Quest\nRay-Ban Meta\nMeta AI\nPlus de contenu Meta AI\nInstagram\nThreads\nCentre d’information sur les élections\nPolitique de confidentialité\nCentre de confidentialité\nRésilier votre contrat ici\nÀ propos\nCréer une publicité\nCréer une Page\nDéveloppeurs\nEmplois\nCookies\nChoisir sa publicité\nConditions générales\nAide\nImportation des contacts et non-utilisateurs\nParamètres\nHistorique d’activité\n Meta © 2025"
+                "https://www.caresagroup.fr/about/mentions-legales": "",
+                "https://www.caresagroup.fr/about/politique-confidentialite": "",
+                "https://www.caresagroup.fr/about/politique-cookies": ""
             }
         },
         "dynamic": {
-            "url": "https://www.facebook.com",
+            "url": "https://www.caresagroup.fr/about",
             "signals_detected": {
-                "cookies": true,
-                "confidentialite": true,
+                "cookies": false,
+                "confidentialite": false,
                 "mentions": false,
-                "formulaires": true,
+                "formulaires": false,
                 "securite": false,
                 "droits": false,
                 "prospection": false
             },
-            "html_text_snippet": "Connect with friends and the world around you on Facebook.\nLog In\nForgot password?\nCreate new account\nCreate a Page for a celebrity, brand or business.\nEnglish (US)\nFrançais (France)\nEspañol\nTürkçe\nPortuguês (Portugal)\nالعربية\n日本語\nSign UpLog InMessengerFacebook LiteVideoMeta PayMeta StoreMeta AIMeta AI more contentInstagramThreadsPrivacy CenterCancel contracts hereAboutCreate adCreate PageAd choices\nTermsHelpContact Uploading & Non-Users\nSettings\nActivity log\nMeta © 2025\nAllow the use of cookies from Facebook on this browser?\nWe use cookies and similar technologies to help provide and improve content on Meta Products. We also use them to provide a safer experience by using information we receive from cookies on and off Facebook, and to provide and improve Meta Products for people who have an account.\nEssential cookies: These cookies are required to use Meta Products and are necessary for our sites to work as intended.\nCookies from other companies: We use these cookies to show you ads off of Meta Products and to provide features like maps and videos on Meta Products. These cookies are optional.\nYou have control over the optional cookies we use. Learn more about cookies and how we use them, and review or change your choices at any time in our Cookies Policy.\nAbout cookies\nWhat are cookies?\nLearn more\nWhy do we use cookies?\nLearn more\nWhat are Meta Products?\nLearn more\nYour cookie choices\nLearn more\nCookies from other companies\nWe use cookies from other companies in order to show you ads off of our Products, and provide features like maps, payment services and video.\nChoose cookies by category\nHow we use these cookies\nIf you allow these cookies\nIf you don't allow these cookies\nOther ways you can control your information\nManage your ad experience in Accounts Center\nMore information about online advertising\nControlling cookies with browser settings\nDecline optional cookies\nAllow all cookies",
+            "html_text_snippet": "À propos de notre service\nNotre société de chauffeur privé propose une expérience haut de gamme, alliant ponctualité, discrétion et confort. Nos véhicules sont récents, élégants et parfaitement entretenus pour garantir un trajet agréable et sécurisé.\nNos chauffeurs sont formés pour offrir un service irréprochable, adapté à vos besoins professionnels ou personnels. Faites confiance à notre équipe pour vos déplacements en toute sérénité.",
             "snippets_nlp": {
-                "0": "Connect with friends and the world around you on Facebook.",
-                "1": "Log In",
-                "2": "Forgot password?",
-                "3": "Create new account",
-                "4": "Create a Page for a celebrity, brand or business.",
-                "5": "English (US)",
-                "6": "Français (France)",
-                "7": "Español",
-                "8": "Türkçe",
-                "9": "Português (Portugal)",
-                "10": "العربية",
-                "11": "日本語",
-                "12": "Sign UpLog InMessengerFacebook LiteVideoMeta PayMeta StoreMeta AIMeta AI more contentInstagramThreadsPrivacy CenterCancel contracts hereAboutCreate adCreate PageAd choices",
-                "13": "TermsHelpContact Uploading & Non-Users",
-                "14": "Settings",
-                "15": "Activity log",
-                "16": "Meta © 2025",
-                "17": "Allow the use of cookies from Facebook on this browser?",
-                "18": "We use cookies and similar technologies to help provide and improve content on Meta Products. We also use them to provide a safer experience by using information we receive from cookies on and off Facebook, and to provide and improve Meta Products for people who have an account.",
-                "19": "Essential cookies: These cookies are required to use Meta Products and are necessary for our sites to work as intended.",
-                "20": "Cookies from other companies: We use these cookies to show you ads off of Meta Products and to provide features like maps and videos on Meta Products. These cookies are optional.",
-                "21": "You have control over the optional cookies we use. Learn more about cookies and how we use them, and review or change your choices at any time in our Cookies Policy.",
-                "22": "About cookies",
-                "23": "What are cookies?",
-                "24": "Learn more",
-                "25": "Why do we use cookies?",
-                "26": "Learn more",
-                "27": "What are Meta Products?",
-                "28": "Learn more",
-                "29": "Your cookie choices",
-                "30": "Learn more",
-                "31": "Cookies from other companies",
-                "32": "We use cookies from other companies in order to show you ads off of our Products, and provide features like maps, payment services and video.",
-                "33": "Choose cookies by category",
-                "34": "How we use these cookies",
-                "35": "If you allow these cookies",
-                "36": "If you don't allow these cookies",
-                "37": "Other ways you can control your information",
-                "38": "Manage your ad experience in Accounts Center",
-                "39": "More information about online advertising",
-                "40": "Controlling cookies with browser settings",
-                "41": "Decline optional cookies",
-                "42": "Allow all cookies"
+                "0": "À propos de notre service",
+                "1": "Notre société de chauffeur privé propose une expérience haut de gamme, alliant ponctualité, discrétion et confort. Nos véhicules sont récents, élégants et parfaitement entretenus pour garantir un trajet agréable et sécurisé.",
+                "2": "Nos chauffeurs sont formés pour offrir un service irréprochable, adapté à vos besoins professionnels ou personnels. Faites confiance à notre équipe pour vos déplacements en toute sérénité."
             },
             "bandeau_cookie": {
-                "present": true,
-                "texts": [
-                    "Allow the use of cookies from Facebook on this browser?",
-                    "We use cookies and similar technologies to help provide and improve content on Meta Products. We also use them to provide a safer experience by using information we receive from cookies on and off Facebook, and to provide and improve Meta Products for people who have an account.",
-                    "Essential cookies: These cookies are required to use Meta Products and are necessary for our sites to work as intended.",
-                    "Cookies from other companies: We use these cookies to show you ads off of Meta Products and to provide features like maps and videos on Meta Products. These cookies are optional.",
-                    "You have control over the optional cookies we use. Learn more about cookies and how we use them, and review or change your choices at any time in our Cookies Policy.",
-                    "Cookies Policy",
-                    "About cookies",
-                    "What are cookies?",
-                    "Why do we use cookies?",
-                    "Your cookie choices",
-                    "Cookies from other companies",
-                    "We use cookies from other companies in order to show you ads off of our Products, and provide features like maps, payment services and video.",
-                    "Choose cookies by category",
-                    "How we use these cookies",
-                    "If you allow these cookies",
-                    "If you don't allow these cookies",
-                    "Controlling cookies with browser settings",
-                    "Decline optional cookies",
-                    "Allow all cookies"
-                ]
+                "present": false,
+                "texts": []
             },
             "privacy_sections": {
-                "present": true,
-                "texts": [
-                    "Privacy Center"
-                ]
+                "present": false,
+                "texts": []
             },
             "mentions_legales": {
                 "present": false,
                 "texts": []
             },
-            "formulaires_detectes": 1,
-            "formulaires_info": [
-                {
-                    "action": "https://www.facebook.com/login/?privacy_mutation_token=eyJ0eXBlIjowLCJjcmVhdGlvbl90aW1lIjoxNzYwOTY0NDU2LCJjYWxsc2l0ZV9pZCI6MzgxMjI5MDc5NTc1OTQ2fQ%3D%3D&next",
-                    "method": "post",
-                    "inputs": [
-                        {
-                            "tag": "input",
-                            "type": "hidden",
-                            "name": "jazoest",
-                            "placeholder": "",
-                            "checked": false
-                        },
-                        {
-                            "tag": "input",
-                            "type": "hidden",
-                            "name": "lsd",
-                            "placeholder": "",
-                            "checked": false
-                        },
-                        {
-                            "tag": "input",
-                            "type": "text",
-                            "name": "email",
-                            "placeholder": "Email or phone number",
-                            "checked": false
-                        },
-                        {
-                            "tag": "input",
-                            "type": "password",
-                            "name": "pass",
-                            "placeholder": "Password",
-                            "checked": false
-                        },
-                        {
-                            "tag": "input",
-                            "type": "hidden",
-                            "name": "login_source",
-                            "placeholder": "",
-                            "checked": false
-                        },
-                        {
-                            "tag": "input",
-                            "type": "hidden",
-                            "name": "next",
-                            "placeholder": "",
-                            "checked": false
-                        },
-                        {
-                            "tag": "input",
-                            "type": "hidden",
-                            "name": "shared_prefs_data",
-                            "placeholder": "",
-                            "checked": false
-                        }
-                    ],
-                    "checkboxes_count": 0,
-                    "all_unchecked": true
-                }
-            ],
+            "formulaires_detectes": 0,
+            "formulaires_info": [],
             "security_info": {
                 "https": false,
                 "mentions": []
@@ -716,7 +555,7 @@
         }
     },
     {
-        "url": "https://www.caresagroup.fr/mentions-legales",
+        "url": "https://www.caresagroup.fr/politique-cookies",
         "ssl": {
             "url": "https://www.facebook.com",
             "hostname": "www.facebook.com",
@@ -727,84 +566,259 @@
             "is_valid_now": true
         },
         "static": {
-            "url": "https://www.caresagroup.fr/mentions-legales",
+            "url": "https://www.caresagroup.fr/politique-cookies",
             "liens_rgpd": [
                 "/mentions-legales",
                 "/politique-confidentialite",
                 "/politique-cookies"
             ],
             "textes_rgpd": {
-                "https://www.caresagroup.fr/mentions-legales/mentions-legales": "",
-                "https://www.caresagroup.fr/mentions-legales/politique-confidentialite": "",
-                "https://www.caresagroup.fr/mentions-legales/politique-cookies": ""
+                "https://www.caresagroup.fr/politique-cookies/mentions-legales": "",
+                "https://www.caresagroup.fr/politique-cookies/politique-confidentialite": "",
+                "https://www.caresagroup.fr/politique-cookies/politique-cookies": ""
             }
         },
         "dynamic": {
-            "url": "https://www.caresagroup.fr/mentions-legales",
+            "url": "https://www.caresagroup.fr/politique-cookies",
             "signals_detected": {
-                "cookies": false,
+                "cookies": true,
                 "confidentialite": false,
-                "mentions": true,
-                "formulaires": true,
+                "mentions": false,
+                "formulaires": false,
                 "securite": true,
                 "droits": false,
                 "prospection": false
             },
-            "html_text_snippet": "Mentions Légales\nIdentification de l'entreprise\nExploitant : AJOUID Adil\nStatut juridique : Entrepreneur individuel\nAdresse : 58 rue de Monceau, 75008 Paris\nNuméro SIREN : 934 243 817\nNuméro SIRET : 934 243 817 00012\nActivité principale : Transport de voyageurs par taxis (Code APE : 49.32Z)\nNuméro TVA intracommunautaire : [À COMPLÉTER - Auto-entrepreneur exonéré ou numéro à vérifier]\nLicences et autorisations\nCarte professionnelle VTC : [À COMPLÉTER]\nImmatriculation au registre VTC : [À COMPLÉTER]\nAssurance professionnelle : Allianz Actif Pro - Contrat n°64203825\nResponsabilité Civile Exploitation\nResponsabilité Civile Professionnelle\nDéfense Pénale et Recours suite à accident\nContact\nTéléphone : +33 7 49 89 45 33\nEmail : contact@caresagroup.fr\nSite web : https://caresagroup.fr\nDirecteur de publication\nDirecteur de publication : AJOUID Adil\nHébergement\nHébergeur : Vercel Inc.\nAdresse : 440 N Baywood Ave, San Jose, CA 95128, États-Unis\nSite web : https://vercel.com",
+            "html_text_snippet": "Politique de Cookies\nQu'est-ce qu'un cookie ?\nUn cookie est un petit fichier texte stocké sur votre ordinateur ou appareil mobile lors de votre visite sur notre site web.\nTypes de cookies utilisés\nCookies essentiels :\nCookies de session pour le fonctionnement du site\nCookies de sécurité\nCookies de préférences utilisateur\nCookies analytiques :\nGoogle Analytics pour mesurer l'audience et améliorer notre site\nDurée de conservation : 13 mois\nGestion des cookies\nAccepter tous les cookies\nRefuser les cookies non essentiels\nParamétrer vos choix\nVous pouvez également configurer votre navigateur pour refuser les cookies.\nDésactiver Google Analytics\nVous pouvez désactiver Google Analytics en installant le module complémentaire : https://tools.google.com/dlpage/gaoptout",
             "snippets_nlp": {
-                "0": "Mentions Légales",
-                "1": "Identification de l'entreprise",
-                "2": "Exploitant : AJOUID Adil",
-                "3": "Statut juridique : Entrepreneur individuel",
-                "4": "Adresse : 58 rue de Monceau, 75008 Paris",
-                "5": "Numéro SIREN : 934 243 817",
-                "6": "Numéro SIRET : 934 243 817 00012",
-                "7": "Activité principale : Transport de voyageurs par taxis (Code APE : 49.32Z)",
-                "8": "Numéro TVA intracommunautaire : [À COMPLÉTER - Auto-entrepreneur exonéré ou numéro à vérifier]",
-                "9": "Licences et autorisations",
-                "10": "Carte professionnelle VTC : [À COMPLÉTER]",
-                "11": "Immatriculation au registre VTC : [À COMPLÉTER]",
-                "12": "Assurance professionnelle : Allianz Actif Pro - Contrat n°64203825",
-                "13": "Responsabilité Civile Exploitation",
-                "14": "Responsabilité Civile Professionnelle",
-                "15": "Défense Pénale et Recours suite à accident",
-                "16": "Contact",
-                "17": "Téléphone : +33 7 49 89 45 33",
-                "18": "Email : contact@caresagroup.fr",
-                "19": "Site web : https://caresagroup.fr",
-                "20": "Directeur de publication",
-                "21": "Directeur de publication : AJOUID Adil",
-                "22": "Hébergement",
-                "23": "Hébergeur : Vercel Inc.",
-                "24": "Adresse : 440 N Baywood Ave, San Jose, CA 95128, États-Unis",
-                "25": "Site web : https://vercel.com"
+                "0": "Politique de Cookies",
+                "1": "Qu'est-ce qu'un cookie ?",
+                "2": "Un cookie est un petit fichier texte stocké sur votre ordinateur ou appareil mobile lors de votre visite sur notre site web.",
+                "3": "Types de cookies utilisés",
+                "4": "Cookies essentiels :",
+                "5": "Cookies de session pour le fonctionnement du site",
+                "6": "Cookies de sécurité",
+                "7": "Cookies de préférences utilisateur",
+                "8": "Cookies analytiques :",
+                "9": "Google Analytics pour mesurer l'audience et améliorer notre site",
+                "10": "Durée de conservation : 13 mois",
+                "11": "Gestion des cookies",
+                "12": "Accepter tous les cookies",
+                "13": "Refuser les cookies non essentiels",
+                "14": "Paramétrer vos choix",
+                "15": "Vous pouvez également configurer votre navigateur pour refuser les cookies.",
+                "16": "Désactiver Google Analytics",
+                "17": "Vous pouvez désactiver Google Analytics en installant le module complémentaire : https://tools.google.com/dlpage/gaoptout"
             },
             "bandeau_cookie": {
-                "present": false,
-                "texts": []
+                "present": true,
+                "texts": [
+                    "Politique de Cookies",
+                    "Qu'est-ce qu'un cookie ?",
+                    "Un cookie est un petit fichier texte stocké sur votre ordinateur ou appareil mobile lors de votre visite sur notre site web.",
+                    "Types de cookies utilisés",
+                    "Cookies essentiels :",
+                    "Cookies de session pour le fonctionnement du site",
+                    "Cookies de sécurité",
+                    "Cookies de préférences utilisateur",
+                    "Cookies analytiques :",
+                    "Gestion des cookies",
+                    "Accepter tous les cookies",
+                    "Refuser les cookies non essentiels",
+                    "Vous pouvez également configurer votre navigateur pour refuser les cookies.",
+                    "Cookies"
+                ]
             },
             "privacy_sections": {
                 "present": false,
                 "texts": []
             },
             "mentions_legales": {
+                "present": false,
+                "texts": []
+            },
+            "formulaires_detectes": 0,
+            "formulaires_info": [],
+            "security_info": {
+                "https": true,
+                "mentions": [
+                    "Mention de sécurité trouvée"
+                ]
+            }
+        }
+    },
+    {
+        "url": "https://www.facebook.com",
+        "ssl": {
+            "url": "https://www.instagram.com/caresagroup/",
+            "hostname": "www.instagram.com",
+            "common_name": "*.www.instagram.com",
+            "issuer": "DigiCert Global G2 TLS RSA SHA256 2020 CA1",
+            "valid_from": "2025-07-29 00:00:00",
+            "valid_until": "2025-10-27 23:59:59",
+            "is_valid_now": true
+        },
+        "static": {
+            "url": "https://www.facebook.com",
+            "liens_rgpd": [
+                "https://www.facebook.com/recover/initiate/?privacy_mutation_token=eyJ0eXBlIjowLCJjcmVhdGlvbl90aW1lIjoxNzYwOTY3Nzk5LCJjYWxsc2l0ZV9pZCI6MzgxMjI5MDc5NTc1OTQ2fQ%3D%3D&ars=facebook_login&next",
+                "/privacy/policy/?entry_point=facebook_page_footer",
+                "/privacy/center/?entry_point=facebook_page_footer",
+                "/policies/cookies/",
+                "/allactivity?privacy_source=activity_log_top_menu"
+            ],
+            "textes_rgpd": {
+                "https://www.facebook.com/recover/initiate/?privacy_mutation_token=eyJ0eXBlIjowLCJjcmVhdGlvbl90aW1lIjoxNzYwOTY3Nzk5LCJjYWxsc2l0ZV9pZCI6MzgxMjI5MDc5NTc1OTQ2fQ%3D%3D&ars=facebook_login&next": "Mot de passe oublié | Connexion impossible | Facebook\n\n\n\n\n\n\n\n\n\n\n\n\nTrouvez votre compte\nTrouvez votre compte\nVeuillez entrer votre e-mail ou votre numéro de mobile pour rechercher votre compte.\nAnnuler\nRechercher\nFrançais (France)\nEnglish (US)\nEspañol\nTürkçe\nPortuguês (Portugal)\nالعربية\nItaliano\nDeutsch\nहिन्दी\n中文(简体)\n日本語\nS’inscrire\nSe connecter\nMessenger\nFacebook Lite\nVidéo\nMeta Pay\nBoutique Meta\nMeta Quest\nRay-Ban Meta\nMeta AI\nPlus de contenu Meta AI\nInstagram\nThreads\nCentre d’information sur les élections\nPolitique de confidentialité\nCentre de confidentialité\nRésilier votre contrat ici\nÀ propos\nCréer une publicité\nCréer une Page\nDéveloppeurs\nEmplois\nCookies\nChoisir sa publicité\nConditions générales\nAide\nImportation des contacts et non-utilisateurs\nParamètres\nHistorique d’activité\n Meta © 2025",
+                "https://www.facebook.com/privacy/policy/?entry_point=facebook_page_footer": "Politique de confidentialité de Meta : comment Meta recueille et utilise les données utilisateur(ice)",
+                "https://www.facebook.com/privacy/center/?entry_point=facebook_page_footer": "Facebook",
+                "https://www.facebook.com/policies/cookies/": "Politique d’utilisation des cookies de Meta",
+                "https://www.facebook.com/allactivity?privacy_source=activity_log_top_menu": "Facebook\n\n\n\n\n\n\n\n\n\n\n\n\nFacebook\nAdresse e-mail ou téléphone\nMot de passe\nInformations de compte oubliées ?\nS’inscrire\nNotice\nVous devez vous connecter pour continuer.\nSe connecter à Facebook\nSe connecter\nInformations de compte oubliées ?\nCréer un nouveau compte\nFrançais (France)\nEnglish (US)\nEspañol\nTürkçe\nPortuguês (Portugal)\nالعربية\nItaliano\nDeutsch\nहिन्दी\n中文(简体)\n日本語\nS’inscrire\nSe connecter\nMessenger\nFacebook Lite\nVidéo\nMeta Pay\nBoutique Meta\nMeta Quest\nRay-Ban Meta\nMeta AI\nPlus de contenu Meta AI\nInstagram\nThreads\nCentre d’information sur les élections\nPolitique de confidentialité\nCentre de confidentialité\nRésilier votre contrat ici\nÀ propos\nCréer une publicité\nCréer une Page\nDéveloppeurs\nEmplois\nCookies\nChoisir sa publicité\nConditions générales\nAide\nImportation des contacts et non-utilisateurs\nParamètres\nHistorique d’activité\n Meta © 2025"
+            }
+        },
+        "dynamic": {
+            "url": "https://www.facebook.com",
+            "signals_detected": {
+                "cookies": true,
+                "confidentialite": true,
+                "mentions": false,
+                "formulaires": true,
+                "securite": false,
+                "droits": false,
+                "prospection": false
+            },
+            "html_text_snippet": "Connect with friends and the world around you on Facebook.\nLog In\nForgot password?\nCreate new account\nCreate a Page for a celebrity, brand or business.\nEnglish (US)\nFrançais (France)\nEspañol\nTürkçe\nPortuguês (Portugal)\nالعربية\n日本語\nSign UpLog InMessengerFacebook LiteVideoMeta PayMeta StoreMeta AIMeta AI more contentInstagramThreadsPrivacy CenterCancel contracts hereAboutCreate adCreate PageAd choices\nTermsHelpContact Uploading & Non-Users\nSettings\nActivity log\nMeta © 2025\nAllow the use of cookies from Facebook on this browser?\nWe use cookies and similar technologies to help provide and improve content on Meta Products. We also use them to provide a safer experience by using information we receive from cookies on and off Facebook, and to provide and improve Meta Products for people who have an account.\nEssential cookies: These cookies are required to use Meta Products and are necessary for our sites to work as intended.\nCookies from other companies: We use these cookies to show you ads off of Meta Products and to provide features like maps and videos on Meta Products. These cookies are optional.\nYou have control over the optional cookies we use. Learn more about cookies and how we use them, and review or change your choices at any time in our Cookies Policy.\nAbout cookies\nWhat are cookies?\nLearn more\nWhy do we use cookies?\nLearn more\nWhat are Meta Products?\nLearn more\nYour cookie choices\nLearn more\nCookies from other companies\nWe use cookies from other companies in order to show you ads off of our Products, and provide features like maps, payment services and video.\nChoose cookies by category\nHow we use these cookies\nIf you allow these cookies\nIf you don't allow these cookies\nOther ways you can control your information\nManage your ad experience in Accounts Center\nMore information about online advertising\nControlling cookies with browser settings\nDecline optional cookies\nAllow all cookies",
+            "snippets_nlp": {
+                "0": "Connect with friends and the world around you on Facebook.",
+                "1": "Log In",
+                "2": "Forgot password?",
+                "3": "Create new account",
+                "4": "Create a Page for a celebrity, brand or business.",
+                "5": "English (US)",
+                "6": "Français (France)",
+                "7": "Español",
+                "8": "Türkçe",
+                "9": "Português (Portugal)",
+                "10": "العربية",
+                "11": "日本語",
+                "12": "Sign UpLog InMessengerFacebook LiteVideoMeta PayMeta StoreMeta AIMeta AI more contentInstagramThreadsPrivacy CenterCancel contracts hereAboutCreate adCreate PageAd choices",
+                "13": "TermsHelpContact Uploading & Non-Users",
+                "14": "Settings",
+                "15": "Activity log",
+                "16": "Meta © 2025",
+                "17": "Allow the use of cookies from Facebook on this browser?",
+                "18": "We use cookies and similar technologies to help provide and improve content on Meta Products. We also use them to provide a safer experience by using information we receive from cookies on and off Facebook, and to provide and improve Meta Products for people who have an account.",
+                "19": "Essential cookies: These cookies are required to use Meta Products and are necessary for our sites to work as intended.",
+                "20": "Cookies from other companies: We use these cookies to show you ads off of Meta Products and to provide features like maps and videos on Meta Products. These cookies are optional.",
+                "21": "You have control over the optional cookies we use. Learn more about cookies and how we use them, and review or change your choices at any time in our Cookies Policy.",
+                "22": "About cookies",
+                "23": "What are cookies?",
+                "24": "Learn more",
+                "25": "Why do we use cookies?",
+                "26": "Learn more",
+                "27": "What are Meta Products?",
+                "28": "Learn more",
+                "29": "Your cookie choices",
+                "30": "Learn more",
+                "31": "Cookies from other companies",
+                "32": "We use cookies from other companies in order to show you ads off of our Products, and provide features like maps, payment services and video.",
+                "33": "Choose cookies by category",
+                "34": "How we use these cookies",
+                "35": "If you allow these cookies",
+                "36": "If you don't allow these cookies",
+                "37": "Other ways you can control your information",
+                "38": "Manage your ad experience in Accounts Center",
+                "39": "More information about online advertising",
+                "40": "Controlling cookies with browser settings",
+                "41": "Decline optional cookies",
+                "42": "Allow all cookies"
+            },
+            "bandeau_cookie": {
                 "present": true,
                 "texts": [
-                    "Mentions Légales",
-                    "Mentions légales"
+                    "Allow the use of cookies from Facebook on this browser?",
+                    "We use cookies and similar technologies to help provide and improve content on Meta Products. We also use them to provide a safer experience by using information we receive from cookies on and off Facebook, and to provide and improve Meta Products for people who have an account.",
+                    "Essential cookies: These cookies are required to use Meta Products and are necessary for our sites to work as intended.",
+                    "Cookies from other companies: We use these cookies to show you ads off of Meta Products and to provide features like maps and videos on Meta Products. These cookies are optional.",
+                    "You have control over the optional cookies we use. Learn more about cookies and how we use them, and review or change your choices at any time in our Cookies Policy.",
+                    "Cookies Policy",
+                    "About cookies",
+                    "What are cookies?",
+                    "Why do we use cookies?",
+                    "Your cookie choices",
+                    "Cookies from other companies",
+                    "We use cookies from other companies in order to show you ads off of our Products, and provide features like maps, payment services and video.",
+                    "Choose cookies by category",
+                    "How we use these cookies",
+                    "If you allow these cookies",
+                    "If you don't allow these cookies",
+                    "Controlling cookies with browser settings",
+                    "Decline optional cookies",
+                    "Allow all cookies"
                 ]
+            },
+            "privacy_sections": {
+                "present": true,
+                "texts": [
+                    "Privacy Center"
+                ]
+            },
+            "mentions_legales": {
+                "present": false,
+                "texts": []
             },
             "formulaires_detectes": 1,
             "formulaires_info": [
                 {
-                    "action": "https://www.caresagroup.fr/mentions-legales",
-                    "method": "get",
+                    "action": "https://www.facebook.com/login/?privacy_mutation_token=eyJ0eXBlIjowLCJjcmVhdGlvbl90aW1lIjoxNzYwOTY3ODAxLCJjYWxsc2l0ZV9pZCI6MzgxMjI5MDc5NTc1OTQ2fQ%3D%3D&next",
+                    "method": "post",
                     "inputs": [
                         {
                             "tag": "input",
-                            "type": "email",
-                            "name": "",
-                            "placeholder": "Votre email",
+                            "type": "hidden",
+                            "name": "jazoest",
+                            "placeholder": "",
+                            "checked": false
+                        },
+                        {
+                            "tag": "input",
+                            "type": "hidden",
+                            "name": "lsd",
+                            "placeholder": "",
+                            "checked": false
+                        },
+                        {
+                            "tag": "input",
+                            "type": "text",
+                            "name": "email",
+                            "placeholder": "Email or phone number",
+                            "checked": false
+                        },
+                        {
+                            "tag": "input",
+                            "type": "password",
+                            "name": "pass",
+                            "placeholder": "Password",
+                            "checked": false
+                        },
+                        {
+                            "tag": "input",
+                            "type": "hidden",
+                            "name": "login_source",
+                            "placeholder": "",
+                            "checked": false
+                        },
+                        {
+                            "tag": "input",
+                            "type": "hidden",
+                            "name": "next",
+                            "placeholder": "",
+                            "checked": false
+                        },
+                        {
+                            "tag": "input",
+                            "type": "hidden",
+                            "name": "shared_prefs_data",
+                            "placeholder": "",
                             "checked": false
                         }
                     ],
@@ -813,7 +827,7 @@
                 }
             ],
             "security_info": {
-                "https": true,
+                "https": false,
                 "mentions": []
             }
         }
@@ -821,12 +835,12 @@
     {
         "url": "https://www.caresagroup.fr/politique-confidentialite",
         "ssl": {
-            "url": "https://www.instagram.com/caresagroup/",
-            "hostname": "www.instagram.com",
-            "common_name": "*.www.instagram.com",
-            "issuer": "DigiCert Global G2 TLS RSA SHA256 2020 CA1",
-            "valid_from": "2025-07-29 00:00:00",
-            "valid_until": "2025-10-27 23:59:59",
+            "url": "https://x.com",
+            "hostname": "x.com",
+            "common_name": "x.com",
+            "issuer": "E7",
+            "valid_from": "2025-10-13 19:12:58",
+            "valid_until": "2026-01-11 19:12:57",
             "is_valid_now": true
         },
         "static": {
@@ -945,205 +959,9 @@
         }
     },
     {
-        "url": "https://www.caresagroup.fr/avis",
-        "ssl": {
-            "url": "https://x.com",
-            "hostname": "x.com",
-            "common_name": "x.com",
-            "issuer": "E7",
-            "valid_from": "2025-10-13 19:12:58",
-            "valid_until": "2026-01-11 19:12:57",
-            "is_valid_now": true
-        },
-        "static": {
-            "url": "https://www.caresagroup.fr/avis",
-            "liens_rgpd": [
-                "/mentions-legales",
-                "/politique-confidentialite",
-                "/politique-cookies"
-            ],
-            "textes_rgpd": {
-                "https://www.caresagroup.fr/avis/mentions-legales": "",
-                "https://www.caresagroup.fr/avis/politique-confidentialite": "",
-                "https://www.caresagroup.fr/avis/politique-cookies": ""
-            }
-        },
-        "dynamic": {
-            "url": "https://www.caresagroup.fr/avis",
-            "signals_detected": {
-                "cookies": false,
-                "confidentialite": false,
-                "mentions": false,
-                "formulaires": false,
-                "securite": true,
-                "droits": false,
-                "prospection": false
-            },
-            "html_text_snippet": "TÉMOIGNAGES CLIENTS\nCe Que Nos Clients Disent\nDécouvrez les expériences authentiques de nos clients lors de leurs trajets VTC à Paris.\n“Service haut de gamme ! J'ai été prise en charge à l'heure, avec une bouteille d'eau et le sourire. Le trajet jusqu'à la gare s'est déroulé dans le calme et la sécurité.”\nClaire Martin\nTouriste\nTransfert Gare de Lyon\nCourse recommandée\n“J'ai réservé pour un rendez-vous professionnel à La Défense. Le chauffeur connaissait parfaitement les itinéraires et a évité tous les bouchons. Très efficace !”\nJulien Lefèvre\nConsultant\nCourse business Paris-La Défense\nCourse recommandée\n“Véhicule très propre, chauffeur discret et attentionné. J'ai pu travailler tranquillement pendant le trajet. Je recommande vivement ce VTC à Paris !”\nIsabelle Petit\nAvocate\nTransfert Paris intra-muros\nCourse recommandée\nLes avis défilent automatiquement • Cliquez sur les points pour naviguer",
-            "snippets_nlp": {
-                "0": "TÉMOIGNAGES CLIENTS",
-                "1": "Ce Que Nos Clients Disent",
-                "2": "Découvrez les expériences authentiques de nos clients lors de leurs trajets VTC à Paris.",
-                "3": "“Service haut de gamme ! J'ai été prise en charge à l'heure, avec une bouteille d'eau et le sourire. Le trajet jusqu'à la gare s'est déroulé dans le calme et la sécurité.”",
-                "4": "Claire Martin",
-                "5": "Touriste",
-                "6": "Transfert Gare de Lyon",
-                "7": "Course recommandée",
-                "8": "“J'ai réservé pour un rendez-vous professionnel à La Défense. Le chauffeur connaissait parfaitement les itinéraires et a évité tous les bouchons. Très efficace !”",
-                "9": "Julien Lefèvre",
-                "10": "Consultant",
-                "11": "Course business Paris-La Défense",
-                "12": "Course recommandée",
-                "13": "“Véhicule très propre, chauffeur discret et attentionné. J'ai pu travailler tranquillement pendant le trajet. Je recommande vivement ce VTC à Paris !”",
-                "14": "Isabelle Petit",
-                "15": "Avocate",
-                "16": "Transfert Paris intra-muros",
-                "17": "Course recommandée",
-                "18": "Les avis défilent automatiquement • Cliquez sur les points pour naviguer"
-            },
-            "bandeau_cookie": {
-                "present": false,
-                "texts": []
-            },
-            "privacy_sections": {
-                "present": false,
-                "texts": []
-            },
-            "mentions_legales": {
-                "present": false,
-                "texts": []
-            },
-            "formulaires_detectes": 0,
-            "formulaires_info": [],
-            "security_info": {
-                "https": true,
-                "mentions": [
-                    "Mention de sécurité trouvée"
-                ]
-            }
-        }
-    },
-    {
-        "url": "https://www.instagram.com/caresagroup/",
-        "ssl": {
-            "url": "https://www.caresagroup.fr/mentions-legales",
-            "hostname": "www.caresagroup.fr",
-            "common_name": "www.caresagroup.fr",
-            "issuer": "R12",
-            "valid_from": "2025-09-08 17:50:27",
-            "valid_until": "2025-12-07 17:50:26",
-            "is_valid_now": true
-        },
-        "static": {
-            "url": "https://www.instagram.com/caresagroup/",
-            "liens_rgpd": [],
-            "textes_rgpd": {}
-        },
-        "dynamic": {
-            "url": "https://www.instagram.com/caresagroup/",
-            "signals_detected": {
-                "cookies": false,
-                "confidentialite": false,
-                "mentions": false,
-                "formulaires": false,
-                "securite": false,
-                "droits": false,
-                "prospection": false
-            },
-            "html_text_snippet": "caresagroup\ncaresagroup\n0 posts\n12 followers\n15 following\nNo Posts Yet",
-            "snippets_nlp": {
-                "0": "caresagroup",
-                "1": "caresagroup",
-                "2": "0 posts",
-                "3": "12 followers",
-                "4": "15 following",
-                "5": "No Posts Yet"
-            },
-            "bandeau_cookie": {
-                "present": false,
-                "texts": []
-            },
-            "privacy_sections": {
-                "present": false,
-                "texts": []
-            },
-            "mentions_legales": {
-                "present": false,
-                "texts": []
-            },
-            "formulaires_detectes": 0,
-            "formulaires_info": [],
-            "security_info": {
-                "https": false,
-                "mentions": []
-            }
-        }
-    },
-    {
-        "url": "https://www.caresagroup.fr/about",
-        "ssl": {
-            "url": "https://www.caresagroup.fr/politique-confidentialite",
-            "hostname": "www.caresagroup.fr",
-            "common_name": "www.caresagroup.fr",
-            "issuer": "R12",
-            "valid_from": "2025-09-08 17:50:27",
-            "valid_until": "2025-12-07 17:50:26",
-            "is_valid_now": true
-        },
-        "static": {
-            "url": "https://www.caresagroup.fr/about",
-            "liens_rgpd": [
-                "/mentions-legales",
-                "/politique-confidentialite",
-                "/politique-cookies"
-            ],
-            "textes_rgpd": {
-                "https://www.caresagroup.fr/about/mentions-legales": "",
-                "https://www.caresagroup.fr/about/politique-confidentialite": "",
-                "https://www.caresagroup.fr/about/politique-cookies": ""
-            }
-        },
-        "dynamic": {
-            "url": "https://www.caresagroup.fr/about",
-            "signals_detected": {
-                "cookies": false,
-                "confidentialite": false,
-                "mentions": false,
-                "formulaires": false,
-                "securite": false,
-                "droits": false,
-                "prospection": false
-            },
-            "html_text_snippet": "À propos de notre service\nNotre société de chauffeur privé propose une expérience haut de gamme, alliant ponctualité, discrétion et confort. Nos véhicules sont récents, élégants et parfaitement entretenus pour garantir un trajet agréable et sécurisé.\nNos chauffeurs sont formés pour offrir un service irréprochable, adapté à vos besoins professionnels ou personnels. Faites confiance à notre équipe pour vos déplacements en toute sérénité.",
-            "snippets_nlp": {
-                "0": "À propos de notre service",
-                "1": "Notre société de chauffeur privé propose une expérience haut de gamme, alliant ponctualité, discrétion et confort. Nos véhicules sont récents, élégants et parfaitement entretenus pour garantir un trajet agréable et sécurisé.",
-                "2": "Nos chauffeurs sont formés pour offrir un service irréprochable, adapté à vos besoins professionnels ou personnels. Faites confiance à notre équipe pour vos déplacements en toute sérénité."
-            },
-            "bandeau_cookie": {
-                "present": false,
-                "texts": []
-            },
-            "privacy_sections": {
-                "present": false,
-                "texts": []
-            },
-            "mentions_legales": {
-                "present": false,
-                "texts": []
-            },
-            "formulaires_detectes": 0,
-            "formulaires_info": [],
-            "security_info": {
-                "https": false,
-                "mentions": []
-            }
-        }
-    },
-    {
         "url": "https://x.com",
         "ssl": {
-            "url": "https://www.caresagroup.fr/politique-cookies",
+            "url": "https://www.caresagroup.fr/mentions-legales",
             "hostname": "www.caresagroup.fr",
             "common_name": "www.caresagroup.fr",
             "issuer": "R12",
@@ -1249,6 +1067,188 @@
             "security_info": {
                 "https": false,
                 "mentions": []
+            }
+        }
+    },
+    {
+        "url": "https://www.caresagroup.fr/mentions-legales",
+        "ssl": {
+            "url": "https://www.caresagroup.fr/politique-confidentialite",
+            "hostname": "www.caresagroup.fr",
+            "common_name": "www.caresagroup.fr",
+            "issuer": "R12",
+            "valid_from": "2025-09-08 17:50:27",
+            "valid_until": "2025-12-07 17:50:26",
+            "is_valid_now": true
+        },
+        "static": {
+            "url": "https://www.caresagroup.fr/mentions-legales",
+            "liens_rgpd": [
+                "/mentions-legales",
+                "/politique-confidentialite",
+                "/politique-cookies"
+            ],
+            "textes_rgpd": {
+                "https://www.caresagroup.fr/mentions-legales/mentions-legales": "",
+                "https://www.caresagroup.fr/mentions-legales/politique-confidentialite": "",
+                "https://www.caresagroup.fr/mentions-legales/politique-cookies": ""
+            }
+        },
+        "dynamic": {
+            "url": "https://www.caresagroup.fr/mentions-legales",
+            "signals_detected": {
+                "cookies": false,
+                "confidentialite": false,
+                "mentions": true,
+                "formulaires": true,
+                "securite": true,
+                "droits": false,
+                "prospection": false
+            },
+            "html_text_snippet": "Mentions Légales\nIdentification de l'entreprise\nExploitant : AJOUID Adil\nStatut juridique : Entrepreneur individuel\nAdresse : 58 rue de Monceau, 75008 Paris\nNuméro SIREN : 934 243 817\nNuméro SIRET : 934 243 817 00012\nActivité principale : Transport de voyageurs par taxis (Code APE : 49.32Z)\nNuméro TVA intracommunautaire : [À COMPLÉTER - Auto-entrepreneur exonéré ou numéro à vérifier]\nLicences et autorisations\nCarte professionnelle VTC : [À COMPLÉTER]\nImmatriculation au registre VTC : [À COMPLÉTER]\nAssurance professionnelle : Allianz Actif Pro - Contrat n°64203825\nResponsabilité Civile Exploitation\nResponsabilité Civile Professionnelle\nDéfense Pénale et Recours suite à accident\nContact\nTéléphone : +33 7 49 89 45 33\nEmail : contact@caresagroup.fr\nSite web : https://caresagroup.fr\nDirecteur de publication\nDirecteur de publication : AJOUID Adil\nHébergement\nHébergeur : Vercel Inc.\nAdresse : 440 N Baywood Ave, San Jose, CA 95128, États-Unis\nSite web : https://vercel.com",
+            "snippets_nlp": {
+                "0": "Mentions Légales",
+                "1": "Identification de l'entreprise",
+                "2": "Exploitant : AJOUID Adil",
+                "3": "Statut juridique : Entrepreneur individuel",
+                "4": "Adresse : 58 rue de Monceau, 75008 Paris",
+                "5": "Numéro SIREN : 934 243 817",
+                "6": "Numéro SIRET : 934 243 817 00012",
+                "7": "Activité principale : Transport de voyageurs par taxis (Code APE : 49.32Z)",
+                "8": "Numéro TVA intracommunautaire : [À COMPLÉTER - Auto-entrepreneur exonéré ou numéro à vérifier]",
+                "9": "Licences et autorisations",
+                "10": "Carte professionnelle VTC : [À COMPLÉTER]",
+                "11": "Immatriculation au registre VTC : [À COMPLÉTER]",
+                "12": "Assurance professionnelle : Allianz Actif Pro - Contrat n°64203825",
+                "13": "Responsabilité Civile Exploitation",
+                "14": "Responsabilité Civile Professionnelle",
+                "15": "Défense Pénale et Recours suite à accident",
+                "16": "Contact",
+                "17": "Téléphone : +33 7 49 89 45 33",
+                "18": "Email : contact@caresagroup.fr",
+                "19": "Site web : https://caresagroup.fr",
+                "20": "Directeur de publication",
+                "21": "Directeur de publication : AJOUID Adil",
+                "22": "Hébergement",
+                "23": "Hébergeur : Vercel Inc.",
+                "24": "Adresse : 440 N Baywood Ave, San Jose, CA 95128, États-Unis",
+                "25": "Site web : https://vercel.com"
+            },
+            "bandeau_cookie": {
+                "present": false,
+                "texts": []
+            },
+            "privacy_sections": {
+                "present": false,
+                "texts": []
+            },
+            "mentions_legales": {
+                "present": true,
+                "texts": [
+                    "Mentions Légales",
+                    "Mentions légales"
+                ]
+            },
+            "formulaires_detectes": 1,
+            "formulaires_info": [
+                {
+                    "action": "https://www.caresagroup.fr/mentions-legales",
+                    "method": "get",
+                    "inputs": [
+                        {
+                            "tag": "input",
+                            "type": "email",
+                            "name": "",
+                            "placeholder": "Votre email",
+                            "checked": false
+                        }
+                    ],
+                    "checkboxes_count": 0,
+                    "all_unchecked": true
+                }
+            ],
+            "security_info": {
+                "https": true,
+                "mentions": []
+            }
+        }
+    },
+    {
+        "url": "https://www.caresagroup.fr/avis",
+        "ssl": {
+            "url": "https://www.caresagroup.fr/politique-cookies",
+            "hostname": "www.caresagroup.fr",
+            "common_name": "www.caresagroup.fr",
+            "issuer": "R12",
+            "valid_from": "2025-09-08 17:50:27",
+            "valid_until": "2025-12-07 17:50:26",
+            "is_valid_now": true
+        },
+        "static": {
+            "url": "https://www.caresagroup.fr/avis",
+            "liens_rgpd": [
+                "/mentions-legales",
+                "/politique-confidentialite",
+                "/politique-cookies"
+            ],
+            "textes_rgpd": {
+                "https://www.caresagroup.fr/avis/mentions-legales": "",
+                "https://www.caresagroup.fr/avis/politique-confidentialite": "",
+                "https://www.caresagroup.fr/avis/politique-cookies": ""
+            }
+        },
+        "dynamic": {
+            "url": "https://www.caresagroup.fr/avis",
+            "signals_detected": {
+                "cookies": false,
+                "confidentialite": false,
+                "mentions": false,
+                "formulaires": false,
+                "securite": true,
+                "droits": false,
+                "prospection": false
+            },
+            "html_text_snippet": "TÉMOIGNAGES CLIENTS\nCe Que Nos Clients Disent\nDécouvrez les expériences authentiques de nos clients lors de leurs trajets VTC à Paris.\n“Service haut de gamme ! J'ai été prise en charge à l'heure, avec une bouteille d'eau et le sourire. Le trajet jusqu'à la gare s'est déroulé dans le calme et la sécurité.”\nClaire Martin\nTouriste\nTransfert Gare de Lyon\nCourse recommandée\n“J'ai réservé pour un rendez-vous professionnel à La Défense. Le chauffeur connaissait parfaitement les itinéraires et a évité tous les bouchons. Très efficace !”\nJulien Lefèvre\nConsultant\nCourse business Paris-La Défense\nCourse recommandée\n“Véhicule très propre, chauffeur discret et attentionné. J'ai pu travailler tranquillement pendant le trajet. Je recommande vivement ce VTC à Paris !”\nIsabelle Petit\nAvocate\nTransfert Paris intra-muros\nCourse recommandée\nLes avis défilent automatiquement • Cliquez sur les points pour naviguer",
+            "snippets_nlp": {
+                "0": "TÉMOIGNAGES CLIENTS",
+                "1": "Ce Que Nos Clients Disent",
+                "2": "Découvrez les expériences authentiques de nos clients lors de leurs trajets VTC à Paris.",
+                "3": "“Service haut de gamme ! J'ai été prise en charge à l'heure, avec une bouteille d'eau et le sourire. Le trajet jusqu'à la gare s'est déroulé dans le calme et la sécurité.”",
+                "4": "Claire Martin",
+                "5": "Touriste",
+                "6": "Transfert Gare de Lyon",
+                "7": "Course recommandée",
+                "8": "“J'ai réservé pour un rendez-vous professionnel à La Défense. Le chauffeur connaissait parfaitement les itinéraires et a évité tous les bouchons. Très efficace !”",
+                "9": "Julien Lefèvre",
+                "10": "Consultant",
+                "11": "Course business Paris-La Défense",
+                "12": "Course recommandée",
+                "13": "“Véhicule très propre, chauffeur discret et attentionné. J'ai pu travailler tranquillement pendant le trajet. Je recommande vivement ce VTC à Paris !”",
+                "14": "Isabelle Petit",
+                "15": "Avocate",
+                "16": "Transfert Paris intra-muros",
+                "17": "Course recommandée",
+                "18": "Les avis défilent automatiquement • Cliquez sur les points pour naviguer"
+            },
+            "bandeau_cookie": {
+                "present": false,
+                "texts": []
+            },
+            "privacy_sections": {
+                "present": false,
+                "texts": []
+            },
+            "mentions_legales": {
+                "present": false,
+                "texts": []
+            },
+            "formulaires_detectes": 0,
+            "formulaires_info": [],
+            "security_info": {
+                "https": true,
+                "mentions": [
+                    "Mention de sécurité trouvée"
+                ]
             }
         }
     }

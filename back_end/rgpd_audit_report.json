@@ -2,49 +2,49 @@
   {
     "point": "Cookies et traceurs",
     "status": "partiellement conforme",
-    "evidence": "La politique cookies mentionne 'Google Analytics pour mesurer l'audience' et propose 'Accepter/Refuser/Paramétrer', mais aucun bandeau de consentement n'est visible dans les extraits analysés",
-    "recommendation": "Implémenter un bandeau de consentement visible au premier accès, bloquant le dépôt de cookies non essentiels (Google Analytics) avant acceptation explicite de l'utilisateur"
+    "evidence": "Politique de Cookies présente avec Google Analytics, cookies essentiels/analytiques, durée 13 mois, et options de gestion mentionnées",
+    "recommendation": "Implémenter un bandeau de consentement visible avant le dépôt de cookies non essentiels (Google Analytics) et vérifier que les utilisateurs peuvent refuser facilement"
   },
   {
     "point": "Politique de confidentialité",
     "status": "conforme",
-    "evidence": "Politique complète identifiant le responsable du traitement (AJOUID Adil), les données collectées, finalités, bases légales (contrat, obligation légale, consentement, intérêt légitime), durées de conservation (5 ans pour transport, 10 ans factures), destinataires et droits RGPD",
-    "recommendation": "Maintenir la politique à jour et informer les utilisateurs en cas de modification substantielle"
+    "evidence": "Politique complète avec responsable du traitement (AJOUID Adil), données collectées (réservations, newsletter, navigation), finalités claires, bases légales, durées de conservation (5 ans transport, 10 ans factures), destinataires, et droits des personnes",
+    "recommendation": "Maintenir la politique à jour et vérifier régulièrement sa conformité avec les traitements réellement effectués"
   },
   {
     "point": "Mentions légales",
     "status": "partiellement conforme",
-    "evidence": "Mentions légales complètes avec identification (AJOUID Adil, SIREN 934 243 817, adresse Paris), mais champs incomplets : 'Numéro TVA intracommunautaire : [À COMPLÉTER]', 'Carte professionnelle VTC : [À COMPLÉTER]', 'Immatriculation au registre VTC : [À COMPLÉTER]'",
-    "recommendation": "Compléter immédiatement les informations manquantes obligatoires : numéro TVA intracommunautaire, carte professionnelle VTC et immatriculation au registre VTC"
+    "evidence": "Identité (AJOUID Adil), SIRET 934 243 817 00012, contact, hébergeur (Vercel) présents, mais TVA, carte VTC et immatriculation VTC marquées '[À COMPLÉTER]'",
+    "recommendation": "Compléter immédiatement le numéro de TVA intracommunautaire (ou indiquer franchise en base), la carte professionnelle VTC et le numéro d'immatriculation au registre VTC"
   },
   {
     "point": "Formulaires et consentements",
-    "status": "non détecté",
-    "evidence": "Mention d'un formulaire newsletter ('Restez informé de nos actualités, événements et promotions exclusives. S'inscrire') mais aucun formulaire visible dans les extraits",
-    "recommendation": "Vérifier que tous les formulaires (réservation, devis, newsletter) incluent des cases à cocher non pré-cochées et un lien vers la politique de confidentialité"
+    "status": "partiellement conforme",
+    "evidence": "Newsletter avec consentement mentionné dans la politique, formulaires de réservation et devis cités avec données collectées",
+    "recommendation": "Vérifier que tous les formulaires comportent des mentions d'information claires au moment de la collecte, avec cases à cocher non pré-cochées pour les consentements"
   },
   {
     "point": "Sécurité et transferts",
     "status": "partiellement conforme",
-    "evidence": "La politique mentionne 'Nos prestataires techniques (hébergement, emailing) sous contrat' et 'Google Analytics pour les statistiques (données anonymisées)' mais aucune information sur les mesures de sécurité ou garanties de transfert",
-    "recommendation": "Ajouter une section décrivant les mesures de sécurité techniques et organisationnelles, et préciser les garanties pour les transferts de données hors UE (clauses contractuelles types pour Google Analytics)"
+    "evidence": "Hébergeur identifié (Vercel Inc., États-Unis), transferts vers plateformes VTC (Uber, Bolt) et Google Analytics mentionnés",
+    "recommendation": "Documenter les garanties pour les transferts hors UE (clauses contractuelles types, Privacy Shield), notamment pour Vercel et Google Analytics"
   },
   {
     "point": "Mineurs",
-    "status": "non conforme",
-    "evidence": "Aucune mention concernant la protection des données des mineurs dans la politique de confidentialité analysée",
-    "recommendation": "Ajouter une clause indiquant que les services ne sont pas destinés aux mineurs de moins de 15 ans, ou qu'une autorisation parentale est requise conformément à l'article 8 du RGPD"
+    "status": "non détecté",
+    "evidence": "Aucune mention spécifique concernant la collecte de données de mineurs dans la politique de confidentialité",
+    "recommendation": "Ajouter une clause précisant que les services ne sont pas destinés aux mineurs de moins de 15 ans ou obtenir le consentement parental si applicable"
   },
   {
     "point": "Documentation",
-    "status": "conforme",
-    "evidence": "Présence de trois documents accessibles via le footer : 'Mentions légales', 'Confidentialité', 'Cookies' avec contenu structuré et détaillé",
-    "recommendation": "Assurer que ces liens restent accessibles sur toutes les pages du site et envisager un registre des traitements interne"
+    "status": "partiellement conforme",
+    "evidence": "Trois documents présents : Mentions légales, Politique de confidentialité, Politique de Cookies accessibles depuis le footer",
+    "recommendation": "Compléter les mentions légales (TVA, licences VTC) et tenir un registre des activités de traitement conformément à l'article 30 du RGPD"
   },
   {
     "point": "Rapport final",
     "status": "partiellement conforme",
-    "evidence": "Le site CaresaGroup présente une structure documentaire solide (3 politiques présentes) mais avec des lacunes techniques : bandeau cookies non visible, informations légales incomplètes, absence de clause mineurs",
-    "recommendation": "Priorités : 1) Implémenter un bandeau de consentement aux cookies conforme, 2) Compléter les mentions légales (TVA, licences VTC), 3) Ajouter une clause sur les mineurs et les mesures de sécurité dans la politique de confidentialité"
+    "evidence": "Site globalement conforme avec une politique de confidentialité détaillée et accessible, mais informations légales incomplètes et mécanisme de consentement cookies à vérifier",
+    "recommendation": "Priorités : 1) Compléter mentions légales (TVA, licences VTC), 2) Implémenter bandeau cookies conforme, 3) Documenter transferts hors UE, 4) Tenir un registre des traitements"
   }
 ]

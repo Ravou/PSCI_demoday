@@ -4,43 +4,12 @@
     "sections": []
   },
   {
-    "url": "https://www.caresagroup.fr/politique-cookies",
+    "url": "https://www.instagram.com/caresagroup/",
     "sections": []
   },
   {
-    "url": "https://www.facebook.com",
-    "sections": [
-      {
-        "type": "static",
-        "url_source": "https://www.facebook.com/recover/initiate/?privacy_mutation_token=eyJ0eXBlIjowLCJjcmVhdGlvbl90aW1lIjoxNzYwOTY0NDUzLCJjYWxsc2l0ZV9pZCI6MzgxMjI5MDc5NTc1OTQ2fQ%3D%3D&ars=facebook_login&next",
-        "contenu": "Mot de passe oublié | Connexion impossible | Facebook\n\n\n\n\n\n\n\n\n\n\n\n\nTrouvez votre compte\nTrouvez votre compte\nVeuillez entrer votre e-mail ou votre numéro de mobile pour rechercher votre compte.\nAnnuler\nRechercher\nFrançais (France)\nEnglish (US)\nEspañol\nTürkçe\nPortuguês (Portugal)\nالعربية\nItaliano\nDeutsch\nहिन्दी\n中文(简体)\n日本語\nS’inscrire\nSe connecter\nMessenger\nFacebook Lite\nVidéo\nMeta Pay\nBoutique Meta\nMeta Quest\nRay-Ban Meta\nMeta AI\nPlus de contenu Meta AI\nInstagram\nThreads\nCentre d’information sur les élections\nPolitique de confidentialité\nCentre de confidentialité\nRésilier votre contrat ici\nÀ propos\nCréer une publicité\nCréer une Page\nDéveloppeurs\nEmplois\nCookies\nChoisir sa publicité\nConditions générales\nAide\nImportation des contacts et non-utilisateurs\nParamètres\nHistorique d’activité\n Meta © 2025",
-        "matches": []
-      },
-      {
-        "type": "static",
-        "url_source": "https://www.facebook.com/privacy/policy/?entry_point=facebook_page_footer",
-        "contenu": "Politique de confidentialité de Meta : comment Meta recueille et utilise les données utilisateur(ice)",
-        "matches": []
-      },
-      {
-        "type": "static",
-        "url_source": "https://www.facebook.com/privacy/center/?entry_point=facebook_page_footer",
-        "contenu": "Facebook",
-        "matches": []
-      },
-      {
-        "type": "static",
-        "url_source": "https://www.facebook.com/policies/cookies/",
-        "contenu": "Politique d’utilisation des cookies de Meta",
-        "matches": []
-      },
-      {
-        "type": "static",
-        "url_source": "https://www.facebook.com/allactivity?privacy_source=activity_log_top_menu",
-        "contenu": "Facebook\n\n\n\n\n\n\n\n\n\n\n\n\nFacebook\nAdresse e-mail ou téléphone\nMot de passe\nInformations de compte oubliées ?\nS’inscrire\nNotice\nVous devez vous connecter pour continuer.\nSe connecter à Facebook\nSe connecter\nInformations de compte oubliées ?\nCréer un nouveau compte\nFrançais (France)\nEnglish (US)\nEspañol\nTürkçe\nPortuguês (Portugal)\nالعربية\nItaliano\nDeutsch\nहिन्दी\n中文(简体)\n日本語\nS’inscrire\nSe connecter\nMessenger\nFacebook Lite\nVidéo\nMeta Pay\nBoutique Meta\nMeta Quest\nRay-Ban Meta\nMeta AI\nPlus de contenu Meta AI\nInstagram\nThreads\nCentre d’information sur les élections\nPolitique de confidentialité\nCentre de confidentialité\nRésilier votre contrat ici\nÀ propos\nCréer une publicité\nCréer une Page\nDéveloppeurs\nEmplois\nCookies\nChoisir sa publicité\nConditions générales\nAide\nImportation des contacts et non-utilisateurs\nParamètres\nHistorique d’activité\n Meta © 2025",
-        "matches": []
-      }
-    ]
+    "url": "https://www.caresagroup.fr/about",
+    "sections": []
   },
   {
     "url": "https://www.caresagroup.fr/faq",
@@ -89,23 +58,46 @@
     ]
   },
   {
-    "url": "https://www.caresagroup.fr/mentions-legales",
+    "url": "https://www.caresagroup.fr/politique-cookies",
     "sections": []
+  },
+  {
+    "url": "https://www.facebook.com",
+    "sections": [
+      {
+        "type": "static",
+        "url_source": "https://www.facebook.com/recover/initiate/?privacy_mutation_token=eyJ0eXBlIjowLCJjcmVhdGlvbl90aW1lIjoxNzYwOTY3Nzk5LCJjYWxsc2l0ZV9pZCI6MzgxMjI5MDc5NTc1OTQ2fQ%3D%3D&ars=facebook_login&next",
+        "contenu": "Mot de passe oublié | Connexion impossible | Facebook\n\n\n\n\n\n\n\n\n\n\n\n\nTrouvez votre compte\nTrouvez votre compte\nVeuillez entrer votre e-mail ou votre numéro de mobile pour rechercher votre compte.\nAnnuler\nRechercher\nFrançais (France)\nEnglish (US)\nEspañol\nTürkçe\nPortuguês (Portugal)\nالعربية\nItaliano\nDeutsch\nहिन्दी\n中文(简体)\n日本語\nS’inscrire\nSe connecter\nMessenger\nFacebook Lite\nVidéo\nMeta Pay\nBoutique Meta\nMeta Quest\nRay-Ban Meta\nMeta AI\nPlus de contenu Meta AI\nInstagram\nThreads\nCentre d’information sur les élections\nPolitique de confidentialité\nCentre de confidentialité\nRésilier votre contrat ici\nÀ propos\nCréer une publicité\nCréer une Page\nDéveloppeurs\nEmplois\nCookies\nChoisir sa publicité\nConditions générales\nAide\nImportation des contacts et non-utilisateurs\nParamètres\nHistorique d’activité\n Meta © 2025",
+        "matches": []
+      },
+      {
+        "type": "static",
+        "url_source": "https://www.facebook.com/privacy/policy/?entry_point=facebook_page_footer",
+        "contenu": "Politique de confidentialité de Meta : comment Meta recueille et utilise les données utilisateur(ice)",
+        "matches": []
+      },
+      {
+        "type": "static",
+        "url_source": "https://www.facebook.com/privacy/center/?entry_point=facebook_page_footer",
+        "contenu": "Facebook",
+        "matches": []
+      },
+      {
+        "type": "static",
+        "url_source": "https://www.facebook.com/policies/cookies/",
+        "contenu": "Politique d’utilisation des cookies de Meta",
+        "matches": []
+      },
+      {
+        "type": "static",
+        "url_source": "https://www.facebook.com/allactivity?privacy_source=activity_log_top_menu",
+        "contenu": "Facebook\n\n\n\n\n\n\n\n\n\n\n\n\nFacebook\nAdresse e-mail ou téléphone\nMot de passe\nInformations de compte oubliées ?\nS’inscrire\nNotice\nVous devez vous connecter pour continuer.\nSe connecter à Facebook\nSe connecter\nInformations de compte oubliées ?\nCréer un nouveau compte\nFrançais (France)\nEnglish (US)\nEspañol\nTürkçe\nPortuguês (Portugal)\nالعربية\nItaliano\nDeutsch\nहिन्दी\n中文(简体)\n日本語\nS’inscrire\nSe connecter\nMessenger\nFacebook Lite\nVidéo\nMeta Pay\nBoutique Meta\nMeta Quest\nRay-Ban Meta\nMeta AI\nPlus de contenu Meta AI\nInstagram\nThreads\nCentre d’information sur les élections\nPolitique de confidentialité\nCentre de confidentialité\nRésilier votre contrat ici\nÀ propos\nCréer une publicité\nCréer une Page\nDéveloppeurs\nEmplois\nCookies\nChoisir sa publicité\nConditions générales\nAide\nImportation des contacts et non-utilisateurs\nParamètres\nHistorique d’activité\n Meta © 2025",
+        "matches": []
+      }
+    ]
   },
   {
     "url": "https://www.caresagroup.fr/politique-confidentialite",
-    "sections": []
-  },
-  {
-    "url": "https://www.caresagroup.fr/avis",
-    "sections": []
-  },
-  {
-    "url": "https://www.instagram.com/caresagroup/",
-    "sections": []
-  },
-  {
-    "url": "https://www.caresagroup.fr/about",
     "sections": []
   },
   {
@@ -124,5 +116,13 @@
         "matches": []
       }
     ]
+  },
+  {
+    "url": "https://www.caresagroup.fr/mentions-legales",
+    "sections": []
+  },
+  {
+    "url": "https://www.caresagroup.fr/avis",
+    "sections": []
   }
 ]

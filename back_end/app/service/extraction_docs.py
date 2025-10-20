@@ -5,16 +5,21 @@ import requests
 import pdfplumber
 from hashlib import sha256
 from datetime import datetime, timezone
+from app.models.base_model import BaseModel
+from app.service.rgpd_updater import RGPDUpdater
+from app.service.nlp_preprocessor import NLPPreprocessor
 import schedule
 import time
 
 PDF_URL = "https://eur-lex.europa.eu/legal-content/FR/TXT/PDF/?uri=CELEX:32016R0679"
 JSON_PATH = "rgpd_structure.json"
 TEMP_PDF = "rgpd_temp.pdf"
+SNIPPET_WORDS = 200  # nombre de mots par snippet
 
 
-class GDPRScraper:
+class GDPRScraper(BaseModel):
     def __init__(self, pdf_url=PDF_URL, json_path=JSON_PATH):
+        super().__init__()
         self.pdf_url = pdf_url
         self.json_path = json_path
         self.data = {
@@ -28,7 +33,8 @@ class GDPRScraper:
                 "parties_preliminaires": {},
                 "dispositif_normatif": {"chapitres": []},
                 "jurisprudences": [],
-                "dernières_modifications": {"date": None, "articles_modifiés": []}
+                "dernières_modifications": {"date": None, "articles_modifiés": []},
+                "snippets_nlp": []  # <-- Ajout du champ pour les snippets
             }
         }
         self.load_json()
@@ -39,7 +45,6 @@ class GDPRScraper:
                 self.data = json.load(f)
 
     def check_update(self):
-        """Vérifie via HEAD si le PDF a été modifié."""
         try:
             response = requests.head(self.pdf_url, allow_redirects=True, timeout=10)
         except requests.RequestException:
@@ -77,16 +82,13 @@ class GDPRScraper:
         return sha256(text.encode("utf-8")).hexdigest()
 
     def parse_sections(self, text):
-        # Parties préliminaires
         prelim_match = re.search(r"(Considérants\s.*?)(?=CHAPITRE\sI)", text, re.DOTALL | re.IGNORECASE)
         if prelim_match:
             self.data["reglement"]["parties_preliminaires"] = {"texte": prelim_match.group(1).strip()}
 
-        # Jurisprudences
         jurisprudences = re.findall(r"(Jurisprudence\s.*?)(?=CHAPITRE\s|Article\s\d+|$)", text, re.DOTALL | re.IGNORECASE)
         self.data["reglement"]["jurisprudences"] = [j.strip() for j in jurisprudences]
 
-        # Chapitres et articles
         chap_pattern = re.compile(r"(CHAPITRE\s+[IVXLC]+)\s+(.*?)\n(.*?)(?=CHAPITRE\s+[IVXLC]+|$)", re.DOTALL)
         new_chap = []
         for chap_match in chap_pattern.finditer(text):
@@ -94,7 +96,6 @@ class GDPRScraper:
             chap_title = chap_match.group(2).strip()
             chap_content = chap_match.group(3).strip()
 
-            # Articles dans ce chapitre
             articles = []
             art_pattern = re.compile(r"(Article\s+\d+[A-Z]?)\s*(.*?)(?=Article\s+\d+[A-Z]?|CHAPITRE\s+[IVXLC]|$)", re.DOTALL)
             for art_match in art_pattern.finditer(chap_content):
@@ -109,19 +110,26 @@ class GDPRScraper:
             })
         return new_chap
 
+    def create_snippets(self, text, max_words=SNIPPET_WORDS):
+        """Découpe le texte en snippets pour NLP."""
+        paragraphs = [p.strip() for p in text.split("\n") if p.strip()]
+        snippets = []
+        for p in paragraphs:
+            words = p.split()
+            for i in range(0, len(words), max_words):
+                snippets.append(" ".join(words[i:i + max_words]))
+        return snippets
+
     def compare_and_update(self, new_chap):
         modified_articles = []
-
         old_chap = {c["numero"]: c for c in self.data["reglement"]["dispositif_normatif"]["chapitres"]}
 
         for chap in new_chap:
             chap_num = chap["numero"]
             if chap_num not in old_chap:
-                # Nouveau chapitre complet
                 self.data["reglement"]["dispositif_normatif"]["chapitres"].append(chap)
                 modified_articles.extend([a["numero"] for a in chap["articles"]])
             else:
-                # Chapitre existant : vérifier chaque article
                 old_articles = {a["numero"]: a for a in old_chap[chap_num]["articles"]}
                 for art in chap["articles"]:
                     num = art["numero"]
@@ -137,9 +145,10 @@ class GDPRScraper:
             "articles_modifiés": modified_articles
         }
 
-    def save_json(self, text_hash):
+    def save_json(self, text_hash, snippets):
         self.data["reglement"]["last_checked"] = datetime.now(timezone.utc).isoformat()
         self.data["reglement"]["hash_content"] = text_hash
+        self.data["reglement"]["snippets_nlp"] = snippets
         with open(self.json_path, "w", encoding="utf-8") as f:
             json.dump(self.data, f, indent=2, ensure_ascii=False)
         print(f"💾 JSON sauvegardé dans {self.json_path}")
@@ -154,8 +163,10 @@ class GDPRScraper:
         new_chap = self.parse_sections(full_text)
         print("🔍 Comparaison avec la version existante...")
         self.compare_and_update(new_chap)
+        print("✂️ Création des snippets NLP...")
+        snippets = self.create_snippets(full_text)
         print("💾 Sauvegarde JSON...")
-        self.save_json(text_hash)
+        self.save_json(text_hash, snippets)
         os.remove(TEMP_PDF)
         print("✅ Terminé.")
 
@@ -163,23 +174,23 @@ class GDPRScraper:
 if __name__ == "__main__":
     scraper = GDPRScraper()
 
-     # Scraping initial au démarrage
     print("🚀 Scraping initial du RGPD...")
     scraper.scrape()
 
     def weekly_check():
-        """Vérifie le serveur chaque semaine et scrape seulement si nécessaire."""
         print("🔎 Vérification hebdomadaire du RGPD...")
         if scraper.check_update():
             scraper.scrape()
+            updater = RGPDUpdater()
+            updater.update_rgpd_cache()
         else:
             print("✅ Aucun changement, scraping non nécessaire.")
 
-    # Planifie la vérification tous les lundis à 09h00
     schedule.every().monday.at("09:00").do(weekly_check)
     print("⏳ Système de vérification hebdomadaire démarré...")
 
-    # Boucle infinie pour exécuter les tâches planifiées
     while True:
         schedule.run_pending()
         time.sleep(60)
+
+

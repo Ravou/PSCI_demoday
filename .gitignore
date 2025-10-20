@@ -42,3 +42,89 @@ Thumbs.db
 *.bak
 *.swp
 
+# ======================
+# 🔧 PYTHON BACKEND
+# ======================
+
+# Environnements virtuels
+venv/
+env/
+back_end/venv/
+.back_env/
+
+# Fichiers Python compilés / cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Fichiers temporaires
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Dossiers générés automatiquement
+build/
+dist/
+.eggs/
+*.egg-info/
+
+# ======================
+# 🧠 JUPYTER / DATA
+# ======================
+
+.ipynb_checkpoints/
+*.ipynb
+*.csv
+*.tsv
+*.json
+*.sqlite3
+
+# ======================
+# 🌐 FRONTEND (React / Vue)
+# ======================
+
+# Node & Build
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+dist/
+build/
+
+# ======================
+# 🧰 OS / ÉDITEURS
+# ======================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# ======================
+# 🤖 AUTRES
+# ======================
+
+# Environnements / secrets
+.env
+.env.*
+*.secret
+*.pem
+
+# Sauvegardes / temporaires
+*.bak
+*.swp
+

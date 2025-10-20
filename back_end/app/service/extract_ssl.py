@@ -2,66 +2,65 @@ import ssl
 import socket
 import datetime
 from urllib.parse import urlparse
+from typing import Dict, Optional, List
+from app.models.base_model import BaseModel
 
-def get_certificate_info(url):
-    """
-    Checks the SSL certificate of any HTTPS URL.
-    Returns a dictionary with certificate details or an explicit error message.
-    """
-    # 1️⃣ Extract hostname from the URL (handles URLs with or without schema)
-    if not url.startswith(("http://", "https://")):
-        url = "https://" + url
-    parsed_url = urlparse(url)
-    hostname = parsed_url.hostname
+class ExtractSSL(BaseModel):
+    _certificates: List['ExtractSSL'] = []
 
-    if not hostname:
-        return {"error": "Invalid URL or hostname not found."}
+    allowed_update_fields = ['url', 'hostname']
 
-    context = ssl.create_default_context()
+    def __init__(self, url: str):
+        super().__init__()
+        # Normalisation de l'URL
+        if not url.startswith(("http://", "https://")):
+            url = "https://" + url
 
-    try:
-        # 2️⃣ Create a secure connection on port 443
-        with socket.create_connection((hostname, 443), timeout=5) as sock:
-            with context.wrap_socket(sock, server_hostname=hostname) as ssock:
-                cert = ssock.getpeercert()
+        self.url = url
+        self.parsed_url = urlparse(url)
+        self.hostname = self.parsed_url.hostname
+        self.context = ssl.create_default_context()
+        self.info: Optional[Dict] = None
 
-        # 3️⃣ Extract key certificate information
-        subject = dict(x[0] for x in cert.get('subject', []))
-        issuer = dict(x[0] for x in cert.get('issuer', []))
-        not_before = datetime.datetime.strptime(cert['notBefore'], '%b %d %H:%M:%S %Y %Z')
-        not_after = datetime.datetime.strptime(cert['notAfter'], '%b %d %H:%M:%S %Y %Z')
+        # Ajout à la liste globale
+        ExtractSSL._certificates.append(self)
 
-        return {
-            "url": url,
-            "hostname": hostname,
-            "common_name": subject.get('commonName'),
-            "issuer": issuer.get('commonName'),
-            "valid_from": not_before.strftime('%Y-%m-%d %H:%M:%S'),
-            "valid_until": not_after.strftime('%Y-%m-%d %H:%M:%S'),
-            "is_valid_now": not_before <= datetime.datetime.utcnow() <= not_after
-        }
+        # Récupération automatique du certificat
+        self._fetch_certificate()
 
-    except ssl.SSLError as e:
-        return {"url": url, "error": f"SSL Error: {e}"}
-    except socket.timeout:
-        return {"url": url, "error": "Connection timed out."}
-    except socket.gaierror:
-        return {"url": url, "error": "Domain name not found."}
-    except Exception as e:
-        return {"url": url, "error": f"Unknown error: {e}"}
+    def _fetch_certificate(self):
+        """Récupère les informations du certificat SSL et les stocke dans self.info"""
+        if not self.hostname:
+            self.info = {"error": "Invalid URL or hostname not found."}
+            return
 
+        try:
+            # Connexion sécurisée
+            with socket.create_connection((self.hostname, 443), timeout=5) as sock:
+                with self.context.wrap_socket(sock, server_hostname=self.hostname) as ssock:
+                    cert = ssock.getpeercert()
 
-if __name__ == "__main__":
-    print("=== Universal SSL Certificate Checker ===\n")
+            # Extraction des informations principales
+            subject = dict(x[0] for x in cert.get('subject', []))
+            issuer = dict(x[0] for x in cert.get('issuer', []))
+            not_before = datetime.datetime.strptime(cert['notBefore'], '%b %d %H:%M:%S %Y %Z')
+            not_after = datetime.datetime.strptime(cert['notAfter'], '%b %d %H:%M:%S %Y %Z')
 
-    while True:
-        user_input = input("👉 Enter a URL (or type 'exit' to quit): ").strip()
-        if user_input.lower() == "exit":
-            break
+            self.info = {
+                "url": self.url,
+                "hostname": self.hostname,
+                "common_name": subject.get('commonName'),
+                "issuer": issuer.get('commonName'),
+                "valid_from": not_before.strftime('%Y-%m-%d %H:%M:%S'),
+                "valid_until": not_after.strftime('%Y-%m-%d %H:%M:%S'),
+                "is_valid_now": not_before <= datetime.datetime.utcnow() <= not_after
+            }
 
-        info = get_certificate_info(user_input)
-        print("\nResult:")
-        for k, v in info.items():
-            print(f"  {k}: {v}")
-        print("\n--------------------------------------------\n")
-
+        except ssl.SSLError as e:
+            self.info = {"url": self.url, "error": f"SSL Error: {e}"}
+        except socket.timeout:
+            self.info = {"url": self.url, "error": "Connection timed out."}
+        except socket.gaierror:
+            self.info = {"url": self.url, "error": "Domain name not found."}
+        except Exception as e:
+            self.info = {"url": self.url, "error": f"Unknown error: {e}"}

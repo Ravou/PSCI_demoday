@@ -1,3 +1,20 @@
+<<<<<<< HEAD
 back_end/venv/
 venv/
+=======
+# Virtual environment
+venv/
+*.pyc
+__pycache__/
+
+# Large libraries
+back_end/venv/lib/python3.12/site-packages/
+
+# Outputs
+*.json
+*.html
+*.pdf
+
+back_end/ollama_pull.sh
+>>>>>>> Olivia
 

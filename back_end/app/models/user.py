@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List, Optional
 from datetime import datetime
+from app.models.audit import Audit
 from app.models.base_model import BaseModel
 import bcrypt
 

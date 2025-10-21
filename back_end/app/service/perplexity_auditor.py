@@ -3,6 +3,10 @@ import os
 import re
 import requests
 from app.models.base_model import BaseModel
+from app.service.nlp_preprocessor import NLPPreprocessor
+from app.service.semantic_matcher import SemanticMatcher
+from app.service.prompt_generator import PromptGenerator
+from app.service.web_crawler import WebCrawler
 
 class PerplexityAuditor(BaseModel):
     """
@@ -70,9 +74,12 @@ class PerplexityAuditor(BaseModel):
 
 
 if __name__ == "__main__":
-    # Mettre la clé directement ici
-    auditor = PerplexityAuditor(api_key="***REMOVED***")
+    auditor = PerplexityAuditor(api_key="")
     auditor.run()
+
+
+
+
 
 
 

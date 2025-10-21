@@ -52,7 +52,7 @@ class NLPPreprocessor(BaseModel):
             "Content-Type": "application/json"
         }
         data = {
-            "model": "pplx-70b-online",
+            "model": "",
             "messages": [
                 {"role": "system", "content": "Tu es un assistant NLP spécialisé en conformité RGPD."},
                 {"role": "user", "content": prompt}

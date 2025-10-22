@@ -6,7 +6,6 @@ from app.models.base_model import BaseModel
 from app.service.nlp_preprocessor import NLPPreprocessor
 from app.service.semantic_matcher import SemanticMatcher
 from app.service.prompt_generator import PromptGenerator
-from app.service.web_crawler import WebCrawler
 
 class PerplexityAuditor(BaseModel):
     """

@@ -1,20 +1,35 @@
-<<<<<<< HEAD
-back_end/venv/
-venv/
-=======
-# Virtual environment
-venv/
-*.pyc
+# Python
 __pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+venv/
+env/
+back_end/venv/
+*.pyc
 
-# Large libraries
-back_end/venv/lib/python3.12/site-packages/
+# Node
+node_modules/
+front_end/node_modules/
+npm-debug.log*
 
-# Outputs
-*.json
-*.html
-*.pdf
+# Build
+front_end/build/
+dist/
 
-back_end/ollama_pull.sh
->>>>>>> Olivia
+# IDE
+.vscode/
+.idea/
 
+# OS
+.DS_Store
+
+# Database
+*.db
+*.sqlite
+
+# Logs
+*.log
+
+# Env
+.env

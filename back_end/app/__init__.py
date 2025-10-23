@@ -1,27 +1,27 @@
-from flask import Flask
+from flask import Flask, redirect
 from flask_restx import Api
-from app.api.user import api as users_ns
-from app.api.audit import api as audit_ns
 from flask_bcrypt import Bcrypt
+
+from app.api.user import api as user_ns
+from app.api.audit import api as audit_ns
 
 bcrypt = Bcrypt()
 
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
     app.config.from_object(config_class)
+
     bcrypt.init_app(app)
 
-    # Crée l'API RESTx avec Swagger
-    api = Api(
-        app,
-        version='1.0',
-        title='RGPD Audit API',
-        description='API pour gérer les utilisateurs et audits RGPD',
-        doc='/docs'  # Swagger disponible sur /docs
-    )
+    api = Api(app, version='1.0', title='User Consent and Audit API',
+              description='PSCI application API', doc='/api/')
 
-    # Ajoute les namespaces
-    api.add_namespace(users_ns, path='/users')
-    api.add_namespace(audit_ns, path='/audit')
+    api.add_namespace(user_ns, path='/api/users')
+    api.add_namespace(audit_ns, path='/api/audit')
+
+    # Route d'accueil qui redirige vers Swagger
+    @app.route('/')
+    def index():
+        return redirect('/api/')
 
     return app

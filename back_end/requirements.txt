@@ -1,0 +1,13 @@
+requests
+beautifulsoup4
+selenium
+urllib3
+pdfplumber
+
+nltk
+spacy
+unidecode
+langdetect
+transformers
+sentence-transformers
+torch

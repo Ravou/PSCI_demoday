@@ -11,6 +11,12 @@ from transformers import pipeline, AutoTokenizer, AutoModel
 from app.models.base_model import BaseModel
 import nltk
 import spacy
+from dotenv import load_dotenv 
+
+# ==========================
+# 📥 Charger le fichier .env
+# ==========================
+load_dotenv() 
 
 # ==========================
 # 📥 Préparations NLTK / spaCy
@@ -31,7 +37,8 @@ class NLPPreprocessor(BaseModel):
 
     def __init__(self):
         super().__init__()
-        self.pplx_key = os.getenv("PPLX_API_KEY")
+        # Récupère la clé depuis .env
+        self.pplx_key = os.getenv("PERPLEXITY_API_KEY")
         self.has_pplx = bool(self.pplx_key)
 
         if not self.has_pplx:
@@ -47,6 +54,8 @@ class NLPPreprocessor(BaseModel):
     # 🔹 API Perplexity
     # ------------------
     def call_perplexity(self, prompt: str):
+        if not self.pplx_key:
+            raise ValueError("⚠️ PERPLEXITY_API_KEY non trouvée.")
         headers = {
             "Authorization": f"Bearer {self.pplx_key}",
             "Content-Type": "application/json"

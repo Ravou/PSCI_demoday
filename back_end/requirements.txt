@@ -1,11 +1,9 @@
-Flask
-FLask-SQLAlchemy
-psycopg2-binary
 requests
 beautifulsoup4
 selenium
 urllib3
 pdfplumber
+
 nltk
 spacy
 unidecode
@@ -13,6 +11,3 @@ langdetect
 transformers
 sentence-transformers
 torch
-schedule
-flask-cors
-flasgger    

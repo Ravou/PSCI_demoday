@@ -5,13 +5,6 @@ from app.models.base_model import BaseModel
 
 
 class Audit(BaseModel):
-    """
-    Modèle représentant un audit RGPD (ou autre) lié à un utilisateur et un site.
-    Permet :
-    - d'historiser les audits générés (un par site et utilisateur),
-    - de les mettre à jour,
-    - et de les récupérer facilement.
-    """
 
     STORAGE_FILE = "audits.json"
 
@@ -27,7 +20,7 @@ class Audit(BaseModel):
         self.user_id = user_id
         self.site = site
         self.content = content
-        self.timestamp = timestamp or datetime.now().isoformat()
+        self.timestamp = timestamp or datetime.now() 
 
     # ---------------------------
     # Conversion & sérialisation
@@ -39,7 +32,7 @@ class Audit(BaseModel):
                 "user_id": self.user_id,
                 "site": self.site,
                 "content": self.content,
-                "timestamp": self.timestamp,
+                "timestamp": self.timestamp.isoformat(),
             }
         )
         return base

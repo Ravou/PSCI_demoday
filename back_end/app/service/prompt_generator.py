@@ -2,14 +2,11 @@ import json
 from app.models.base_model import BaseModel
 
 class PromptGenerator(BaseModel):
-    """Génère un prompt RGPD à partir de données sémantiques."""
+    """Génère un prompt RGPD compatible Perplexity API (full mémoire)."""
 
     def __init__(self):
         super().__init__()
-        self.prompt_file = "prompt_data.json"
-        self.output_prompt_file = "rgpd_prompt_to_model.json"
-
-        # Points RGPD
+        self.output_prompt = None
         self.rgpd_points = [
             "Cookies et traceurs",
             "Politique de confidentialité",
@@ -18,40 +15,56 @@ class PromptGenerator(BaseModel):
             "Sécurité et transferts",
             "Mineurs",
             "Documentation",
-            "Rapport final"
+            "Rapport final",
         ]
 
-    def generate_prompt(self):
-        # Charger les données sémantiques
-        with open(self.prompt_file, "r", encoding="utf-8") as f:
-            prompt_data = json.load(f)
+    @staticmethod
+    def dict_to_list(site_dict: dict) -> list:
+        """Convertit un dict {url: {...}} en liste [{url, sections}] pour l’API."""
+        result = []
+        for url, content in site_dict.items():
+            result.append({
+                "url": url,
+                "sections": content.get("sections", [])
+            })
+        return result
 
-        # Construire le prompt
+    def generate_prompt(self, prompt_data: dict) -> dict:
+        if not isinstance(prompt_data, dict):
+            raise TypeError("❌ prompt_data doit être un dict.")
+
+        # Conversion dict → liste pour l’API
+        prompt_data_list = self.dict_to_list(prompt_data)
+
         prompt_text = (
-            "⚠️ Réponds uniquement par un JSON valide, sans aucun texte explicatif.\n"
-            "Ne mets rien avant ni après le JSON.\n"
-            "Tu es un assistant IA spécialisé en conformité RGPD.\n"
-            "Analyse les extraits de site suivants et évalue leur conformité pour chaque point RGPD.\n\n"
-            f"Extraits de site :\n{json.dumps(prompt_data, ensure_ascii=False, indent=2)}\n\n"
+            "⚠️ Réponds uniquement par un JSON valide.\n"
+            "Analyse les extraits de site suivants et évalue chaque point RGPD.\n"
+            "Pour chaque point, indique les articles légaux utilisés.\n\n"
+            f"Extraits de site : {json.dumps(prompt_data_list, ensure_ascii=False)}\n"
             f"Points RGPD à évaluer : {', '.join(self.rgpd_points)}\n\n"
-            "Format JSON attendu :\n"
-            "[\n"
-            "  {\n"
-            "    \"point\": \"Nom du point RGPD\",\n"
-            "    \"status\": \"conforme | partiellement conforme | non conforme | non détecté\",\n"
-            "    \"evidence\": \"Court extrait du site justifiant l'évaluation\",\n"
-            "    \"recommendation\": \"Recommandation simple et concrète\"\n"
-            "  }\n"
-            "]\n"
-    )
+            "Format JSON attendu : "
+            "[" 
+            "{\"point\": \"Nom du point RGPD\", "
+            "\"status\": \"conforme | partiellement conforme | non conforme | non détecté\", "
+            "\"evidence\": \"Court extrait du site justifiant l'évaluation\", "
+            "\"recommendation\": \"Recommandation simple et concrète\", "
+            "\"articles\": \"Articles légaux utilisés pour cette évaluation\"}"
+            "]"
+        )
+
+        self.output_prompt = {
+            "model": "sonar-medium-chat",
+            "messages": [
+                {"role": "system", "content": "Tu es un assistant IA spécialisé en conformité RGPD."},
+                {"role": "user", "content": prompt_text}
+            ]
+        }
+
+        # Vérification rapide
+        if not isinstance(self.output_prompt, dict) or "model" not in self.output_prompt or "messages" not in self.output_prompt:
+            raise ValueError("❌ Payload généré invalide.")
+
+        print("✅ Prompt généré en mémoire et prêt pour Perplexity.")
+        return self.output_prompt
 
 
-        # Sauvegarde
-        with open(self.output_prompt_file, "w", encoding="utf-8") as f:
-            json.dump({"prompt": prompt_text}, f, ensure_ascii=False, indent=2)
-
-        print(f"✅ Prompt généré et sauvegardé dans : {self.output_prompt_file}")
-
-if __name__ == "__main__":
-    pg = PromptGenerator()
-    pg.generate_prompt()

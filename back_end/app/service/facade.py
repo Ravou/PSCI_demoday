@@ -5,9 +5,10 @@ from app.models.audit import Audit
 from app.service.content_scraper import ContentScraper
 from app.service.nlp_preprocessor import NLPPreprocessor
 from app.service.semantic_matcher import SemanticMatcher
-from app.service.prompt_generator import PromptGenerator  # full mémoire
-from app.service.perplexity_auditor import PerplexityAuditor  # full mémoire
+from app.service.prompt_generator import PromptGenerator
+from app.service.perplexity_auditor import PerplexityAuditor
 from sentence_transformers import SentenceTransformer
+
 
 class Facade:
     def __init__(self):
@@ -15,21 +16,47 @@ class Facade:
         self.audits: Dict[str, List[Audit]] = {}  # user_id -> List[Audit]
         self.scraper = ContentScraper()
         self.nlp = NLPPreprocessor()
-        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')  # embeddings pour SemanticMatcher
+        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
 
     # -------------------------------
     # Gestion des utilisateurs
     # -------------------------------
     def create_user(self, name: str, email: str, password: str, consent_ip: str) -> User:
+        """Crée un nouvel utilisateur avec password hashé automatiquement"""
         user = User(name=name, email=email, password=password, consent_ip=consent_ip)
         self.users[user.id] = user
         return user
 
     def get_user(self, user_id: str) -> Optional[User]:
+        """Récupère un utilisateur par son ID"""
         return self.users.get(user_id)
+    
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        """Récupère un utilisateur par son email"""
+        for user in self.users.values():
+            if user.email == email:
+                return user
+        return None
+
+    def authenticate_user(self, email: str, password: str) -> Optional[User]:
+        """Authentifie un utilisateur par email et password"""
+        user = self.get_user_by_email(email)
+        if user and user.verify_password(password):
+            return user
+        return None
 
     def list_users(self) -> List[User]:
+        """Liste tous les utilisateurs"""
         return list(self.users.values())
+    
+    def delete_user(self, user_id: str) -> bool:
+        """Supprime un utilisateur"""
+        user = self.get_user(user_id)
+        if user:
+            user.delete_account(archive_consent=True)
+            del self.users[user_id]
+            return True
+        return False
 
     # -------------------------------
     # Gestion des audits
@@ -99,7 +126,9 @@ class Facade:
                 return audit
         return None
 
+
 # Instance globale
+
 facade = Facade()
 
 

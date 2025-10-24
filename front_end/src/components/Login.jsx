@@ -21,17 +21,41 @@ const Login = ({ onLoginSuccess }) => {
         password,
       });
 
+      console.log('Réponse API:', response.data); // Debug
+
+      // 🔥 CHANGEMENT: Adaptation aux champs exacts de ton API
+      // Ton backend retourne: { message, user_id, name, email }
       const userData = {
-        id: response.data.userid || response.data.id,
+        id: response.data.user_id,      // ✅ Ton API retourne "user_id" pas "userid"
         email: response.data.email,
-        name: response.data.name || email,
-        token: response.data.token,
+        name: response.data.name,
+        token: response.data.token || null, // Optionnel si tu n'as pas de JWT pour l'instant
       };
 
-      onLoginSuccess(userData);
+      // Stocke dans localStorage pour persistance
+      localStorage.setItem('user_id', userData.id);
+      localStorage.setItem('user_name', userData.name);
+      localStorage.setItem('user_email', userData.email);
+      if (userData.token) {
+        localStorage.setItem('auth_token', userData.token);
+      }
+
+      // Appelle la fonction callback si fournie
+      if (onLoginSuccess) {
+        onLoginSuccess(userData);
+      }
+
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Erreur de connexion');
+      console.error('Erreur connexion:', err);
+      
+      // 🔥 CHANGEMENT: Gestion d'erreur adaptée à ton API
+      // Ton backend retourne { error: 'Invalid credentials' }
+      setError(
+        err.response?.data?.error || 
+        err.response?.data?.message || 
+        'Identifiants incorrects'
+      );
     } finally {
       setLoading(false);
     }

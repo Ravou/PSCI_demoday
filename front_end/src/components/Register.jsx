@@ -17,16 +17,25 @@ const Register = () => {
     setLoading(true);
 
     try {
-      await axios.post('http://localhost:5000/api/users/register', {
+      // 🔥 CHANGEMENT 1: Ajout de consent_given dans le body
+      const response = await axios.post('http://localhost:5000/api/users/register', {
         name,
         email,
         password,
+        consent_given: true  // ✅ Obligatoire pour ton API
       });
 
+      console.log('Inscription réussie:', response.data);
       alert('Inscription réussie ! Vous pouvez maintenant vous connecter.');
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.message || 'Erreur lors de l\'inscription');
+      // 🔥 CHANGEMENT 2: Meilleure gestion des erreurs axios
+      console.error('Erreur inscription:', err);
+      setError(
+        err.response?.data?.error || 
+        err.response?.data?.message || 
+        'Erreur lors de l\'inscription'
+      );
     } finally {
       setLoading(false);
     }

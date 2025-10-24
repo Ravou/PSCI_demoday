@@ -40,14 +40,29 @@ class PerplexityAuditor(BaseModel):
         print(json.dumps(data, ensure_ascii=False, indent=2))
         raise RuntimeError("❌ Aucune réponse valide reçue de l'API.")
 
-    def extract_json(self, text: str) -> dict:
-        """Extrait le JSON de la réponse."""
-        match = re.search(r'\[.*\]', text, re.DOTALL)
-        if not match:
+    def extract_json(text: str) -> dict:
+        """Extrait le JSON de la réponse de façon plus robuste."""
+        # Recherche la première accolade ouvrante ou crochet
+        start = text.find('{')
+        end = text.rfind('}') + 1
+
+        if start == -1 or end == -1:
+            start = text.find('[')
+            end = text.rfind(']') + 1
+
+        if start == -1 or end == -1:
             print("=== Réponse brute du modèle ===")
             print(text)
             raise ValueError("❌ Aucun JSON valide trouvé dans la réponse.")
-        return json.loads(match.group(0))
+
+        json_str = text[start:end]
+
+        try:
+            return json.loads(json_str)
+        except json.JSONDecodeError as e:
+            print("=== JSON extrait mais invalide ===")
+            print(json_str)
+            raise ValueError(f"❌ JSON invalide : {e}")
 
     def run(self, prompt_payload: dict) -> dict:
         """Pipeline complet, tout en mémoire."""

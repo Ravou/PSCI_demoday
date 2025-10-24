@@ -61,7 +61,7 @@ class NLPPreprocessor(BaseModel):
             "Content-Type": "application/json"
         }
         data = {
-            "model": "sonar-pro",
+            "model": "",
             "messages": [
                 {"role": "system", "content": "Tu es un assistant NLP spécialisé en conformité RGPD."},
                 {"role": "user", "content": prompt}

@@ -46,6 +46,11 @@ class User(BaseModel):
     def verify_password(self, password: str) -> bool:
         """Checks if the provided password matches the stored hash."""
         return bcrypt.checkpw(password.encode('utf-8'), self._password_hash.encode('utf-8'))
+    
+    @property
+    def password_hash(self) -> str:
+        """Retourne le hash du password (lecture seule)"""
+        return self._password_hash
 
     # -----------------------
     # Consent archival and account deletion

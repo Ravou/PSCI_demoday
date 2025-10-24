@@ -1,9 +1,7 @@
 import json
 import torch
-import argparse
 from sentence_transformers import util
 from app.models.base_model import BaseModel
-
 
 class SemanticMatcher(BaseModel):
     """
@@ -29,6 +27,7 @@ class SemanticMatcher(BaseModel):
 
         # --- Normalisation : dict → list si nécessaire ---
         if isinstance(self.site_data, dict):
+            # si dict, on prend la première clé qui contient la liste
             first_key = next(iter(self.site_data))
             if isinstance(self.site_data[first_key], list):
                 self.site_data = self.site_data[first_key]
@@ -94,30 +93,8 @@ class SemanticMatcher(BaseModel):
 
 
 if __name__ == "__main__":
-    # === Nouveau bloc : gestion des arguments ===
-    parser = argparse.ArgumentParser(description="Lance le SemanticMatcher")
-    parser.add_argument("--rgpd_embeddings_path", type=str, default="rgpd_embeddings.json",
-                        help="Chemin vers le fichier des embeddings RGPD")
-    parser.add_argument("--nlp_output_path", type=str, help="Chemin vers le fichier JSON NLP")
-    parser.add_argument("--output_path", type=str, default="prompt_data.json",
-                        help="Chemin de sortie du fichier généré")
-    parser.add_argument("--threshold", type=float, default=0.75,
-                        help="Seuil de similarité pour filtrer les correspondances")
-    parser.add_argument("--top_k", type=int, default=3,
-                        help="Nombre maximum de correspondances à conserver")
-    args = parser.parse_args()
-
-    # Instanciation avec les bons arguments
-    matcher = SemanticMatcher(
-        rgpd_embeddings_path=args.rgpd_embeddings_path,
-        nlp_output_path=args.nlp_output_path
-    )
-
-    matcher.save_prompt_data(
-        output_path=args.output_path,
-        threshold=args.threshold,
-        top_k=args.top_k
-    )
+    matcher = SemanticMatcher()
+    matcher.save_prompt_data()
 
 
 

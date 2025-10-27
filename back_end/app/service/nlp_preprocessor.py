@@ -61,7 +61,7 @@ class NLPPreprocessor(BaseModel):
             "Content-Type": "application/json"
         }
         data = {
-            "model": "",
+            "model": "sonar-pro",
             "messages": [
                 {"role": "system", "content": "Tu es un assistant NLP spécialisé en conformité RGPD."},
                 {"role": "user", "content": prompt}
@@ -173,21 +173,13 @@ class NLPPreprocessor(BaseModel):
     # ====================================================
     # 🔹 Sauvegarde RGPD / Site
     # ====================================================
-    def save_rgpd_embeddings(self, rgpd_path: str, cache_path="rgpd_embeddings.json"):
-        if os.path.exists(cache_path):
-            print(f"✅ Cache RGPD trouvé : {cache_path} — pas de recalcul.")
-            return
-
+    def save_rgpd_embeddings(self, rgpd_data: dict) -> list:
         if self.has_pplx:
             print("⚠️ Mode Perplexity : embeddings locaux non générés (texte uniquement).")
-            return
+            return []
 
-        print(f"📘 Génération du cache RGPD à partir de {rgpd_path}...")
         results = []
-        with open(rgpd_path, "r", encoding="utf-8") as f:
-            rgpd = json.load(f)
-
-        chapitres = rgpd.get("reglement", {}).get("dispositif_normatif", {}).get("chapitres", [])
+        chapitres = rgpd_data.get("reglement", {}).get("dispositif_normatif", {}).get("chapitres", [])
         for chapitre in chapitres:
             for article in chapitre.get("articles", []):
                 texte = article.get("contenu", "")
@@ -199,16 +191,13 @@ class NLPPreprocessor(BaseModel):
                         "embedding": self.vectorize_text(texte).tolist()
                     })
 
-        with open(cache_path, "w", encoding="utf-8") as out:
-            json.dump(results, out, ensure_ascii=False, indent=2)
-        print(f"✅ Embeddings RGPD enregistrés dans {cache_path}")
+        print(f"✅ Embeddings RGPD générés, count={len(results)}")
+        return results
 
-    def save_audit_nlp_output(self, crawler_path: str, output_path="nlp_output.json"):
+    def save_audit_nlp_output(self, crawler_data: list) -> dict:
         site_results = []
-        with open(crawler_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
 
-        for item in data:
+        for item in crawler_data:
             page_data = {"url": item.get("url"), "sections": []}
 
             # Contenu dynamique
@@ -233,16 +222,30 @@ class NLPPreprocessor(BaseModel):
 
             site_results.append(page_data)
 
-        output_data = {"site_analysis": site_results}
-        with open(output_path, "w", encoding="utf-8") as out:
-            json.dump(output_data, out, ensure_ascii=False, indent=2)
-        print(f"✅ NLP complet sauvegardé dans {output_path}")
-
+        return {"site_analysis": site_results}
 
 # ==========================
 # 🔹 Main
 # ==========================
 if __name__ == "__main__":
+    import json
+
     nlp_proc = NLPPreprocessor()
-    nlp_proc.save_rgpd_embeddings("rgpd_structure.json", cache_path="rgpd_embeddings.json")
-    nlp_proc.save_audit_nlp_output("crawler_results.json", output_path="nlp_output.json")
+
+    # Chargement manuel des fichiers JSON (mode debug uniquement)
+    try:
+        with open("rgpd_structure.json", "r", encoding="utf-8") as f:
+            rgpd_data = json.load(f)
+        embeddings = nlp_proc.save_rgpd_embeddings(rgpd_data)
+        print(f"✅ Embeddings RGPD générés, count={len(embeddings)}")
+    except Exception as e:
+        print(f"Erreur chargement embeddings RGPD: {e}")
+
+    try:
+        with open("crawler_results.json", "r", encoding="utf-8") as f:
+            crawler_data = json.load(f)
+
+        nlp_output = nlp_proc.save_audit_nlp_output(crawler_data)
+        print(f"✅ Analyse NLP terminée, données prêtes")
+    except Exception as e:
+        print(f"Erreur chargement ou traitement NLP audit: {e}")

@@ -3,9 +3,17 @@ from app.service.facade import facade
 
 api = Namespace('audit', description='Audit operations for GDPR compliance')
 
+# Modèle Swagger / validation
 audit_model = api.model('Audit', {
-    'target': fields.String(required=True, description='Target website or domain to audit'),
-    'run_perplexity': fields.Boolean(required=False, description='Run Perplexity AI on this audit', default=False)
+    'target': fields.String(
+        required=True,
+        description='Target website or domain to audit'
+    ),
+    'run_perplexity': fields.Boolean(
+        required=False,
+        description='Run Perplexity AI on this audit',
+        default=True  # <-- par défaut True
+    )
 })
 
 # -------------------------------
@@ -24,23 +32,13 @@ class UserAudits(Resource):
 
         payload = api.payload
         target = payload['target']
-        run_perplexity = payload.get('run_perplexity', False)
+        run_perplexity = payload.get('run_perplexity', True)  # <-- par défaut True
 
-        api_key = None
-        if run_perplexity:
-            api_key = "YOUR_PERPLEXITY_API_KEY"  # ou récupérer depuis .env / config
-
-        audit = facade.create_audit(user_id, target, api_key=api_key)
+        audit = facade.create_audit(user_id, target, run_perplexity=run_perplexity)
         if not audit:
             return {'error': 'Audit creation failed'}, 500
 
-        return {
-            'id': audit.id,
-            'user_id': audit.user_id,
-            'site': audit.site,
-            'timestamp': audit.timestamp.isoformat(),
-            'content': audit.content
-        }, 201
+        return audit.to_dict(), 201
 
     @api.response(200, 'Audits retrieved successfully')
     @api.response(404, 'User not found')
@@ -51,13 +49,8 @@ class UserAudits(Resource):
             return {'error': 'User not found'}, 404
 
         audits = facade.list_audits(user_id)
-        return [{
-            'id': a.id,
-            'user_id': a.user_id,
-            'site': a.site,
-            'timestamp': a.timestamp.isoformat(),
-            'content': a.content
-        } for a in audits], 200
+        return [audit.to_dict() for audit in audits], 200
+
 
 # -------------------------------
 # Audit spécifique pour un site
@@ -71,13 +64,7 @@ class SingleAudit(Resource):
         audit = facade.get_audit(user_id, site)
         if not audit:
             return {'error': 'Audit not found'}, 404
-        return {
-            'id': audit.id,
-            'user_id': audit.user_id,
-            'site': audit.site,
-            'timestamp': audit.timestamp.isoformat(),
-            'content': audit.content
-        }, 200
+        return audit.to_dict(), 200
 
     @api.expect(audit_model, validate=True)
     @api.response(200, 'Audit updated successfully')
@@ -90,17 +77,10 @@ class SingleAudit(Resource):
 
         payload = api.payload
         new_target = payload['target']
-        run_perplexity = payload.get('run_perplexity', False)
-        api_key = "YOUR_PERPLEXITY_API_KEY" if run_perplexity else None
+        run_perplexity = payload.get('run_perplexity', True)  # <-- par défaut True
 
-        updated_audit = facade.create_audit(user_id, new_target, api_key=api_key)
-        return {
-            'id': updated_audit.id,
-            'user_id': updated_audit.user_id,
-            'site': updated_audit.site,
-            'timestamp': updated_audit.timestamp.isoformat(),
-            'content': updated_audit.content
-        }, 200
+        updated_audit = facade.create_audit(user_id, new_target, run_perplexity=run_perplexity)
+        return updated_audit.to_dict(), 200
 
     @api.response(200, 'Audit deleted successfully')
     @api.response(404, 'Audit not found')
@@ -112,7 +92,5 @@ class SingleAudit(Resource):
                 audits.remove(audit)
                 return {'message': 'Audit deleted successfully'}, 200
         return {'error': 'Audit not found'}, 404
-
-
 
 

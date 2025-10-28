@@ -18,3 +18,4 @@ back_end/venv/lib/python3.12/site-packages/
 back_end/ollama_pull.sh
 >>>>>>> Olivia
 
+back_end/.env

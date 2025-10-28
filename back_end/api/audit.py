@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from app.services.facade import facade  # façade qui gère la logique métier
+# façade qui gère la logique métier
 
 api = Namespace('audit', description='Audit operations, consent, scraping and audits')
 

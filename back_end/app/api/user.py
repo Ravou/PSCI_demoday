@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-
+from app.service.facade import facade
 
 api = Namespace('users', description='User operations, consent, scraping and audits')
 

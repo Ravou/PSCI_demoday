@@ -38,7 +38,7 @@ const FeaturesSection = () => {
             Proven Protection <span className="text-gradient">in Action</span>
           </h2>
           <p className="section-subtitle">
-            At PSCI Security, we go beyond basic protection — we deliver strategic, 
+            At PSCI we secure your GRPD compliance, we go beyond basic protection — we deliver strategic, 
             results-driven security tailored to your unique needs.
           </p>
         </motion.div>

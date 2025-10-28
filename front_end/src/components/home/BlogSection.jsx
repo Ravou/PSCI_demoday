@@ -44,7 +44,7 @@ const BlogSection = () => {
             Latest from our <span className="text-gradient">blog</span>
           </h2>
           <p className="section-subtitle">
-            At Secuby® Security, we believe that security starts with awareness. 
+            At PSCI company, we believe that GRPD compliance is not just a legal requirement. 
             Our blog features expert tips, industry insights, and the latest trends.
           </p>
         </motion.div>

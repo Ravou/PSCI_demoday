@@ -46,7 +46,7 @@ const HeroSection = () => {
           </div>
 
           <h1 className="hero-title">
-            Reliable Cyber Security for Your{' '}
+            Reliable Compliance Security for Your{' '}
             <span className="text-gradient">Peace of Mind</span>
           </h1>
 

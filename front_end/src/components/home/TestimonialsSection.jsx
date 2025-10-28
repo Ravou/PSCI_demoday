@@ -42,7 +42,7 @@ const TestimonialsSection = () => {
         >
           <h2 className="section-title">What Our <span className="text-gradient">Clients Say</span></h2>
           <p className="section-subtitle">
-            At Secuby® Security, we believe great service speaks for itself, but our clients say it even better. 
+            At PSCI® , we believe great service speaks for itself, but our clients say it even better. 
             Here's what they have to say:
           </p>
           <div className="overall-rating">

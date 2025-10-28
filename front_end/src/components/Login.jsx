@@ -47,14 +47,14 @@ const Login = ({ onLoginSuccess }) => {
 
       navigate('/dashboard');
     } catch (err) {
-      console.error('Erreur connexion:', err);
+      console.error('Connection error:', err);
       
       // 🔥 CHANGEMENT: Gestion d'erreur adaptée à ton API
       // Ton backend retourne { error: 'Invalid credentials' }
       setError(
         err.response?.data?.error || 
         err.response?.data?.message || 
-        'Identifiants incorrects'
+        'Incorrect email or password'
       );
     } finally {
       setLoading(false);
@@ -66,10 +66,10 @@ const Login = ({ onLoginSuccess }) => {
       <div className="login-container">
         <div className="login-card">
           <h1 className="login-title">
-            Connexion à <span className="text-gradient">PSCI</span>
+            Connect to <span className="text-gradient">PSCI</span>
           </h1>
           <p className="login-subtitle">
-            Accédez à votre tableau de bord sécurisé
+            Acces to your dashboard and manage your audits easily.
           </p>
 
           {error && <div className="error-message">{error}</div>}
@@ -82,13 +82,13 @@ const Login = ({ onLoginSuccess }) => {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="votre@email.com"
+                placeholder="your@email.com"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Mot de passe</label>
+              <label htmlFor="password">Password</label>
               <input
                 type="password"
                 id="password"
@@ -100,13 +100,13 @@ const Login = ({ onLoginSuccess }) => {
             </div>
 
             <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
-              {loading ? 'Connexion...' : 'Se connecter'}
+              {loading ? 'Connecting...' : 'Sign In'}
             </button>
           </form>
 
           <p className="login-footer">
-            Pas encore de compte ?{' '}
-            <a href="/register" className="login-link">S'inscrire</a>
+              Don't have an account yet ?{' '}
+            <a href="/register" className="login-link">Register</a>
           </p>
         </div>
       </div>

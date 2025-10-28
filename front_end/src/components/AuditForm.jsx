@@ -37,7 +37,7 @@ const AuditForm = ({ userid }) => {
             Audit <span className="text-gradient">RGPD</span>
           </h1>
           <p className="login-subtitle">
-            Entrez l'URL de votre site pour lancer un audit de conformité
+            Enter your website URL to run a compliance audit
           </p>
 
           {error && <div className="error-message">{error}</div>}
@@ -60,7 +60,7 @@ const AuditForm = ({ userid }) => {
 
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-group">
-              <label htmlFor="url">URL du site</label>
+              <label htmlFor="url">URL of the website</label>
               <input
                 type="url"
                 id="url"

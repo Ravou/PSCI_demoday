@@ -39,7 +39,7 @@ const Dashboard = () => {
       );
       setAudits(response.data);
     } catch (err) {
-      console.error('Erreur chargement audits:', err);
+      console.error('Error loading audits:', err);
       setAudits([]);
     } finally {
       setLoadingAudits(false);
@@ -52,7 +52,7 @@ const Dashboard = () => {
     setLoading(true);
 
     if (!user) {
-      setError('Utilisateur non connecté');
+      setError('User not logged in');
       setLoading(false);
       return;
     }
@@ -69,16 +69,16 @@ const Dashboard = () => {
         }
       );
 
-      console.log('Audit créé:', response.data);
-      alert('Audit lancé avec succès !');
+      console.log('Audit created:', response.data);
+      alert('Audit was created successfully!');
       setUrl('');
       loadAudits(user.id);
     } catch (err) {
-      console.error('Erreur création audit:', err);
+      console.error('Error creating audit:', err);
       setError(
         err.response?.data?.error || 
         err.response?.data?.message || 
-        'Erreur lors de la création de l\'audit'
+        'Error creating audit'
       );
     } finally {
       setLoading(false);
@@ -99,7 +99,7 @@ const Dashboard = () => {
   };
 
   if (!user) {
-    return <div className="loading-state">Chargement...</div>;
+    return <div className="loading-state">Loading...</div>;
   }
 
   return (
@@ -109,12 +109,23 @@ const Dashboard = () => {
         <div className="header-content">
           <h1 className="dashboard-title">Dashboard</h1>
           <p className="dashboard-subtitle">
-            Bienvenue, <span className="user-name">{user.name}</span> • {user.email}
+            Welcome, <span className="user-name">{user.name}</span> • {user.email}
           </p>
         </div>
-        <button className="btn-logout" onClick={handleLogout}>
-          🚪 Déconnexion
-        </button>
+        
+        {/* ✅ AJOUTÉ: Boutons Settings et Logout */}
+        <div className="header-actions">
+          <button 
+            className="btn-settings" 
+            onClick={() => navigate('/settings')}
+            title="Account Settings"
+          >
+            ⚙️ Settings
+          </button>
+          <button className="btn-logout" onClick={handleLogout}>
+            🚪 Logout
+          </button>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -136,7 +147,7 @@ const Dashboard = () => {
         </div>
 
         <div className="stat-card card">
-          <div className="stat-icon">��</div>
+          <div className="stat-icon">📊</div>
           <div className="stat-content">
             <div className="stat-value">{stats.averageScore}/100</div>
             <div className="stat-label">Average Score</div>
@@ -178,10 +189,10 @@ const Dashboard = () => {
         <h3 className="section-title">📋 Audit History</h3>
 
         {loadingAudits ? (
-          <div className="empty-state">Chargement des audits...</div>
+          <div className="empty-state">Loading audits...</div>
         ) : audits.length === 0 ? (
           <div className="empty-state">
-            Aucun audit pour le moment. Créez-en un ci-dessus !
+            Enter your website URL to run a compliance audit!
           </div>
         ) : (
           <div className="history-list">
@@ -198,7 +209,7 @@ const Dashboard = () => {
                   </a>
                   <div className="history-meta">
                     <span className="meta-icon">🕐</span>
-                    <span>{new Date(audit.timestamp || audit.date).toLocaleString('fr-FR')}</span>
+                    <span>{new Date(audit.timestamp || audit.date).toLocaleString('en-US')}</span>
                   </div>
                 </div>
 
@@ -207,7 +218,7 @@ const Dashboard = () => {
                     {audit.score || 0}/100
                   </div>
                   <div className={`result-status ${(audit.score || 0) < 50 ? 'status-fail' : 'status-pass'}`}>
-                    {(audit.score || 0) < 50 ? '✗ Non conforme' : '✓ Conforme'}
+                    {(audit.score || 0) < 50 ? '✗ Non-Compliant' : '✓ Compliant'}
                   </div>
                 </div>
               </div>

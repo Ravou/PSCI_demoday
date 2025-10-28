@@ -1,7 +1,8 @@
-from typing import Optional, List, Dict
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+from typing import Optional, List, Dict
+
 from app.models.user import User
 from app.models.audit import Audit
 from app.service.content_scraper import ContentScraper
@@ -12,6 +13,7 @@ from app.service.perplexity_auditor import PerplexityAuditor
 from sentence_transformers import SentenceTransformer
 
 load_dotenv()
+
 
 class Facade:
     def __init__(self):
@@ -59,16 +61,18 @@ class Facade:
             "policy_version": "1.0"
         }
 
-    # ---------- Audits (with outputs memory) ----------
+    # ---------- Sections du site ----------
     def get_site_sections(self, site: str) -> List[dict]:
         return [{"type": "section_example", "content": "Contenu exemple"}]
 
+    # ---------- Gestion outputs ----------
     def save_output(self, file_id: str, output: dict):
         self.temp_outputs[file_id] = output
 
     def get_output(self, file_id: str) -> Optional[dict]:
         return self.temp_outputs.get(file_id)
 
+    # ---------- Création d’un audit ----------
     def create_audit(self, user_id: str, site: str, run_perplexity: bool = False) -> Optional[Audit]:
         user = self.get_user(user_id)
         if not user:
@@ -82,20 +86,33 @@ class Facade:
         dynamic_data = self.scraper.scrape_dynamic(site)
         html_text = dynamic_data.get("html_text_snippet", "")
 
-        # --- NLP ---
-        nlp_output_texts = self.nlp.nlp_pipeline(html_text)
+        # --- NLP local / Hugging Face ---
+        nlp_output = self.nlp.nlp_pipeline(html_text)
         enriched_sections = []
-        for text in nlp_output_texts:
-            vector = self.embedder.encode(text).tolist()
+
+        # NLP output peut être soit un dict Perplexity soit un dict local
+        if isinstance(nlp_output, dict) and "analysis" in nlp_output:
+            # Cas Perplexity
             enriched_sections.append({
                 "type": "text",
                 "url_source": site,
-                "contenu": text,
-                "nlp": {"vector": vector}
+                "contenu": nlp_output["analysis"],
+                "nlp": {"vector": []}  # pas de vector local si Perplexity
             })
+        else:
+            # Cas local Hugging Face
+            for text in nlp_output.get("snippets", [html_text]):
+                vector = self.embedder.encode(text).tolist()
+                enriched_sections.append({
+                    "type": "text",
+                    "url_source": site,
+                    "contenu": text,
+                    "nlp": {"vector": vector}
+                })
 
         # --- Semantic Matching & Prompt ---
-        semantic_matcher = SemanticMatcher(site_data=[{"url": site, "sections": enriched_sections}], rgpd_data=rgpd_data)
+        semantic_matcher = SemanticMatcher(site_data=[{"url": site, "sections": enriched_sections}],
+                                           rgpd_data=rgpd_data)
         prompt_data_dict = semantic_matcher.build_prompt_data()
         prompt_generator = PromptGenerator()
         prompt_payload = prompt_generator.generate_prompt(prompt_data_dict)
@@ -115,7 +132,7 @@ class Facade:
         self.save_output(temp_id, {
             "static": static_data,
             "dynamic": dynamic_data,
-            "nlp_output": nlp_output_texts,
+            "nlp_output": nlp_output,
             "prompt_data": prompt_payload,
             "perplexity_report": perplexity_report
         })
@@ -131,11 +148,13 @@ class Facade:
         user.audits.append(audit)
         return audit
 
+    # ---------- Liste et récupération des audits ----------
     def list_audits(self, user_id: str) -> List[Audit]:
         return self.audits.get(user_id, [])
 
     def get_audit(self, user_id: str, site: str) -> Optional[Audit]:
         return next((a for a in self.list_audits(user_id) if a.site == site), None)
+
 
 # Instance globale
 facade = Facade()

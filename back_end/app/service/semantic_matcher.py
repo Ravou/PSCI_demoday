@@ -1,34 +1,36 @@
 import json
 import torch
-from sentence_transformers import util
+from sentence_transformers import SentenceTransformer, util
 from app.models.base_model import BaseModel
 
 class SemanticMatcher(BaseModel):
     """
     Fait le matching sémantique entre sections d’un site et les embeddings RGPD.
+    Génère automatiquement les vecteurs si absents dans le NLP.
     Retourne un dict prêt pour PromptGenerator ou stockage en base.
     """
 
-    def __init__(self, rgpd_data: list, site_data: list):
+    def __init__(self, rgpd_data: list, site_data: list, embedding_model_name: str = "all-MiniLM-L6-v2"):
         super().__init__()
 
         if rgpd_data is None:
-            raise ValueError("Il faut passer les embeddings RGPD déjà chargé en mémoire")
+            raise ValueError("Il faut passer les embeddings RGPD déjà chargés en mémoire")
         self.rgpd_data = rgpd_data
 
-        # --- Chargement des données du site ---
         if site_data is None:
-            raise ValueError("Il faut passer soit site_data contenant les donées du site")
+            raise ValueError("Il faut passer les données du site")
         self.site_data = site_data
 
-        # --- Normalisation : dict → list si nécessaire ---
+        # --- Normalisation dict → list si nécessaire ---
         if isinstance(self.site_data, dict):
-            # si dict, on prend la première clé qui contient la liste
             first_key = next(iter(self.site_data))
             if isinstance(self.site_data[first_key], list):
                 self.site_data = self.site_data[first_key]
             else:
                 raise ValueError("Format inattendu : aucune liste de pages trouvée.")
+
+        # --- Modèle pour générer les vecteurs ---
+        self.embedding_model = SentenceTransformer(embedding_model_name)
 
     @staticmethod
     def cosine_similarity(vec1, vec2):
@@ -62,22 +64,44 @@ class SemanticMatcher(BaseModel):
             "url_2": {"sections": [...matches...]},
         }
         """
+
         prompt_data = {}
+
         for page in self.site_data:
             url = page.get("url", "unknown_url")
             prompt_data[url] = {"sections": []}
 
             for section in page.get("sections", []):
-                vector = section.get("nlp", {}).get("vector")
+                nlp_data = section.get("nlp", {})
+                vector = nlp_data.get("vector")
+
+                # --- Générer le vecteur si absent ---
+                if vector is None:
+                    text_to_embed = section.get("contenu", "")
+                    if text_to_embed.strip():
+                        vector = self.embedding_model.encode(text_to_embed).tolist()
+                    else:
+                        vector = None
+
                 if vector is None:
                     continue
+
+                # --- Match RGPD ---
                 matches = self.match_section(vector, threshold=threshold, top_k=top_k)
+
+                # --- Contenu réel pour le prompt ---
+                if nlp_data.get("model") == "Perplexity" and "analysis" in nlp_data:
+                    section_content = nlp_data["analysis"]
+                else:
+                    section_content = section.get("contenu", "")
+
                 prompt_data[url]["sections"].append({
                     "type": section.get("type"),
                     "url_source": section.get("url_source"),
-                    "contenu": section.get("contenu"),
+                    "contenu": section_content,
                     "matches": matches
                 })
+
         return prompt_data
 
     def save_prompt_data(self, threshold=0.75, top_k=3) -> dict:
@@ -85,10 +109,7 @@ class SemanticMatcher(BaseModel):
 
 
 if __name__ == "__main__":
-    import json
-
     try:
-        # Chargement manuel des embeddings RGPD depuis fichier (debug)
         with open("rgpd_embeddings.json", "r", encoding="utf-8") as f:
             rgpd_embeddings = json.load(f)
         print(f"✅ Embeddings RGPD chargés, count={len(rgpd_embeddings)}")
@@ -97,7 +118,6 @@ if __name__ == "__main__":
         rgpd_embeddings = None
 
     try:
-        # Chargement manuel des données NLP du site depuis fichier (debug)
         with open("nlp_output.json", "r", encoding="utf-8") as f:
             site_data = json.load(f)
         print("✅ Données NLP site chargées")
@@ -105,16 +125,13 @@ if __name__ == "__main__":
         print(f"Erreur lors du chargement des données NLP site: {e}")
         site_data = None
 
-    # S’assurer que les données nécessaires sont bien chargées
     if rgpd_embeddings and site_data:
         matcher = SemanticMatcher(rgpd_data=rgpd_embeddings, site_data=site_data)
         prompt_data = matcher.build_prompt_data()
-        
-        # Pour debug, on peut afficher ou sauver ce dict dans un fichier
+
         print("=== Prompt data construit ===")
         print(json.dumps(prompt_data, ensure_ascii=False, indent=2))
-        
-        # Exemple sauvegarde optionnelle (debug uniquement)
+
         with open("prompt_data.json", "w", encoding="utf-8") as f:
             json.dump(prompt_data, f, ensure_ascii=False, indent=2)
         print("✅ Données de prompt sauvegardées dans prompt_data.json")

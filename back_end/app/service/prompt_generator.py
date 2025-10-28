@@ -6,8 +6,8 @@ from app.models.base_model import BaseModel
 class PromptGenerator(BaseModel):
     """Génère un prompt RGPD compatible Perplexity API."""
 
-    MAX_CONTENT_LENGTH = 8000  # assez grand pour sonar-pro
-    MAX_SECTION_LENGTH = 600   # limite sûre par section
+    MAX_CONTENT_LENGTH = 8000  # taille max du prompt complet
+    MAX_SECTION_LENGTH = 600   # taille max par section de texte
 
     def __init__(self):
         super().__init__()
@@ -25,13 +25,14 @@ class PromptGenerator(BaseModel):
 
     @staticmethod
     def clean_text(text: Any) -> str:
-        """Nettoie le texte (caractères non imprimables)."""
+        """Nettoie le texte en retirant les caractères non imprimables."""
         if not isinstance(text, str):
             text = str(text)
         return ''.join(c if 32 <= ord(c) <= 126 else ' ' for c in text)
 
     def dict_to_list(self, site_dict: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Convertit un dict {url: {...}} en liste [{url, sections}] pour l’API."""
+        """Convertit un dict {url: {...}} en liste [{url, sections}] compatible API,
+           en nettoyant et tronquant chaque section."""
         result = []
         for url, content in site_dict.items():
             sections = content.get("sections", [])
@@ -39,7 +40,9 @@ class PromptGenerator(BaseModel):
             for s in sections:
                 s_clean = self.clean_text(s)
                 if len(s_clean) > self.MAX_SECTION_LENGTH:
-                    s_clean = s_clean[:self.MAX_SECTION_LENGTH] + "..."
+                    cutoff = s_clean.rfind(' ', 0, self.MAX_SECTION_LENGTH)
+                    cutoff = cutoff if cutoff > 0 else self.MAX_SECTION_LENGTH
+                    s_clean = s_clean[:cutoff] + "..."
                 truncated_sections.append(s_clean)
             result.append({
                 "url": self.clean_text(url),
@@ -48,36 +51,37 @@ class PromptGenerator(BaseModel):
         return result
 
     def generate_prompt(self, prompt_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Construit un prompt structuré et conforme au schéma attendu par Perplexity."""
+        """Construit un prompt structuré au format attendu par Perplexity API."""
         if not isinstance(prompt_data, dict):
             raise TypeError("❌ prompt_data doit être un dict.")
 
         prompt_data_list = self.dict_to_list(prompt_data)
         site_json = json.dumps(prompt_data_list, ensure_ascii=False)
 
+        # Construire le texte du prompt avec guillemets échappés dans l'exemple JSON
+        format_json_example = (
+            '[{{"point": "Nom du point RGPD", '
+            '"status": "conforme | partiellement conforme | non conforme | non détecté", '
+            '"evidence": "Court extrait justifiant l’évaluation", '
+            '"recommendation": "Recommandation simple et concrète", '
+            '"articles": "Articles légaux utilisés"}}]'
+        )
+
         prompt_text = (
-            "⚠️ Réponds uniquement par un JSON valide, sans texte explicatif.\n"
+            "⚠️ Réponds uniquement par un JSON valide.\n"
             "Tu es un auditeur RGPD chargé d’évaluer un site web.\n"
             "Analyse les extraits suivants et attribue une évaluation pour chaque point RGPD.\n"
             "Format de réponse attendu : liste JSON.\n\n"
             f"Extraits du site : {site_json}\n\n"
             f"Points RGPD à évaluer : {', '.join(self.rgpd_points)}\n\n"
-            "Format JSON attendu : ["
-            "{\"point\": \"Nom du point RGPD\", "
-            "\"status\": \"conforme | partiellement conforme | non conforme | non détecté\", "
-            "\"evidence\": \"Court extrait justifiant l’évaluation\", "
-            "\"recommendation\": \"Recommandation simple et concrète\", "
-            "\"articles\": \"Articles légaux utilisés\"}"
-            "]"
+            f"Format JSON attendu : {format_json_example}"
         )
 
-        # tronquer uniquement si le texte total dépasse la limite API
         if len(prompt_text) > self.MAX_CONTENT_LENGTH:
             prompt_text = prompt_text[:self.MAX_CONTENT_LENGTH] + "\n…[truncated]"
 
-        # ✅ Structure finale acceptée par Perplexity API
         self.output_prompt = {
-            "model": "sonar-pro",  # ← modèle valide
+            "model": "sonar-pro",
             "messages": [
                 {"role": "system", "content": "Tu es un assistant IA spécialisé en conformité RGPD."},
                 {"role": "user", "content": prompt_text}
@@ -90,14 +94,13 @@ class PromptGenerator(BaseModel):
         return self.output_prompt
 
 
-# === Exemple d’exécution directe ===
 if __name__ == "__main__":
     pg = PromptGenerator()
     example_data = {
         "https://exemple.com": {
             "sections": [
                 "Voici un exemple de contenu RGPD avec cookies.",
-                "Une autre section de texte expliquant la politique de confidentialité."
+                "Une autre section expliquant la politique de confidentialité."
             ]
         }
     }

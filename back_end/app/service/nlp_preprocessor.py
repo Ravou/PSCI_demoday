@@ -1,6 +1,5 @@
 import os
 import re
-import json
 import math
 import torch
 import requests
@@ -11,12 +10,13 @@ from transformers import pipeline, AutoTokenizer, AutoModel
 from app.models.base_model import BaseModel
 import nltk
 import spacy
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
+import json
 
 # ==========================
 # 📥 Charger le fichier .env
 # ==========================
-load_dotenv() 
+load_dotenv()
 
 # ==========================
 # 📥 Préparations NLTK / spaCy
@@ -37,7 +37,6 @@ class NLPPreprocessor(BaseModel):
 
     def __init__(self):
         super().__init__()
-        # Récupère la clé depuis .env
         self.pplx_key = os.getenv("PERPLEXITY_API_KEY")
         self.has_pplx = bool(self.pplx_key)
 
@@ -71,6 +70,29 @@ class NLPPreprocessor(BaseModel):
         resp = requests.post("https://api.perplexity.ai/chat/completions", headers=headers, json=data)
         resp.raise_for_status()
         return resp.json()["choices"][0]["message"]["content"]
+
+    def perplexity_pipeline(self, text: str):
+        """
+        Appelle l'API Perplexity et renvoie le JSON d'analyse.
+        """
+        prompt = f"""
+        Analyse ce texte RGPD et renvoie un JSON structuré avec les champs :
+        - lang
+        - summary
+        - sentiment
+        - entities
+        - themes
+        - recommendations
+
+        Texte :
+        {text[:4000]}
+        """
+        result = self.call_perplexity(prompt)
+        return {
+            "model": "Perplexity",
+            "analysis": result,
+            "text_length": len(text)
+        }
 
     # ------------------
     # 🔹 Nettoyage & métadonnées
@@ -139,29 +161,6 @@ class NLPPreprocessor(BaseModel):
         return embeddings.numpy()
 
     # ------------------
-    # 🔹 Version API Perplexity
-    # ------------------
-    def perplexity_pipeline(self, text: str):
-        prompt = f"""
-        Analyse ce texte RGPD et renvoie un JSON structuré avec les champs :
-        - "lang"
-        - "summary"
-        - "sentiment"
-        - "entities"
-        - "themes"
-        - "recommendations"
-
-        Texte :
-        {text[:4000]}
-        """
-
-        try:
-            result = self.call_perplexity(prompt)
-            return {"model": "Perplexity", "analysis": result, "text_length": len(text)}
-        except Exception as e:
-            return {"model": "Perplexity", "error": str(e)}
-
-    # ------------------
     # 🔹 Wrapper principal
     # ------------------
     def nlp_pipeline(self, text: str):
@@ -170,82 +169,83 @@ class NLPPreprocessor(BaseModel):
         else:
             return self.local_nlp_pipeline(text)
 
-    # ====================================================
-    # 🔹 Sauvegarde RGPD / Site
-    # ====================================================
-    def save_rgpd_embeddings(self, rgpd_data: dict) -> list:
-        if self.has_pplx:
-            print("⚠️ Mode Perplexity : embeddings locaux non générés (texte uniquement).")
-            return []
+    # ------------------
+    # 🔹 Parsing Perplexity pour SemanticMatcher
+    # ------------------
+    def parse_perplexity_output(self, nlp_output: dict):
+        """
+        Parse le champ 'analysis' et retourne un dict exploitable
+        """
+        analysis_text = nlp_output.get("analysis", "{}")
+        try:
+            parsed = json.loads(analysis_text)
+        except json.JSONDecodeError:
+            parsed = {}
+        return parsed
 
-        results = []
-        chapitres = rgpd_data.get("reglement", {}).get("dispositif_normatif", {}).get("chapitres", [])
-        for chapitre in chapitres:
-            for article in chapitre.get("articles", []):
-                texte = article.get("contenu", "")
-                if texte.strip():
-                    results.append({
-                        "numero": article.get("numero"),
-                        "titre_chapitre": chapitre.get("titre"),
-                        "contenu": texte,
-                        "embedding": self.vectorize_text(texte).tolist()
-                    })
+    def nlp_sections_for_matching(self, nlp_output: dict, url: str):
+        """
+        Crée des sections utilisables par SemanticMatcher
+        """
+        parsed = self.parse_perplexity_output(nlp_output)
+        sections = []
 
-        print(f"✅ Embeddings RGPD générés, count={len(results)}")
-        return results
+        # Résumé
+        summary_text = parsed.get("summary", "")
+        if summary_text.strip():
+            vector = self.vectorize_text(summary_text).tolist()
+            sections.append({
+                "type": "text",
+                "url_source": url,
+                "contenu": summary_text,
+                "nlp": {
+                    "model": nlp_output.get("model"),
+                    "vector": vector
+                }
+            })
 
-    def save_audit_nlp_output(self, crawler_data: list) -> dict:
-        site_results = []
-
-        for item in crawler_data:
-            page_data = {"url": item.get("url"), "sections": []}
-
-            # Contenu dynamique
-            main_text = item.get("dynamic", {}).get("resultats", {}).get("html_text_snippet", "")
-            if main_text.strip():
-                page_data["sections"].append({
-                    "type": "dynamic",
-                    "contenu": main_text,
-                    "nlp": self.nlp_pipeline(main_text)
+        # Recommandations
+        for rec in parsed.get("recommendations", []):
+            if rec.strip():
+                vector = self.vectorize_text(rec).tolist()
+                sections.append({
+                    "type": "text",
+                    "url_source": url,
+                    "contenu": rec,
+                    "nlp": {
+                        "model": nlp_output.get("model"),
+                        "vector": vector
+                    }
                 })
 
-            # Contenu statique RGPD
-            textes_rgpd = item.get("static", {}).get("textes_rgpd", {})
-            for rgpd_url, rgpd_text in textes_rgpd.items():
-                if rgpd_text.strip():
-                    page_data["sections"].append({
-                        "type": "static",
-                        "url_source": rgpd_url,
-                        "contenu": rgpd_text,
-                        "nlp": self.nlp_pipeline(rgpd_text)
-                    })
+        # Texte complet
+        full_text = f"{summary_text} {' '.join(parsed.get('recommendations', []))}".strip()
+        if full_text:
+            vector = self.vectorize_text(full_text).tolist()
+            sections.append({
+                "type": "text",
+                "url_source": url,
+                "contenu": full_text,
+                "nlp": {
+                    "model": nlp_output.get("model"),
+                    "vector": vector
+                }
+            })
 
-            site_results.append(page_data)
+        return sections
 
-        return {"site_analysis": site_results}
+    def build_site_data(self, nlp_outputs: list):
+        """
+        Construit un dictionnaire site_data prêt pour SemanticMatcher
+        """
+        site_data = []
+        for entry in nlp_outputs:
+            url = entry.get("url", "unknown_url")
+            sections = self.nlp_sections_for_matching(entry, url)
+            site_data.append({
+                "url": url,
+                "sections": sections
+            })
+        return site_data
 
-# ==========================
-# 🔹 Main
-# ==========================
-if __name__ == "__main__":
-    import json
 
-    nlp_proc = NLPPreprocessor()
-
-    # Chargement manuel des fichiers JSON (mode debug uniquement)
-    try:
-        with open("rgpd_structure.json", "r", encoding="utf-8") as f:
-            rgpd_data = json.load(f)
-        embeddings = nlp_proc.save_rgpd_embeddings(rgpd_data)
-        print(f"✅ Embeddings RGPD générés, count={len(embeddings)}")
-    except Exception as e:
-        print(f"Erreur chargement embeddings RGPD: {e}")
-
-    try:
-        with open("crawler_results.json", "r", encoding="utf-8") as f:
-            crawler_data = json.load(f)
-
-        nlp_output = nlp_proc.save_audit_nlp_output(crawler_data)
-        print(f"✅ Analyse NLP terminée, données prêtes")
-    except Exception as e:
-        print(f"Erreur chargement ou traitement NLP audit: {e}")

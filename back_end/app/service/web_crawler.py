@@ -83,6 +83,13 @@ class WebCrawler(BaseModel):
             })
 
         return all_results
+    
+    def run(self):
+        """Enchaîne le crawl et le scraping et retourne TOUT en mémoire."""
+        self.crawl()
+        results = self.run_scraping()
+        return results
+
 
     def __repr__(self):
         return (
@@ -94,14 +101,6 @@ class WebCrawler(BaseModel):
 if __name__ == "__main__":
     url_input = input("Entrez l'URL du site à auditer : ")
     crawler = WebCrawler(start_url=url_input, max_depth=2, delay=1)
-    crawler.crawl()
-    results = crawler.run_scraping()
-
-    # Export JSON
-    output_json = json.dumps(results, ensure_ascii=False, indent=4)
-    print(output_json)
-
-    with open("crawler_results.json", "w", encoding="utf-8") as f:
-        f.write(output_json)
-
-
+    results = crawler.run()
+    
+    print(json.dumps(results, indent=2, ensure_ascii=False))

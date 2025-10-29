@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Optional
+from typing import List, Optional, Dict
 from datetime import datetime
 from app.models.audit import Audit
 from app.models.base_model import BaseModel
@@ -52,6 +52,11 @@ class User(BaseModel):
         """Retourne le hash du password (lecture seule)"""
         return self._password_hash
 
+    @property
+    def password_hash(self) -> str:
+        """Returns the password hash (read-only)."""
+        return self._password_hash
+
     # -----------------------
     # Consent archival and account deletion
     # -----------------------
@@ -59,9 +64,9 @@ class User(BaseModel):
         """Archives minimal consent data for legal traceability (GDPR)."""
         record = {
             "email": self.email,
-            "consent_date": self.consent_date,
+            "consent_date": self.consent_date.isoformat(),
             "consent_ip": self.consent_ip,
-            "archived_at": datetime.utcnow(),
+            "archived_at": datetime.utcnow().isoformat(),
         }
         User._archived_consents.append(record)
         print(f"Consent archived for {self.email} at {record['archived_at']}")
@@ -71,7 +76,7 @@ class User(BaseModel):
         if archive_consent:
             self._archive_consent()
 
-        # Delete linked audits and raw data
+        # Delete linked audits and raw data (assumes Audit and scraped_data objects have a delete method)
         for audit in getattr(self, 'audits', []):
             audit.delete()
         for data in getattr(self, 'scraped_data', []):
@@ -82,7 +87,40 @@ class User(BaseModel):
         print(f"Account deleted and consent revoked for {self.email}.")
 
     # -----------------------
-    # Class methods
+    # Serialization / Deserialization
+    # -----------------------
+    def to_dict(self) -> Dict:
+        base = super().to_dict()
+        base.update({
+            "name": self.name,
+            "email": self.email,
+            "password_hash": self._password_hash,
+            "account_created_at": self.account_created_at.isoformat(),
+            "consent_given": self.consent_given,
+            "consent_date": self.consent_date.isoformat(),
+            "consent_ip": self.consent_ip,
+            "consent_summary": self.consent_summary,
+            # Note: audits and scraped_data can be added if needed
+        })
+        return base
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> User:
+        obj = cls(
+            name=data["name"],
+            email=data["email"],
+            password="dummy",  # Password hash is set below; avoid unhashed password use
+            consent_ip=data.get("consent_ip", "")
+        )
+        obj._password_hash = data.get("password_hash", "")
+        obj.account_created_at = datetime.fromisoformat(data["account_created_at"])
+        obj.consent_given = data.get("consent_given", False)
+        obj.consent_date = datetime.fromisoformat(data["consent_date"])
+        obj.consent_summary = data.get("consent_summary", "")
+        return obj
+
+    # -----------------------
+    # Class methods to manage users in memory
     # -----------------------
     @classmethod
     def get_by_email(cls, email: str) -> Optional['User']:
@@ -110,6 +148,5 @@ class User(BaseModel):
     def __repr__(self):
         return (
             f"User(id='{self.id}', email='{self.email}', "
-            f"consent_given={self.consent_given}, created='{self.account_created_at}')"
+            f"consent_given={self.consent_given}, created='{self.account_created_at.isoformat()}')"
         )
-

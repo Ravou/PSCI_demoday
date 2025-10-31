@@ -1,9 +1,9 @@
 import json
 import torch
 from sentence_transformers import SentenceTransformer, util
-from app.models.base_model import BaseModel
 
-class SemanticMatcher(BaseModel):
+
+class SemanticMatcher:
     """
     Fait le matching sémantique entre sections d’un site et les embeddings RGPD.
     Génère automatiquement les vecteurs si absents dans le NLP.
@@ -11,7 +11,6 @@ class SemanticMatcher(BaseModel):
     """
 
     def __init__(self, rgpd_data: list, site_data: list, embedding_model_name: str = "all-MiniLM-L6-v2"):
-        super().__init__()
 
         if rgpd_data is None:
             raise ValueError("Il faut passer les embeddings RGPD déjà chargés en mémoire")
@@ -106,6 +105,9 @@ class SemanticMatcher(BaseModel):
 
     def save_prompt_data(self, threshold=0.75, top_k=3) -> dict:
         return self.build_prompt_data(threshold=threshold, top_k=top_k)
+    
+    def __repr__(self):
+        return f"SemanticMatcher(rgpd_data={self.rgpd_data}, site_data={self.site_data})"
 
 
 if __name__ == "__main__":

@@ -1,147 +1,100 @@
 from __future__ import annotations
-from typing import List, Optional, Dict
 from datetime import datetime
-from app.models.audit import Audit
+from typing import List, Dict
+from sqlalchemy import String, Boolean, DateTime
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base_model import BaseModel
 import bcrypt
+import uuid
 
-
+# -----------------------------
+# Définition de User
+# -----------------------------
 class User(BaseModel):
-    """Represents a user with mandatory consent and integrated GDPR-friendly archival system."""
+    __tablename__ = "users"
 
-    # In-memory storage for active users and archived consents
-    _users: List['User'] = []
-    _archived_consents: List[dict] = []
+    # UUID natif PostgreSQL pour l'ID
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
+    )
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    consent_ip: Mapped[str] = mapped_column(String(50), nullable=False)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    allowed_update_fields = ['name', 'email', 'password']
+    consent_given: Mapped[bool] = mapped_column(Boolean, default=True)
+    consent_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    consent_summary: Mapped[str] = mapped_column(String(255))
+    account_created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    def __init__(self, name: str, email: str, password: str, consent_ip: str):
+    # -----------------------------
+    # Relation avec Audit
+    # -----------------------------
+    audits: Mapped[List["Audit"]] = relationship(
+        "Audit", back_populates="user", cascade="all, delete-orphan"
+    )
+
+    # -----------------------------
+    # Initialisation
+    # -----------------------------
+    def __init__(self, name: str, email: str, password: str, consent_ip: str, is_admin: bool = False):
         super().__init__()
         self.name = name
         self.email = email
-        self._password_hash = self._hash_password(password)
-        self.account_created_at = datetime.utcnow()
-
-        # Consent (mandatory to create an account)
-        self.consent_given = True
-        self.consent_date = datetime.utcnow()
+        self.password_hash = self._hash_password(password)
         self.consent_ip = consent_ip
-        self.consent_summary = (
-            "Consent granted for site scraping and temporary data processing."
-        )
+        self.is_admin = is_admin
+        self.account_created_at = datetime.utcnow()
+        self.consent_date = datetime.utcnow()
+        self.consent_summary = "Consent granted for site scraping and temporary data processing."
 
-        # Relationships (to be linked later)
-        self.audits: List['Audit'] = []
-        self.scraped_data: List['dict'] = []
-
-        User._users.append(self)
-
-    # -----------------------
-    # Password management
-    # -----------------------
+    # -----------------------------
+    # Mot de passe
+    # -----------------------------
     def _hash_password(self, password: str) -> str:
-        """Hashes the password before storing it."""
-        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
     def verify_password(self, password: str) -> bool:
-        """Checks if the provided password matches the stored hash."""
-        return bcrypt.checkpw(password.encode('utf-8'), self._password_hash.encode('utf-8'))
+        return bcrypt.checkpw(password.encode("utf-8"), self.password_hash.encode("utf-8"))
 
-    @property
-    def password_hash(self) -> str:
-        """Returns the password hash (read-only)."""
-        return self._password_hash
-
-    # -----------------------
-    # Consent archival and account deletion
-    # -----------------------
-    def _archive_consent(self):
-        """Archives minimal consent data for legal traceability (GDPR)."""
-        record = {
+    # -----------------------------
+    # Consentement
+    # -----------------------------
+    def archive_consent(self) -> dict:
+        return {
             "email": self.email,
             "consent_date": self.consent_date.isoformat(),
             "consent_ip": self.consent_ip,
             "archived_at": datetime.utcnow().isoformat(),
         }
-        User._archived_consents.append(record)
-        print(f"Consent archived for {self.email} at {record['archived_at']}")
 
-    def delete_account(self, archive_consent: bool = True):
-        """Deletes the user's account and all associated data, optionally archiving consent."""
-        if archive_consent:
-            self._archive_consent()
-
-        # Delete linked audits and raw data (assumes Audit and scraped_data objects have a delete method)
-        for audit in getattr(self, 'audits', []):
-            audit.delete()
-        for data in getattr(self, 'scraped_data', []):
-            data.delete()
-
-        # Remove the user from active records
-        User._users = [u for u in User._users if u.id != self.id]
-        print(f"Account deleted and consent revoked for {self.email}.")
-
-    # -----------------------
-    # Serialization / Deserialization
-    # -----------------------
+    # -----------------------------
+    # Sérialisation
+    # -----------------------------
     def to_dict(self) -> Dict:
-        base = super().to_dict()
-        base.update({
+        return {
+            "id": str(self.id),
             "name": self.name,
             "email": self.email,
-            "password_hash": self._password_hash,
+            "is_admin": self.is_admin,
             "account_created_at": self.account_created_at.isoformat(),
             "consent_given": self.consent_given,
             "consent_date": self.consent_date.isoformat(),
             "consent_ip": self.consent_ip,
             "consent_summary": self.consent_summary,
-            # Note: audits and scraped_data can be added if needed
-        })
-        return base
+        }
 
-    @classmethod
-    def from_dict(cls, data: Dict) -> User:
-        obj = cls(
-            name=data["name"],
-            email=data["email"],
-            password="dummy",  # Password hash is set below; avoid unhashed password use
-            consent_ip=data.get("consent_ip", "")
-        )
-        obj._password_hash = data.get("password_hash", "")
-        obj.account_created_at = datetime.fromisoformat(data["account_created_at"])
-        obj.consent_given = data.get("consent_given", False)
-        obj.consent_date = datetime.fromisoformat(data["consent_date"])
-        obj.consent_summary = data.get("consent_summary", "")
-        return obj
-
-    # -----------------------
-    # Class methods to manage users in memory
-    # -----------------------
-    @classmethod
-    def get_by_email(cls, email: str) -> Optional['User']:
-        """Finds a user by email."""
-        return next((user for user in cls._users if user.email == email), None)
-
-    @classmethod
-    def get_by_id(cls, id: str) -> Optional['User']:
-        """Finds a user by ID."""
-        return next((user for user in cls._users if user.id == id), None)
-
-    @classmethod
-    def list_all(cls) -> List['User']:
-        """Returns all active users."""
-        return cls._users
-
-    @classmethod
-    def list_archived_consents(cls) -> List[dict]:
-        """Returns all archived consents."""
-        return cls._archived_consents
-
-    # -----------------------
-    # Representation
-    # -----------------------
+    # -----------------------------
+    # Représentation
+    # -----------------------------
     def __repr__(self):
-        return (
-            f"User(id='{self.id}', email='{self.email}', "
-            f"consent_given={self.consent_given}, created='{self.account_created_at.isoformat()}')"
-        )
+        return f"<User(id='{self.id}', email='{self.email}', admin={self.is_admin}, created='{self.account_created_at.isoformat()}')>"
+
+# -----------------------------
+# Import Audit après définition de User
+# -----------------------------
+from app.models.audit import Audit

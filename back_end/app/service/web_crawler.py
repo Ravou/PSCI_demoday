@@ -1,16 +1,14 @@
 from app.service.content_scraper import ContentScraper
 from app.service.extract_ssl import ExtractSSL
-from app.models.base_model import BaseModel
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import time
 import json
 
-class WebCrawler(BaseModel):
+class WebCrawler:
 
     def __init__(self, start_url, max_depth=2, delay=1):
-        super().__init__()
         self.start_url = start_url
         self.max_depth = max_depth
         self.delay = delay
@@ -48,7 +46,7 @@ class WebCrawler(BaseModel):
         for link in soup.find_all('a', href=True):
             next_url = link['href']
             full_url = urljoin(url, next_url)
-            if full_url.startswith("http://") or full_url.startswith("https://"):
+            if full_url.startswith(("http://", "https://")):
                 if full_url not in self.visited:
                     self.crawl(full_url, depth + 1)
 
@@ -83,17 +81,16 @@ class WebCrawler(BaseModel):
             })
 
         return all_results
-    
+
     def run(self):
-        """Enchaîne le crawl et le scraping et retourne TOUT en mémoire."""
+        """Enchaîne le crawl et le scraping et retourne tout en mémoire"""
         self.crawl()
         results = self.run_scraping()
         return results
 
-
     def __repr__(self):
         return (
-            f"WebCrawler(id='{self.id}', start_url='{self.start_url}', "
+            f"WebCrawler(start_url='{self.start_url}', "
             f"pages_visited={len(self.visited)})"
         )
 

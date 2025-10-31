@@ -3,16 +3,11 @@ import socket
 import datetime
 from urllib.parse import urlparse
 from typing import Dict, Optional, List
-from app.models.base_model import BaseModel
 
-class ExtractSSL(BaseModel):
+class ExtractSSL:
     _certificates: List['ExtractSSL'] = []
 
-    allowed_update_fields = ['url', 'hostname']
-
     def __init__(self, url: str):
-        super().__init__()
-        # Normalisation de l'URL
         if not url.startswith(("http://", "https://")):
             url = "https://" + url
 
@@ -64,3 +59,6 @@ class ExtractSSL(BaseModel):
             self.info = {"url": self.url, "error": "Domain name not found."}
         except Exception as e:
             self.info = {"url": self.url, "error": f"Unknown error: {e}"}
+    
+        def __repr__(self):
+            return f"ExtractSSL(url='{self.url}', hostname='{self.hostname}')"

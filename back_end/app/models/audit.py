@@ -1,92 +1,67 @@
-from typing import List, Dict, Optional
-from app.models.base_model import BaseModel
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import ForeignKey
+import uuid
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, DateTime, JSON
 from datetime import datetime
-
+from typing import Optional
+from app.models.base_model import BaseModel
 
 class Audit(BaseModel):
+    __tablename__ = "audits"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False
+    )
+    site: Mapped[str] = mapped_column(String, nullable=False)
+    content: Mapped[dict] = mapped_column(JSON, nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # Relation inverse vers User
+    user: Mapped["User"] = relationship("User", back_populates="audits")
+
     def __init__(
         self,
-        user_id: str,
+        user_id: uuid.UUID,
         site: str,
         content: dict,
-        timestamp: Optional[datetime] = None,
+        timestamp: Optional[str | datetime] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
         self.user_id = user_id
         self.site = site
         self.content = content
-        self.timestamp = timestamp or datetime.now()
+        self.timestamp = (
+            datetime.fromisoformat(timestamp) if isinstance(timestamp, str) else timestamp
+        ) or datetime.utcnow()
 
     def to_dict(self) -> dict:
-        base = super().to_dict()
-        base.update(
-            {
-                "user_id": self.user_id,
-                "site": self.site,
-                "content": self.content,
-                "timestamp": self.timestamp.isoformat(),
-            }
+        return {
+            "id": str(self.id),
+            "user_id": str(self.user_id),
+            "site": self.site,
+            "content": self.content,
+            "timestamp": self.timestamp.isoformat() if self.timestamp else None,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Audit":
+        return cls(
+            user_id=uuid.UUID(data["user_id"]),
+            site=data["site"],
+            content=data["content"],
+            timestamp=datetime.fromisoformat(data["timestamp"])
+            if data.get("timestamp")
+            else datetime.utcnow(),
         )
-        return base
 
-    # Méthodes modifiées pour recevoir et retourner des dicts/lists en mémoire
-    
-    @staticmethod
-    def load_all_from_memory(audits_data: List[dict]) -> List["Audit"]:
-        """Transforme une liste de dicts en objets Audit (mémoire uniquement)."""
-        audits = []
-        for a in audits_data:
-            audits.append(
-                Audit(
-                    user_id=a["user_id"],
-                    site=a["site"],
-                    content=a["content"],
-                    timestamp=datetime.fromisoformat(a["timestamp"]),
-                )
-            )
-        return audits
+    def __repr__(self):
+        return f"<Audit site='{self.site}' user_id='{self.user_id}' at {self.timestamp}>"
 
-    @staticmethod
-    def save_all_to_memory(audits: List["Audit"]) -> List[dict]:
-        """Transforme une liste d’Audit en liste de dicts (mémoire uniquement)."""
-        return [audit.to_dict() for audit in audits]
+# Import réel de User après définition d’Audit
+from app.models.user import User
 
-    def save_in_memory(self, audits: List["Audit"]) -> List["Audit"]:
-        """
-        Ajoute ou met à jour self dans la liste d’audits en mémoire.
-        Retourne la liste mise à jour.
-        """
-        updated = False
-        for i, audit in enumerate(audits):
-            if audit.user_id == self.user_id and audit.site == self.site:
-                audits[i] = self
-                updated = True
-                break
-        if not updated:
-            audits.append(self)
-        return audits
-
-    @staticmethod
-    def delete_from_memory(audits: List["Audit"], user_id: str, site: str) -> List["Audit"]:
-        """Supprime l’audit pour user+site dans la liste en mémoire."""
-        return [a for a in audits if not (a.user_id == user_id and a.site == site)]
-
-    @staticmethod
-    def get_by_user_in_memory(audits: List["Audit"], user_id: str) -> List["Audit"]:
-        return [a for a in audits if a.user_id == user_id]
-
-    @staticmethod
-    def get_by_user_and_site_in_memory(audits: List["Audit"], user_id: str, site: str) -> Optional["Audit"]:
-        for a in audits:
-            if a.user_id == user_id and a.site == site:
-                return a
-        return None
-
-    @staticmethod
-    def list_sites_for_user_in_memory(audits: List["Audit"], user_id: str) -> List[str]:
-        return list({a.site for a in audits if a.user_id == user_id})
-
-    @staticmethod
-    def get_last_audit_in_memory(audits: List["Audit"], user_id: str, site: str) -> Optional["Audit"]:
-        return Audit.get_by_user_and_site_in_memory(audits, user_id, site)

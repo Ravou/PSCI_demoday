@@ -5,8 +5,6 @@ import requests
 import pdfplumber
 from hashlib import sha256
 from datetime import datetime, timezone
-from app.models.base_model import BaseModel
-from app.service.rgpd_updater import RGPDUpdater
 from app.service.nlp_preprocessor import NLPPreprocessor
 import schedule
 import time
@@ -17,9 +15,8 @@ TEMP_PDF = "rgpd_temp.pdf"
 SNIPPET_WORDS = 200  # nombre de mots par snippet
 
 
-class GDPRScraper(BaseModel):
+class GDPRScraper:
     def __init__(self, pdf_url=PDF_URL, json_path=JSON_PATH):
-        super().__init__()
         self.pdf_url = pdf_url
         self.json_path = json_path
         self.data = {
@@ -169,6 +166,10 @@ class GDPRScraper(BaseModel):
         self.save_json(text_hash, snippets)
         os.remove(TEMP_PDF)
         print("✅ Terminé.")
+    
+    def __repr__(self):
+        return f"GDPRScraper(pdf_url='{self.pdf_url}', json_path='{self.json_path}')"
+
 
 
 if __name__ == "__main__":
@@ -181,6 +182,8 @@ if __name__ == "__main__":
         print("🔎 Vérification hebdomadaire du RGPD...")
         if scraper.check_update():
             scraper.scrape()
+
+            from app.service.rgpd_updater import RGPDUpdater
             updater = RGPDUpdater()
             updater.update_rgpd_cache()
         else:

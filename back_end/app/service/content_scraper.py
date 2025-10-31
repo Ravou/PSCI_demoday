@@ -4,17 +4,13 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from typing import List, Dict, Any, Optional
-from app.models.base_model import BaseModel
 import time
 import json
 
-class ContentScraper(BaseModel):
+class ContentScraper:
     _scrapers: List['ContentScraper'] = []
 
-    allowed_update_fields = ['remote_url']
-
     def __init__(self, remote_url: str = "http://localhost:4444/wd/hub"):
-        super().__init__()
         self.remote_url = remote_url
         self.results: Optional[Dict[str, Any]] = None
         self.rgpd_checklist = {
@@ -222,5 +218,5 @@ class ContentScraper(BaseModel):
             return results
 
     def __repr__(self):
-        return f"ContentScraper(id='{self.id}', remote_url='{self.remote_url}')"
+        return f"ContentScraper(remote_url='{self.remote_url}')"
 

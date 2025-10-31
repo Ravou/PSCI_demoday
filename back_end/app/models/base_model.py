@@ -1,7 +1,9 @@
 import uuid
 from datetime import datetime
+from app.persistence.database import Base
 
-class BaseModel:
+class BaseModel(Base):
+    __abstract__ = True
 
     def __init__(self, id=None, created_at=None, updated_at=None):
         self.id = id or str(uuid.uuid4())

@@ -40,8 +40,7 @@ def create_app(config_class="config.DevelopmentConfig"):
             'description': "Type 'Bearer <JWT token>' to authorize."
         } 
     }
-    api = Api(app, version='1.0', title='User Consent and Audit API',
-              description='PSCI application API', doc='/api/')
+    api = Api(app, version='1.0', title='User Consent and Audit API', description='PSCI application API', doc='/api/', authorizations=authorizations, security='Bearer Auth')
 
     api.add_namespace(user_ns, path='/api/users')
     api.add_namespace(audit_ns, path='/api/audit')
@@ -61,5 +60,3 @@ def create_app(config_class="config.DevelopmentConfig"):
         return response
 
     return app
-
-

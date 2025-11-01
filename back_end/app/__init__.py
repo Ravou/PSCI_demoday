@@ -1,21 +1,21 @@
 from flask import Flask, redirect
+from flask_sqlalchemy import SQLAlchemy
 from flask_restx import Api
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
-
-from app.api.user import api as user_ns
-from app.api.audit import api as audit_ns
+from flask_jwt_extended import JWTManager
 
 bcrypt = Bcrypt()
+jwt = JWTManager()
+db = SQLAlchemy()
 
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # Configuration CORS AVANT l'initialisation de l'API
     CORS(app, resources={
         r"/api/*": {
-            "origins": "*",  # En production, remplace par "http://localhost:3000"
+            "origins": "*",
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True
@@ -23,19 +23,35 @@ def create_app(config_class="config.DevelopmentConfig"):
     })
 
     bcrypt.init_app(app)
+    jwt.init_app(app)
+    db.init_app(app)
 
-    api = Api(app, version='1.0', title='User Consent and Audit API',
-              description='PSCI application API', doc='/api/')
+    from app.api.user import api as user_ns
+    from app.api.audit import api as audit_ns
+    from app.api.auth import api as auth_ns
+    from app.api.protected import api as protected_ns
+    from app.api.admin import api as admin_ns
+
+    authorizations = {
+        'Bearer Auth': {
+            'type': 'apiKey', 
+            'in': 'header', 
+            'name': 'Authorization', 
+            'description': "Type 'Bearer <JWT token>' to authorize."
+        } 
+    }
+    api = Api(app, version='1.0', title='User Consent and Audit API', description='PSCI application API', doc='/api/', authorizations=authorizations, security='Bearer Auth')
 
     api.add_namespace(user_ns, path='/api/users')
     api.add_namespace(audit_ns, path='/api/audit')
+    api.add_namespace(auth_ns, path='/api/auth')          
+    api.add_namespace(protected_ns, path='/api/protected')
+    api.add_namespace(admin_ns, path='/api/admin')
 
-    # Route d'accueil qui redirige vers Swagger
     @app.route('/')
     def index():
         return redirect('/api/')
 
-    # Hook pour ajouter les headers CORS à toutes les réponses
     @app.after_request
     def after_request(response):
         response.headers.add('Access-Control-Allow-Origin', '*')
@@ -44,4 +60,3 @@ def create_app(config_class="config.DevelopmentConfig"):
         return response
 
     return app
-

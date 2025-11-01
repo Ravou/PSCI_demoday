@@ -7,7 +7,6 @@ from unidecode import unidecode
 from langdetect import detect, DetectorFactory
 from nltk.tokenize import word_tokenize
 from transformers import pipeline, AutoTokenizer, AutoModel
-from app.models.base_model import BaseModel
 import nltk
 import spacy
 from dotenv import load_dotenv
@@ -32,11 +31,10 @@ DetectorFactory.seed = 0
 # ==========================
 # 🌐 Classe principale
 # ==========================
-class NLPPreprocessor(BaseModel):
+class NLPPreprocessor:
     CHUNK_SIZE = 2000
 
     def __init__(self):
-        super().__init__()
         self.pplx_key = os.getenv("PERPLEXITY_API_KEY")
         self.has_pplx = bool(self.pplx_key)
 
@@ -247,5 +245,7 @@ class NLPPreprocessor(BaseModel):
                 "sections": sections
             })
         return site_data
-
+    
+    def __repr__(self):
+        return f"NLPPreprocessor(url='{self.url}', hostname='{self.hostname}')"
 

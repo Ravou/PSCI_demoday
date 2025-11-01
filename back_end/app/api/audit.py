@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.service.facade import facade
 
 api = Namespace('audit', description='Audit operations for GDPR compliance')
@@ -12,85 +13,96 @@ audit_model = api.model('Audit', {
     'run_perplexity': fields.Boolean(
         required=False,
         description='Run Perplexity AI on this audit',
-        default=True  # <-- par défaut True
+        default=True
     )
 })
 
+
 # -------------------------------
-# Liste des audits pour un utilisateur
+# Liste ou création d’audits (par l’utilisateur connecté)
 # -------------------------------
-@api.route('/<string:user_id>/audits')
+@api.route('/audits')
 class UserAudits(Resource):
+    @jwt_required()
     @api.expect(audit_model, validate=True)
     @api.response(201, 'Audit created successfully')
-    @api.response(404, 'User not found')
-    def post(self, user_id):
-        """Create a full audit for a user (scraping + NLP + Semantic Matching + optional Perplexity)"""
-        user = facade.get_user(user_id)
-        if not user:
-            return {'error': 'User not found'}, 404
+    def post(self):
+        """Create a full audit for the logged-in user"""
+        current_user_id = get_jwt_identity()  # Récupère depuis le JWT
 
         payload = api.payload
         target = payload['target']
-        run_perplexity = payload.get('run_perplexity', True)  # <-- par défaut True
+        run_perplexity = payload.get('run_perplexity', True)
 
-        audit = facade.create_audit(user_id, target, run_perplexity=run_perplexity)
+        audit = facade.create_audit(current_user_id, target, run_perplexity=run_perplexity)
         if not audit:
             return {'error': 'Audit creation failed'}, 500
 
-        return audit.to_dict(), 201
+        return audit, 201
 
+    @jwt_required()
     @api.response(200, 'Audits retrieved successfully')
-    @api.response(404, 'User not found')
-    def get(self, user_id):
-        """List all audits for a user"""
-        user = facade.get_user(user_id)
-        if not user:
-            return {'error': 'User not found'}, 404
+    def get(self):
+        """List all audits for the logged-in user"""
+        current_user_id = get_jwt_identity()
+        audits = facade.list_audits(current_user_id)
+        return audits, 200
 
-        audits = facade.list_audits(user_id)
-        return [audit.to_dict() for audit in audits], 200
+    def options(self):
+        """Handle preflight CORS requests"""
+        return {}, 200
 
 
 # -------------------------------
-# Audit spécifique pour un site
+# Audit spécifique (par site)
 # -------------------------------
-@api.route('/<string:user_id>/audits/<string:site>')
+@api.route('/audits/<string:site>')
 class SingleAudit(Resource):
+    @jwt_required()
     @api.response(200, 'Audit retrieved successfully')
     @api.response(404, 'Audit not found')
-    def get(self, user_id, site):
-        """Get a specific audit by site"""
-        audit = facade.get_audit(user_id, site)
+    def get(self, site):
+        """Get a specific audit by site for the logged-in user"""
+        current_user_id = get_jwt_identity()
+        audit = facade.get_audit(current_user_id, site)
         if not audit:
             return {'error': 'Audit not found'}, 404
-        return audit.to_dict(), 200
+        return audit, 200
 
+    @jwt_required()
     @api.expect(audit_model, validate=True)
     @api.response(200, 'Audit updated successfully')
     @api.response(404, 'Audit not found')
-    def put(self, user_id, site):
+    def put(self, site):
         """Update audit target and rerun full pipeline"""
-        audit = facade.get_audit(user_id, site)
-        if not audit:
-            return {'error': 'Audit not found'}, 404
-
+        current_user_id = get_jwt_identity()
         payload = api.payload
         new_target = payload['target']
-        run_perplexity = payload.get('run_perplexity', True)  # <-- par défaut True
+        run_perplexity = payload.get('run_perplexity', True)
 
-        updated_audit = facade.create_audit(user_id, new_target, run_perplexity=run_perplexity)
-        return updated_audit.to_dict(), 200
+        updated_audit = facade.create_audit(current_user_id, new_target, run_perplexity=run_perplexity)
+        if not updated_audit:
+            return {'error': 'Audit update failed'}, 500
 
+        return updated_audit, 200
+
+    @jwt_required()
     @api.response(200, 'Audit deleted successfully')
     @api.response(404, 'Audit not found')
-    def delete(self, user_id, site):
+    def delete(self, site):
         """Delete an audit for a specific site"""
-        audits = facade.list_audits(user_id)
+        current_user_id = get_jwt_identity()
+        audits = facade.list_audits(current_user_id)
+
         for audit in audits:
-            if audit.site == site:
+            if audit['site'] == site:
                 audits.remove(audit)
                 return {'message': 'Audit deleted successfully'}, 200
+
         return {'error': 'Audit not found'}, 404
+
+    def options(self, site):
+        """Handle preflight CORS requests"""
+        return {}, 200
 
 

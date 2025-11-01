@@ -11,3 +11,12 @@ langdetect
 transformers
 sentence-transformers
 torch
+
+flask-jwt-extended
+flask-cors
+flask-restful
+flask
+sqlalchemy
+flask-sqlalchemy
+psycopg2-binary
+alembic

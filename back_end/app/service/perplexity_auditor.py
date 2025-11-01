@@ -4,17 +4,15 @@ import json
 import requests
 from dotenv import load_dotenv
 from typing import Dict, Any
-from app.models.base_model import BaseModel
 
 load_dotenv()
 
-class PerplexityAuditor(BaseModel):
+class PerplexityAuditor:
     """Audit RGPD via Perplexity, full mémoire (dict en entrée/sortie)."""
 
     MAX_MESSAGE_LENGTH = 3500  # Limite par message pour éviter 400
 
     def __init__(self, api_key: str = None):
-        super().__init__()
         self.api_key = api_key or os.getenv("PERPLEXITY_API_KEY")
         if not self.api_key:
             raise ValueError("⚠️ Variable d’environnement PERPLEXITY_API_KEY non trouvée !")
@@ -108,6 +106,10 @@ class PerplexityAuditor(BaseModel):
         audit_json = self.extract_json(response_text)
         print("✅ Audit RGPD généré en mémoire.")
         return audit_json
+    
+    def __repr__(self):
+        return f"PerplexityAuditor(url='{self.url}', hostname='{self.hostname}')"
+
 
 
 

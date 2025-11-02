@@ -76,7 +76,7 @@ function App() {
               {user ? (
                 <>
                   <span className="user-name">
-                    Welcome, <strong>{user.name || user.email}</strong>
+                   <strong>{user.name || user.email}</strong>
                   </span>
                   <button onClick={handleLogout} className="btn btn-primary">
                     Logout

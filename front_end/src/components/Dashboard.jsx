@@ -109,7 +109,7 @@ const Dashboard = () => {
         <div className="header-content">
           <h1 className="dashboard-title">Dashboard</h1>
           <p className="dashboard-subtitle">
-            Welcome, <span className="user-name">{user.name}</span> • {user.email}
+            <span className="user-name">{user.name}</span> • {user.email}
           </p>
         </div>
         
@@ -120,10 +120,10 @@ const Dashboard = () => {
             onClick={() => navigate('/settings')}
             title="Account Settings"
           >
-            ⚙️ Settings
+             Settings
           </button>
           <button className="btn-logout" onClick={handleLogout}>
-            🚪 Logout
+             Logout
           </button>
         </div>
       </div>
@@ -131,7 +131,7 @@ const Dashboard = () => {
       {/* Stats Grid */}
       <div className="stats-grid">
         <div className="stat-card card">
-          <div className="stat-icon">✓</div>
+          <div className="stat-icon"></div>
           <div className="stat-content">
             <div className="stat-value stat-value-primary">{stats.auditsCompleted}</div>
             <div className="stat-label">Audits Completed</div>
@@ -139,7 +139,7 @@ const Dashboard = () => {
         </div>
 
         <div className="stat-card card">
-          <div className="stat-icon">⏳</div>
+          <div className="stat-icon"></div>
           <div className="stat-content">
             <div className="stat-value">{stats.auditsInProgress}</div>
             <div className="stat-label">Audits In Progress</div>
@@ -147,7 +147,7 @@ const Dashboard = () => {
         </div>
 
         <div className="stat-card card">
-          <div className="stat-icon">📊</div>
+          <div className="stat-icon"></div>
           <div className="stat-content">
             <div className="stat-value">{stats.averageScore}/100</div>
             <div className="stat-label">Average Score</div>
@@ -186,7 +186,7 @@ const Dashboard = () => {
 
       {/* Audit History */}
       <div className="audit-history">
-        <h3 className="section-title">📋 Audit History</h3>
+        <h3 className="section-title"> Audit History</h3>
 
         {loadingAudits ? (
           <div className="empty-state">Loading audits...</div>
@@ -208,7 +208,7 @@ const Dashboard = () => {
                     {audit.site || audit.url}
                   </a>
                   <div className="history-meta">
-                    <span className="meta-icon">🕐</span>
+                    <span className="meta-icon"></span>
                     <span>{new Date(audit.timestamp || audit.date).toLocaleString('en-US')}</span>
                   </div>
                 </div>

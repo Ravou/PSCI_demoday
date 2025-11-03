@@ -4,13 +4,17 @@ from flask_restx import Api
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
+from config import config 
 
 bcrypt = Bcrypt()
 jwt = JWTManager()
 db = SQLAlchemy()
+migrate = Migrate()
 
-def create_app(config_class="config.DevelopmentConfig"):
+def create_app(config_name="development"):
     app = Flask(__name__)
+    config_class = config.get(config_name, config['default'])
     app.config.from_object(config_class)
 
     CORS(app, resources={
@@ -25,6 +29,7 @@ def create_app(config_class="config.DevelopmentConfig"):
     bcrypt.init_app(app)
     jwt.init_app(app)
     db.init_app(app)
+    migrate.init_app(app, db)
 
     from app.api.user import api as user_ns
     from app.api.audit import api as audit_ns
@@ -34,17 +39,26 @@ def create_app(config_class="config.DevelopmentConfig"):
 
     authorizations = {
         'Bearer Auth': {
-            'type': 'apiKey', 
-            'in': 'header', 
-            'name': 'Authorization', 
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
             'description': "Type 'Bearer <JWT token>' to authorize."
-        } 
+        }
     }
-    api = Api(app, version='1.0', title='User Consent and Audit API', description='PSCI application API', doc='/api/', authorizations=authorizations, security='Bearer Auth')
+
+    api = Api(
+        app,
+        version='1.0',
+        title='User Consent and Audit API',
+        description='PSCI application API',
+        doc='/api/',
+        authorizations=authorizations,
+        security='Bearer Auth'
+    )
 
     api.add_namespace(user_ns, path='/api/users')
     api.add_namespace(audit_ns, path='/api/audit')
-    api.add_namespace(auth_ns, path='/api/auth')          
+    api.add_namespace(auth_ns, path='/api/auth')
     api.add_namespace(protected_ns, path='/api/protected')
     api.add_namespace(admin_ns, path='/api/admin')
 

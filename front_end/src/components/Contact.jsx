@@ -9,9 +9,9 @@ const Contact = () => {
   return (
     <div className="contact-page">
       <div className="contact-container">
-        <h1 className="contact-title">Nos Contacts</h1>
+        <h1 className="contact-title">Contact</h1>
         <p className="contact-subtitle">
-          Rencontrez l'équipe de PSCI
+          Meet the founders of PSCI and learn more about our mission to simplify compliance auditing through innovative technology.
         </p>
 
         <div className="founders-grid">
@@ -23,10 +23,10 @@ const Contact = () => {
             <h2 className="founder-name">Olivia Letchy</h2>
             <h3 className="founder-title">Founder and Chief Technical Officer</h3>
             <p className="founder-description">
-               Olivia Letchy is an expert in cybersecurity and data protection. 
+              Olivia Letchy is an expert in cybersecurity and data protection. 
               With a master's degree in Information Systems Security, she has developed 
               specialized expertise in GDPR compliance analysis and vulnerability detection
-              . Passionate about technological innovation, she leads 
+              Passionate about technological innovation, she leads 
               PSCI's technical development with a clear vision: to make digital security 
               accessible to all.
             </p>
@@ -51,10 +51,11 @@ const Contact = () => {
               Dirimo Iriarte is an entrepreneur passionate about digital transformation and privacy protection.
               With extensive experience in innovative project management and full-stack application development,
               he is a PSCI consultant with a mission to revolutionize compliance auditing.
-              His user-centric approach and strategic vision make him a recognized leader in the field of information technology.
+              His user-centric approach and strategic vision make him a recognized leader 
+              in the field of information technology.
             </p>
             <a 
-              href="https://www.linkedin.com/in/dirimo-iriarte" 
+              href="https://www.linkedin.com/in/dirimo-iriarte-1a00a0b5/" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="social-link"
@@ -66,7 +67,7 @@ const Contact = () => {
 
         {/* Section Contact supplémentaire */}
         <div className="contact-info">
-          <h3 className="contact-info-title">Contactez-nous</h3>
+          <h3 className="contact-info-title">Contact - Information</h3>
           <div className="contact-details">
             <div className="contact-item">
               <span className="contact-icon">📧</span>

@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Dashboard.css';
 
+// ✅ Import des images (place-les dans front_end/src/assets/)
+import auditIcon from '../assets/images/audit.jpg';
+import auditProgressIcon from '../assets/images/auditprogress.jpg';
+import scoreIcon from '../assets/images/score.jpg';
+
 const Dashboard = () => {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
@@ -85,11 +90,8 @@ const Dashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate('/login');
-  };
 
+  
   const stats = {
     auditsCompleted: audits.filter(a => a.status === 'completed').length || audits.length,
     auditsInProgress: audits.filter(a => a.status === 'in_progress').length || 0,
@@ -104,34 +106,21 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      {/* Header */}
+      {/* ✅ Header SANS boutons Settings et Logout */}
       <div className="dashboard-header">
         <div className="header-content">
           <h1 className="dashboard-title">Dashboard</h1>
           <p className="dashboard-subtitle">
-            <span className="user-name">{user.name}</span> • {user.email}
+            Welcome, <span className="user-name">{user.name}</span> • {user.email}
           </p>
+          </div>
         </div>
-        
-        {/* ✅ AJOUTÉ: Boutons Settings et Logout */}
-        <div className="header-actions">
-          <button 
-            className="btn-settings" 
-            onClick={() => navigate('/settings')}
-            title="Account Settings"
-          >
-             Settings
-          </button>
-          <button className="btn-logout" onClick={handleLogout}>
-             Logout
-          </button>
-        </div>
-      </div>
 
-      {/* Stats Grid */}
+
+      {/* ✅ Stats Grid AVEC images */}
       <div className="stats-grid">
         <div className="stat-card card">
-          <div className="stat-icon"></div>
+          <img src={auditIcon} alt="Audit Completed" className="stat-image" />
           <div className="stat-content">
             <div className="stat-value stat-value-primary">{stats.auditsCompleted}</div>
             <div className="stat-label">Audits Completed</div>
@@ -139,7 +128,7 @@ const Dashboard = () => {
         </div>
 
         <div className="stat-card card">
-          <div className="stat-icon"></div>
+          <img src={auditProgressIcon} alt="Audit In Progress" className="stat-image" />
           <div className="stat-content">
             <div className="stat-value">{stats.auditsInProgress}</div>
             <div className="stat-label">Audits In Progress</div>
@@ -147,12 +136,29 @@ const Dashboard = () => {
         </div>
 
         <div className="stat-card card">
-          <div className="stat-icon"></div>
+          <img src={scoreIcon} alt="Average Score" className="stat-image" />
           <div className="stat-content">
             <div className="stat-value">{stats.averageScore}/100</div>
             <div className="stat-label">Average Score</div>
           </div>
         </div>
+      </div>
+
+      {/* ✅ NOUVELLE SECTION : Bannière 24/7 Protection */}
+      <div className="protection-banner card">
+        <div className="banner-tag">24/7 PROTECTION WITH LIVE RECORDING</div>
+        <h2 className="banner-title">
+          Your safety is our mission. Your trust is our commitment.
+        </h2>
+        <p className="banner-subtitle">
+          Click below to schedule your free risk assessment and learn how we can help protect your world.
+        </p>
+        <button 
+          className="btn btn-primary btn-large"
+          onClick={() => navigate('/contact')}
+        >
+          START PROTECTING YOUR PRESENCE
+        </button>
       </div>
 
       {/* New Audit Form */}

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import Login from './components/Login';
 import Register from './components/Register';
-import Dashboard from './components/Dashboard'; // ✅ Nouveau Dashboard
-import Settings from './components/Settings'; // ✅ Nouvelle page Settings
+import Dashboard from './components/Dashboard';
+import Settings from './components/Settings';
+import Contact from './components/Contact'; 
 import LandingPage from './components/LandingPage';
 import './styles/theme.css';
 import './App.css';
@@ -13,7 +14,7 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // ✅ MODIFIÉ: Utilise localStorage directement au lieu de JSON.parse
+
     const userId = localStorage.getItem('user_id');
     const userName = localStorage.getItem('user_name');
     const userEmail = localStorage.getItem('user_email');
@@ -30,7 +31,7 @@ function App() {
 
   const handleLoginSuccess = (userProfile) => {
     setUser(userProfile);
-    // ✅ MODIFIÉ: Stocke les données séparément
+
     localStorage.setItem('user_id', userProfile.id);
     localStorage.setItem('user_name', userProfile.name);
     localStorage.setItem('user_email', userProfile.email);
@@ -38,7 +39,7 @@ function App() {
 
   const handleLogout = () => {
     setUser(null);
-    // ✅ MODIFIÉ: Supprime toutes les données utilisateur
+
     localStorage.removeItem('user_id');
     localStorage.removeItem('user_name');
     localStorage.removeItem('user_email');
@@ -63,20 +64,20 @@ function App() {
               <span>PSCI</span>
             </Link>
             
-            {/* Menu de navigation */}
+
             <div className="nav-menu">
               <Link to="/" className="nav-link">Home</Link>
               {user && <Link to="/dashboard" className="nav-link">Dashboard</Link>}
               {user && <Link to="/settings" className="nav-link">Settings</Link>}
+              <Link to="/contact" className="nav-link">Contact</Link> {/* ✅ AJOUTÉ */}
               <a href="#features" className="nav-link">About Us</a>
-              <a href="#footer" className="nav-link">Contact</a>
-            </div>
+              </div>
 
             <div className="nav-right">
               {user ? (
                 <>
                   <span className="user-name">
-                   <strong>{user.name || user.email}</strong>
+                    <strong>{user.name || user.email}</strong>
                   </span>
                   <button onClick={handleLogout} className="btn btn-primary">
                     Logout
@@ -114,7 +115,7 @@ function App() {
               } 
             />
             
-            {/* ✅ MODIFIÉ: Utilise le nouveau Dashboard */}
+
             <Route 
               path="/dashboard" 
               element={
@@ -124,7 +125,7 @@ function App() {
               } 
             />
 
-            {/* ✅ NOUVEAU: Route Settings */}
+
             <Route 
               path="/settings" 
               element={
@@ -133,6 +134,9 @@ function App() {
                   <Navigate to="/login" replace />
               } 
             />
+
+            {/* ✅ NOUVELLE ROUTE Contact - Accessible à tous */}
+            <Route path="/contact" element={<Contact />} />
             
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
@@ -143,7 +147,7 @@ function App() {
           <div className="footer-links">
             <a href="mailto:contact@psci.com">contact@psci.com</a>
             <span> | </span>
-            <Link to="/settings">Privacy Policy</Link>
+            <Link to="/contact">Contact</Link> {/* ✅ CHANGÉ */}
             <span> | </span>
             <a href="http://localhost:5000/api/" target="_blank" rel="noopener noreferrer">
               API Docs

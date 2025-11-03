@@ -49,7 +49,7 @@ const Login = ({ onLoginSuccess }) => {
     } catch (err) {
       console.error('Connection error:', err);
       
-      // 🔥 CHANGEMENT: Gestion d'erreur adaptée à ton API
+      //  CHANGEMENT: Gestion d'erreur adaptée à ton API
       // Ton backend retourne { error: 'Invalid credentials' }
       setError(
         err.response?.data?.error || 

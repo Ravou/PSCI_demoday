@@ -138,19 +138,19 @@ const Settings = () => {
             className={`tab-button ${activeTab === 'profile' ? 'active' : ''}`}
             onClick={() => setActiveTab('profile')}
           >
-            👤 Profile
+             Profile
           </button>
           <button
             className={`tab-button ${activeTab === 'password' ? 'active' : ''}`}
             onClick={() => setActiveTab('password')}
           >
-            🔒 Password
+             Password
           </button>
           <button
             className={`tab-button ${activeTab === 'audits' ? 'active' : ''}`}
             onClick={() => setActiveTab('audits')}
           >
-            📋 Audit History
+             Audit History
           </button>
         </div>
 
@@ -270,7 +270,7 @@ const Settings = () => {
                       <div className="audit-info">
                         <h3 className="audit-url">{audit.site || audit.url}</h3>
                         <p className="audit-date">
-                          🕐 {new Date(audit.timestamp || audit.date).toLocaleString('en-US')}
+                           {new Date(audit.timestamp || audit.date).toLocaleString('en-US')}
                         </p>
                       </div>
                       <div className="audit-score">

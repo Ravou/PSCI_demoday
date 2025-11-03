@@ -1,0 +1,58 @@
+[
+  {
+    "point": "Cookies et traceurs",
+    "status": "non détecté",
+    "evidence": "Aucun extrait de site fourni ne permet d'identifier la présence ou l'absence d'une bannière ou d'une politique cookies.",
+    "recommendation": "Ajouter une bannière de consentement aux cookies et une politique détaillée sur les traceurs.",
+    "articles": "Articles 4, 6, 7, 13 RGPD ; Directive ePrivacy (2002/58/CE)"
+  },
+  {
+    "point": "Politique de confidentialité",
+    "status": "non détecté",
+    "evidence": "Aucun extrait ne permet de vérifier la présence, la complétude ou la conformité d'une politique de confidentialité.",
+    "recommendation": "Rédiger et publier une politique de confidentialité conforme, incluant identité du responsable, finalités, base légale, droits des personnes, destinataires, durée de conservation, DPO, réclamation CNIL.",
+    "articles": "Articles 12, 13, 14 RGPD"
+  },
+  {
+    "point": "Mentions légales",
+    "status": "non détecté",
+    "evidence": "Aucun extrait ne mentionne la présence ou le contenu des mentions légales.",
+    "recommendation": "Publier des mentions légales incluant identité, coordonnées, finalités, destinataires, base légale, droits RGPD, durée de conservation.",
+    "articles": "Article 6 III-1 LCEN ; Articles 13, 14 RGPD"
+  },
+  {
+    "point": "Formulaires et consentements",
+    "status": "non détecté",
+    "evidence": "Aucun extrait ne permet de vérifier la gestion du consentement ou l'information sur les formulaires.",
+    "recommendation": "Ajouter des informations claires sur les finalités, base légale et recueillir un consentement explicite et granulaire pour chaque traitement.",
+    "articles": "Articles 6, 7, 8, 13 RGPD"
+  },
+  {
+    "point": "Sécurité et transferts",
+    "status": "non détecté",
+    "evidence": "Aucun extrait ne présente les mesures de sécurité ou les transferts hors UE.",
+    "recommendation": "Décrire les mesures techniques et organisationnelles de sécurité et indiquer tout transfert de données hors UE.",
+    "articles": "Articles 32, 44 à 50 RGPD"
+  },
+  {
+    "point": "Mineurs",
+    "status": "non détecté",
+    "evidence": "Aucun extrait ne traite de la protection des mineurs ou du recueil du consentement parental.",
+    "recommendation": "Mettre en place un dispositif spécifique pour le recueil du consentement parental si le site cible des mineurs.",
+    "articles": "Article 8 RGPD"
+  },
+  {
+    "point": "Documentation",
+    "status": "non détecté",
+    "evidence": "Aucun extrait ne permet de vérifier l'existence d'une documentation relative aux traitements ou à la conformité.",
+    "recommendation": "Tenir un registre des traitements et documenter les procédures internes.",
+    "articles": "Article 30 RGPD"
+  },
+  {
+    "point": "Rapport final",
+    "status": "non conforme",
+    "evidence": "Aucune information détectée dans les extraits sur la conformité RGPD des différents points évalués.",
+    "recommendation": "Effectuer un audit complet du site et mettre en œuvre les mesures de conformité sur tous les points listés.",
+    "articles": "Articles 5, 24, 25 RGPD"
+  }
+]

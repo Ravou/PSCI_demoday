@@ -1,0 +1,13 @@
+{
+  "model": "sonar-pro",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Tu es un assistant IA spécialisé en conformité RGPD."
+    },
+    {
+      "role": "user",
+      "content": "⚠️ Réponds uniquement par un JSON valide.\nAnalyse les extraits de site suivants et évalue chaque point RGPD.\nPour chaque point, indique les articles légaux utilisés.\n\nExtraits de site : [{\"url\": \"https://x.com\", \"sections\": []}, {\"url\": \"https://www.caresagroup.fr/politique-confidentialite\", \"sections\": []}, {\"url\": \"https://www.facebook.com\", \"sections\": []}, {\"url\": \"https://www.instagram.com/caresagroup/\", \"sections\": []}, {\"url\": \"https://www.caresagroup.fr/faq\", \"sections\": []}, {\"url\": \"https://www.caresagroup.fr/avis\", \"sections\": []}, {\"url\": \"https://www.caresagroup.fr/\", \"sections\": []}, {\"url\": \"https://www.caresagroup.fr/about\", \"sections\": []}, {\"url\": \"https://www.caresagroup.fr/contact\", \"sections\": []}, {\"url\": \"https://www.caresagroup.fr/mentions-legales\", \"sections\": []}, {\"url\": \"https://www.caresagroup.fr/politique-cookies\", \"sections\": []}]\nPoints RGPD à évaluer : Cookies et traceurs, Politique de confidentialité, Mentions légales, Formulaires et consentements, Sécurité et transferts, Mineurs, Documentation, Rapport final\n\nFormat JSON attendu : [{\"point\": \"Nom du point RGPD\", \"status\": \"conforme | partiellement conforme | non conforme | non détecté\", \"evidence\": \"Court extrait du site justifiant l'évaluation\", \"recommendation\": \"Recommandation simple et concrète\", \"articles\": \"Articles légaux utilisés pour cette évaluation\"}]"
+    }
+  ]
+}

@@ -1,15 +1,39 @@
-# Virtual environment
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
 venv/
+env/
+back_end/venv/
+*.pyc
+
+# Node
+node_modules/
+front_end/node_modules/
+npm-debug.log*
+
+# Build
+front_end/build/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Database
+*.db
+*.sqlite
+
+# Logs
+*.log
+
+# Env
+.env
 *.pyc
 __pycache__/
-
-# Large libraries
-back_end/venv/lib/python3.12/site-packages/
-
-# Outputs
-*.json
-*.html
-*.pdf
-
-back_end/ollama_pull.sh
-
+*.py[cod]
+venv/

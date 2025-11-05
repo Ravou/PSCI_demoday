@@ -12,34 +12,40 @@ import spacy
 from dotenv import load_dotenv
 import json
 
+
 # ==========================
-# 📥 Charger le fichier .env
+# 📥 Load .env file
 # ==========================
 load_dotenv()
 
+
 # ==========================
-# 📥 Préparations NLTK / spaCy
+# 📥 NLTK / spaCy preparations
 # ==========================
 nltk.download("punkt", quiet=True)
 nltk.download("stopwords", quiet=True)
+
 
 nlp_fr = spacy.load("fr_core_news_sm")
 nlp_en = spacy.load("en_core_web_sm")
 nlp_fallback = spacy.load("xx_ent_wiki_sm")
 DetectorFactory.seed = 0
 
+
 # ==========================
-# 🌐 Classe principale
+# 🌐 Main class
 # ==========================
 class NLPPreprocessor:
     CHUNK_SIZE = 2000
+
 
     def __init__(self):
         self.pplx_key = os.getenv("PERPLEXITY_API_KEY")
         self.has_pplx = bool(self.pplx_key)
 
+
         if not self.has_pplx:
-            print("⚙️ Mode local Hugging Face (aucune clé Perplexity détectée).")
+            print("⚙️ Local Hugging Face mode (no Perplexity key detected).")
             self.tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
             self.model = AutoModel.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
             self.sentiment_analyzer = pipeline(
@@ -47,12 +53,13 @@ class NLPPreprocessor:
                 model="cardiffnlp/twitter-roberta-base-sentiment-latest"
             )
 
+
     # ------------------
-    # 🔹 API Perplexity
+    # 🔹 Perplexity API
     # ------------------
     def call_perplexity(self, prompt: str):
         if not self.pplx_key:
-            raise ValueError("⚠️ PERPLEXITY_API_KEY non trouvée.")
+            raise ValueError("⚠️ PERPLEXITY_API_KEY not found.")
         headers = {
             "Authorization": f"Bearer {self.pplx_key}",
             "Content-Type": "application/json"
@@ -60,7 +67,7 @@ class NLPPreprocessor:
         data = {
             "model": "sonar-pro",
             "messages": [
-                {"role": "system", "content": "Tu es un assistant NLP spécialisé en conformité RGPD."},
+                {"role": "system", "content": "You are an NLP assistant specialized in GDPR compliance."},
                 {"role": "user", "content": prompt}
             ],
             "temperature": 0.2
@@ -69,12 +76,13 @@ class NLPPreprocessor:
         resp.raise_for_status()
         return resp.json()["choices"][0]["message"]["content"]
 
+
     def perplexity_pipeline(self, text: str):
         """
-        Appelle l'API Perplexity et renvoie le JSON d'analyse.
+        Calls the Perplexity API and returns JSON analysis.
         """
         prompt = f"""
-        Analyse ce texte RGPD et renvoie un JSON structuré avec les champs :
+        Analyze this GDPR text and return structured JSON with fields:
         - lang
         - summary
         - sentiment
@@ -82,7 +90,8 @@ class NLPPreprocessor:
         - themes
         - recommendations
 
-        Texte :
+
+        Text:
         {text[:4000]}
         """
         result = self.call_perplexity(prompt)
@@ -92,8 +101,9 @@ class NLPPreprocessor:
             "text_length": len(text)
         }
 
+
     # ------------------
-    # 🔹 Nettoyage & métadonnées
+    # 🔹 Cleaning & metadata
     # ------------------
     def detect_lang(self, text: str):
         if not text or not text.strip():
@@ -103,6 +113,7 @@ class NLPPreprocessor:
         except:
             doc = nlp_fallback(text)
             return getattr(doc, "lang_", "unknown")
+
 
     def clean_text_with_metadata(self, text: str):
         if not text:
@@ -119,8 +130,9 @@ class NLPPreprocessor:
         text = re.sub(r"\s+", " ", text)
         return text.strip().lower(), metadata
 
+
     # ------------------
-    # 🔹 Version locale HF (fallback)
+    # 🔹 Local HF version (fallback)
     # ------------------
     def local_nlp_pipeline(self, text: str):
         lang = self.detect_lang(text)
@@ -128,10 +140,12 @@ class NLPPreprocessor:
         nlp = nlp_fr if lang == "fr" else nlp_en
         doc = nlp(cleaned)
 
+
         tokens = [t.text for t in doc if not t.is_stop and not t.is_punct]
         entities = [(ent.text, ent.label_) for ent in doc.ents]
         sentiment = self.sentiment_analyzer(cleaned[:512])[0]
         vector = self.vectorize_text(cleaned)
+
 
         snippets = []
         if len(cleaned) > self.CHUNK_SIZE:
@@ -139,6 +153,7 @@ class NLPPreprocessor:
                 snippets.append(cleaned[i*self.CHUNK_SIZE:(i+1)*self.CHUNK_SIZE])
         else:
             snippets.append(cleaned)
+
 
         return {
             "lang": lang,
@@ -152,14 +167,16 @@ class NLPPreprocessor:
             "snippets": snippets
         }
 
+
     def vectorize_text(self, text: str):
         inputs = self.tokenizer(text, return_tensors="pt", truncation=True, padding=True)
         with torch.no_grad():
             embeddings = self.model(**inputs).last_hidden_state.mean(dim=1).squeeze()
         return embeddings.numpy()
 
+
     # ------------------
-    # 🔹 Wrapper principal
+    # 🔹 Main wrapper
     # ------------------
     def nlp_pipeline(self, text: str):
         if self.has_pplx:
@@ -167,12 +184,13 @@ class NLPPreprocessor:
         else:
             return self.local_nlp_pipeline(text)
 
+
     # ------------------
-    # 🔹 Parsing Perplexity pour SemanticMatcher
+    # 🔹 Perplexity parsing for SemanticMatcher
     # ------------------
     def parse_perplexity_output(self, nlp_output: dict):
         """
-        Parse le champ 'analysis' et retourne un dict exploitable
+        Parse the 'analysis' field and return a usable dict
         """
         analysis_text = nlp_output.get("analysis", "{}")
         try:
@@ -181,60 +199,66 @@ class NLPPreprocessor:
             parsed = {}
         return parsed
 
+
     def nlp_sections_for_matching(self, nlp_output: dict, url: str):
         """
-        Crée des sections utilisables par SemanticMatcher
+        Create sections usable by SemanticMatcher
         """
         parsed = self.parse_perplexity_output(nlp_output)
         sections = []
 
-        # Résumé
+
+        # Summary
         summary_text = parsed.get("summary", "")
         if summary_text.strip():
             vector = self.vectorize_text(summary_text).tolist()
             sections.append({
                 "type": "text",
                 "url_source": url,
-                "contenu": summary_text,
+                "content": summary_text,
                 "nlp": {
                     "model": nlp_output.get("model"),
                     "vector": vector
                 }
             })
 
-        # Recommandations
+
+        # Recommendations
         for rec in parsed.get("recommendations", []):
             if rec.strip():
                 vector = self.vectorize_text(rec).tolist()
                 sections.append({
                     "type": "text",
                     "url_source": url,
-                    "contenu": rec,
+                    "content": rec,
                     "nlp": {
                         "model": nlp_output.get("model"),
                         "vector": vector
                     }
                 })
 
-        # Texte complet
+
+        # Full text
         full_text = f"{summary_text} {' '.join(parsed.get('recommendations', []))}".strip()
         if full_text:
             vector = self.vectorize_text(full_text).tolist()
             sections.append({
                 "type": "text",
                 "url_source": url,
-                "contenu": full_text,
+                "content": full_text,
                 "nlp": {
                     "model": nlp_output.get("model"),
                     "vector": vector
                 }
             })
 
+
         return sections
+
 
     def build_site_data(self, nlp_outputs: list):
         """
-        Construit un dictionnaire site_data prêt pour SemanticMatcher
+        Build a site_data dictionary ready for SemanticMatcher
         """
         site_data = []
         for entry in nlp_outputs:
@@ -248,4 +272,3 @@ class NLPPreprocessor:
     
     def __repr__(self):
         return f"NLPPreprocessor(url='{self.url}', hostname='{self.hostname}')"
-

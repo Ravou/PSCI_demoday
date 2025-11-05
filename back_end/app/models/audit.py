@@ -20,7 +20,6 @@ class Audit(BaseModel):
     content: Mapped[dict] = mapped_column(JSON, nullable=False)
     timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    # Relation inverse vers User
     user: Mapped["User"] = relationship("User", back_populates="audits")
 
     def __init__(
@@ -62,6 +61,5 @@ class Audit(BaseModel):
     def __repr__(self):
         return f"<Audit site='{self.site}' user_id='{self.user_id}' at {self.timestamp}>"
 
-# Import réel de User après définition d’Audit
 from app.models.user import User
 

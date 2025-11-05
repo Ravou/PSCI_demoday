@@ -7,73 +7,81 @@ from typing import List, Dict, Any, Optional
 import time
 import json
 
+
 class ContentScraper:
     _scrapers: List['ContentScraper'] = []
+
 
     def __init__(self, remote_url: str = "http://localhost:4444/wd/hub"):
         self.remote_url = remote_url
         self.results: Optional[Dict[str, Any]] = None
         self.rgpd_checklist = {
-            "cookies": ["cookie", "consent", "traceur"],
-            "confidentialite": ["confidentialité", "privacy", "données personnelles"],
-            "mentions_legales": ["mentions légales", "legal notice"],
-            "formulaires": ["formulaire", "contact", "newsletter"],
-            "securite": ["https", "securite", "cryptage", "chiffrement"]
+            "cookies": ["cookie", "consent", "tracker"],
+            "privacy": ["privacy", "data protection", "personal data"],
+            "legal_notices": ["legal notice"],
+            "forms": ["form", "contact", "newsletter"],
+            "security": ["https", "security", "encryption", "cryptography"]
         }
         ContentScraper._scrapers.append(self)
 
+
     # ------------------------------------------------------------
-    # 📄 SCRAPING STATIQUE
+    # 📄 STATIC SCRAPING
     # ------------------------------------------------------------
     def scrape_static(self, url: str) -> Dict[str, Any]:
-        """Analyse statique : liens RGPD et texte complet des pages RGPD."""
+        """Static analysis: GDPR links and full text of GDPR pages."""
         if not url.startswith("http"):
             url = "https://" + url
 
-        result = {"url": url, "liens_rgpd": [], "textes_rgpd": {}}
+
+        result = {"url": url, "gdpr_links": [], "gdpr_texts": {}}
+
 
         try:
             response = requests.get(url, timeout=10)
             response.raise_for_status()
             soup = BeautifulSoup(response.text, "html.parser")
 
-            # Extraction des liens RGPD
-            links = [a.get("href") for a in soup.find_all("a", href=True)]
-            rgpd_links = [
-                l for l in links
-                if any(word in l.lower() for word in ["cookie", "privacy", "confidentialite", "legal", "rgpd"])
-            ]
-            result["liens_rgpd"] = rgpd_links
 
-            # Extraction du texte des pages RGPD
-            for link in rgpd_links:
+            links = [a.get("href") for a in soup.find_all("a", href=True)]
+            gdpr_links = [
+                l for l in links
+                if any(word in l.lower() for word in ["cookie", "privacy", "confidentiality", "legal", "gdpr"])
+            ]
+            result["gdpr_links"] = gdpr_links
+
+
+            # Extract texts from GDPR pages
+            for link in gdpr_links:
                 full_url = link if link.startswith("http") else url.rstrip("/") + "/" + link.lstrip("/")
                 try:
                     r = requests.get(full_url, timeout=10)
                     r.raise_for_status()
                     soup_page = BeautifulSoup(r.text, "html.parser")
-                    result["textes_rgpd"][full_url] = soup_page.get_text(separator="\n").strip()
+                    result["gdpr_texts"][full_url] = soup_page.get_text(separator="\n").strip()
                 except Exception:
-                    result["textes_rgpd"][full_url] = ""
+                    result["gdpr_texts"][full_url] = ""
             return result
+
 
         except requests.RequestException as e:
-            print(f"Erreur lors de la requête statique : {e}")
+            print(f"Error during static request: {e}")
             return result
 
+
     # ------------------------------------------------------------
-    # 🧠 DÉTECTION DE SIGNAUX RGPD
+    # 🧠 GDPR SIGNAL DETECTION
     # ------------------------------------------------------------
-    def detect_rgpd_signals(self, text: str) -> Dict[str, bool]:
-        """Détection rapide des thèmes RGPD dans le texte général de la page"""
+    def detect_gdpr_signals(self, text: str) -> Dict[str, bool]:
+        """Quick detection of GDPR themes in the general page text"""
         checks = {
-            "cookies": ["cookie", "consent", "traceur"],
-            "confidentialite": ["confidentialité", "privacy", "données personnelles", "protection des données"],
-            "mentions": ["mentions légales", "legal notice"],
-            "formulaires": ["formulaire", "contact", "newsletter", "inscription"],
-            "securite": ["https", "ssl", "sécurité", "chiffrement"],
-            "droits": ["droit d'accès", "effacement", "rectification", "portabilité", "opposition"],
-            "prospection": ["newsletter", "désinscription", "email marketing"]
+            "cookies": ["cookie", "consent", "tracker"],
+            "privacy": ["privacy", "data protection", "personal data", "data protection"],
+            "legal_notices": ["legal notice"],
+            "forms": ["form", "contact", "newsletter", "registration"],
+            "security": ["https", "ssl", "security", "encryption"],
+            "rights": ["right of access", "erasure", "rectification", "portability", "objection"],
+            "marketing": ["newsletter", "unsubscription", "email marketing"]
         }
         detected = {}
         lower_text = text.lower()
@@ -81,26 +89,29 @@ class ContentScraper:
             detected[theme] = any(k in lower_text for k in keywords)
         return detected
 
+
     # ------------------------------------------------------------
-    # ⚙️ SCRAPING DYNAMIQUE COMPLET AVEC SNIPPETS
+    # ⚙️ FULL DYNAMIC SCRAPING WITH SNIPPETS
     # ------------------------------------------------------------
     def scrape_dynamic(self, url: str, wait_time: int = 5, implicit_wait: int = 2, snippet_words: int = 200) -> Dict[str, Any]:
-        """Scraping dynamique RGPD complet + création de snippets pour NLP"""
+        """Full dynamic GDPR scraping + snippet creation for NLP"""
         if not url.startswith("http"):
             url = "https://" + url
+
 
         results = {
             "url": url,
             "signals_detected": {},
             "html_text_snippet": "",
-            "snippets_nlp": {},  # dict indexé pour NLP
-            "bandeau_cookie": {"present": False, "texts": []},
+            "snippets_nlp": {},
+            "cookie_banner": {"present": False, "texts": []},
             "privacy_sections": {"present": False, "texts": []},
-            "mentions_legales": {"present": False, "texts": []},
-            "formulaires_detectes": 0,
-            "formulaires_info": [],
+            "legal_notices": {"present": False, "texts": []},
+            "forms_detected": 0,
+            "forms_info": [],
             "security_info": {"https": False, "mentions": []}
         }
+
 
         driver = None
         try:
@@ -109,12 +120,14 @@ class ContentScraper:
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
 
+
             driver = webdriver.Remote(command_executor=self.remote_url, options=options)
             driver.implicitly_wait(implicit_wait)
             driver.get(url)
             time.sleep(wait_time)
 
-            # ---- Récupération du texte principal ----
+
+            # ---- Getting main text content ----
             main_content = driver.find_elements(By.TAG_NAME, "main")
             if main_content:
                 full_text = "\n".join([el.text for el in main_content if el.text.strip()])
@@ -122,11 +135,13 @@ class ContentScraper:
                 body = driver.find_element(By.TAG_NAME, "body")
                 full_text = body.text or ""
 
-            # Nettoyage simple pour NLP
+
+            # Simple cleaning for NLP
             full_text = "\n".join([line.strip() for line in full_text.splitlines() if line.strip()])
             results["html_text_snippet"] = full_text
 
-            # ---- Création des snippets NLP ----
+
+            # ---- Creating NLP snippets ----
             paragraphs = [p.strip() for p in full_text.split("\n") if p.strip()]
             snippets = []
             for p in paragraphs:
@@ -135,23 +150,26 @@ class ContentScraper:
                     snippets.append(" ".join(words[i:i + snippet_words]))
             results["snippets_nlp"] = {i: s for i, s in enumerate(snippets)}
 
-            # ---- Détection des signaux RGPD ----
-            rgpd_signals = self.detect_rgpd_signals(full_text)
-            results["signals_detected"] = rgpd_signals
+
+            # ---- Detect GDPR signals ----
+            gdpr_signals = self.detect_gdpr_signals(full_text)
+            results["signals_detected"] = gdpr_signals
             lower_html = driver.page_source.lower()
 
-            # ---- Bandeau cookie ----
-            if rgpd_signals.get("cookies"):
+
+            # ---- Cookie banner ----
+            if gdpr_signals.get("cookies"):
                 cookie_elements = driver.find_elements(
                     By.XPATH,
                     "//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'cookie') or contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'consent')]"
                 )
-                results["bandeau_cookie"]["present"] = len(cookie_elements) > 0
-                results["bandeau_cookie"]["texts"] = [el.text.strip() for el in cookie_elements if el.text.strip()]
+                results["cookie_banner"]["present"] = len(cookie_elements) > 0
+                results["cookie_banner"]["texts"] = [el.text.strip() for el in cookie_elements if el.text.strip()]
 
-            # ---- Sections privacy ----
-            if rgpd_signals.get("confidentialite"):
-                for kw in ["privacy", "confidentialit", "données personnelles"]:
+
+            # ---- Privacy sections ----
+            if gdpr_signals.get("privacy"):
+                for kw in ["privacy", "confidentialit", "personal data"]:
                     elems = driver.find_elements(By.XPATH, f"//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{kw}')]")
                     for el in elems:
                         t = el.text.strip()
@@ -159,20 +177,22 @@ class ContentScraper:
                             results["privacy_sections"]["texts"].append(t)
                 results["privacy_sections"]["present"] = len(results["privacy_sections"]["texts"]) > 0
 
-            # ---- Mentions légales ----
-            if rgpd_signals.get("mentions"):
-                for kw in ["mentions légales", "legal notice"]:
+
+            # ---- Legal notices ----
+            if gdpr_signals.get("legal_notices"):
+                for kw in ["legal notice"]:
                     elems = driver.find_elements(By.XPATH, f"//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{kw}')]")
                     for el in elems:
                         t = el.text.strip()
-                        if t and t not in results["mentions_legales"]["texts"]:
-                            results["mentions_legales"]["texts"].append(t)
-                results["mentions_legales"]["present"] = len(results["mentions_legales"]["texts"]) > 0
+                        if t and t not in results["legal_notices"]["texts"]:
+                            results["legal_notices"]["texts"].append(t)
+                results["legal_notices"]["present"] = len(results["legal_notices"]["texts"]) > 0
 
-            # ---- Formulaires ----
-            if rgpd_signals.get("formulaires"):
+
+            # ---- Forms ----
+            if gdpr_signals.get("forms"):
                 forms = driver.find_elements(By.TAG_NAME, "form")
-                results["formulaires_detectes"] = len(forms)
+                results["forms_detected"] = len(forms)
                 for f in forms:
                     info = {
                         "action": f.get_attribute("action") or "",
@@ -200,22 +220,26 @@ class ContentScraper:
                             "placeholder": placeholder,
                             "checked": checked
                         })
-                    results["formulaires_info"].append(info)
+                    results["forms_info"].append(info)
 
-            # ---- Sécurité ----
-            if rgpd_signals.get("securite"):
+
+            # ---- Security ----
+            if gdpr_signals.get("security"):
                 results["security_info"]["https"] = url.startswith("https")
-                if "sécurité" in lower_html or "ssl" in lower_html:
-                    results["security_info"]["mentions"].append("Mention de sécurité trouvée")
+                if "security" in lower_html or "ssl" in lower_html:
+                    results["security_info"]["mentions"].append("Security mention found")
+
 
             driver.quit()
             return results
 
+
         except Exception as e:
-            print(f"Erreur scraping dynamique : {e}")
+            print(f"Dynamic scraping error: {e}")
             if driver:
                 driver.quit()
             return results
+
 
     def __repr__(self):
         return f"ContentScraper(remote_url='{self.remote_url}')"

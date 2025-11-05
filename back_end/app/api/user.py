@@ -15,7 +15,7 @@ user_model = api.model('User', {
 
 
 # -----------------------------
-# Liste des utilisateurs (admin only)
+# List of users (admin only)
 # -----------------------------
 @api.route('/')
 class UserList(Resource):
@@ -40,7 +40,7 @@ class UserList(Resource):
 
 
 # -----------------------------
-# Inscription d’un utilisateur (publique)
+# Registration of user (public)
 # -----------------------------
 @api.route('/register')
 class UserRegister(Resource):
@@ -76,7 +76,7 @@ class UserRegister(Resource):
 
 
 # -----------------------------
-# Gestion d’un utilisateur spécifique (JWT)
+# Management of a specific user (JWT)
 # -----------------------------
 @api.route('/<string:user_id>')
 class UserResource(Resource):

@@ -13,17 +13,18 @@ from app.service.semantic_matcher import SemanticMatcher
 from app.service.prompt_generator import PromptGenerator
 from app.service.perplexity_auditor import PerplexityAuditor
 from app.service.extraction_docs import GDPRScraper
-from app.service.rgpd_updater import RGPDUpdater
+from app.service.rgpd_updater import GDPRUpdater
 from sentence_transformers import SentenceTransformer
 import schedule
 import time
+
 
 load_dotenv()
 
 
 class Facade:
     def __init__(self):
-        # Repositories SQLAlchemy
+        # SQLAlchemy Repositories
         self.user_repo = UserRepository()
         self.audit_repo = AuditRepository()
 
@@ -32,18 +33,18 @@ class Facade:
         self.nlp = NLPPreprocessor()
         self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
 
-        # RGPD
+        # GDPR
         self.gdpr_scraper = GDPRScraper()
-        self.rgpd_updater = RGPDUpdater()
+        self.gdpr_updater = GDPRUpdater()
 
-        # Stockage temporaire outputs
+        # Temporary storage for outputs
         self.temp_outputs: Dict[str, dict] = {}
 
-        # Scheduler RGPD hebdomadaire
+        # Weekly GDPR scheduler
         self.start_rgpd_scheduler()
 
     # =======================================================
-    # UTILISATEURS
+    # USERS
     # =======================================================
     def create_user(self, name: str, email: str, password: str, consent_ip: str, is_admin: bool = False) -> dict:
         user = self.user_repo.create(name, email, password, consent_ip, is_admin)
@@ -58,7 +59,7 @@ class Facade:
         return user.to_dict() if user else None
 
     def authenticate_user(self, email: str, password: str) -> Optional[dict]:
-        """Vérifie email + password et retourne dict si correct"""
+        """Verifies email + password and returns dict if correct"""
         user = self.user_repo.get_by_email(email)
         if user and user.verify_password(password):
             return user.to_dict()
@@ -72,18 +73,18 @@ class Facade:
         return self.user_repo.delete_user(user_id, archive_consent=archive_consent)
 
     # =======================================================
-    # RGPD
+    # GDPR
     # =======================================================
     def update_rgpd(self):
-        """Vérifie et met à jour les données RGPD si nécessaire"""
+        """Checks and updates GDPR data if necessary"""
         if self.gdpr_scraper.check_update():
             self.gdpr_scraper.scrape()
             self.rgpd_updater.update_rgpd()
         else:
-            print("✅ RGPD déjà à jour")
+            print("✅ GDPR already up to date")
 
     def get_rgpd_data(self) -> dict:
-        """Retourne les données RGPD pour les audits ou analyses"""
+        """Returns GDPR data for audits or analyses"""
         return {
             "consent": True,
             "timestamp": datetime.now().isoformat(),
@@ -91,7 +92,7 @@ class Facade:
         }
 
     def start_rgpd_scheduler(self):
-        """Lance un thread pour vérifier le RGPD chaque lundi à 09:00"""
+        """Starts a thread to check GDPR every Monday at 09:00"""
         schedule.every().monday.at("09:00").do(self.update_rgpd)
 
         def run_scheduler():
@@ -103,13 +104,13 @@ class Facade:
         thread.start()
 
     # =======================================================
-    # SECTIONS DU SITE
+    # SITE SECTIONS
     # =======================================================
     def get_site_sections(self, site: str) -> List[dict]:
-        return [{"type": "section_example", "content": "Contenu exemple"}]
+        return [{"type": "section_example", "content": "Example content"}]
 
     # =======================================================
-    # GESTION DES OUTPUTS TEMPORAIRES
+    # TEMPORARY OUTPUTS MANAGEMENT
     # =======================================================
     def save_output(self, file_id: str, output: dict):
         self.temp_outputs[file_id] = output
@@ -125,7 +126,7 @@ class Facade:
         if not user:
             return None
 
-        # Mise à jour RGPD avant l’audit
+        # GDPR update before the audit
         self.update_rgpd()
         rgpd_data = self.get_rgpd_data()
 
@@ -134,7 +135,7 @@ class Facade:
         dynamic_data = self.scraper.scrape_dynamic(site)
         html_text = dynamic_data.get("html_text_snippet", "")
 
-        # --- NLP local / embeddings ---
+        # --- Local NLP / embeddings ---
         nlp_output = self.nlp.nlp_pipeline(html_text)
         enriched_sections = []
 
@@ -142,7 +143,7 @@ class Facade:
             enriched_sections.append({
                 "type": "text",
                 "url_source": site,
-                "contenu": nlp_output["analysis"],
+                "content": nlp_output["analysis"],
                 "nlp": {"vector": []}
             })
         else:
@@ -151,7 +152,7 @@ class Facade:
                 enriched_sections.append({
                     "type": "text",
                     "url_source": site,
-                    "contenu": text,
+                    "content": text,
                     "nlp": {"vector": vector}
                 })
 
@@ -164,7 +165,7 @@ class Facade:
         prompt_generator = PromptGenerator()
         prompt_payload = prompt_generator.generate_prompt(prompt_data_dict)
 
-        # --- Appel Perplexity (optionnel) ---
+        # --- Perplexity call (optional) ---
         perplexity_report = None
         if run_perplexity:
             api_key = os.getenv("PERPLEXITY_API_KEY")
@@ -172,9 +173,9 @@ class Facade:
                 auditor = PerplexityAuditor(api_key=api_key)
                 perplexity_report = auditor.run(prompt_payload=prompt_payload)
             else:
-                print("⚠️ Aucune clé API Perplexity trouvée dans .env")
+                print("⚠️ No Perplexity API key found in .env")
 
-        # --- Enregistrement output temporaire ---
+        # --- Temporary output storage ---
         temp_id = f"{user_id}_{site}_{datetime.now().isoformat()}"
         self.save_output(temp_id, {
             "static": static_data,
@@ -184,7 +185,7 @@ class Facade:
             "perplexity_report": perplexity_report
         })
 
-        # --- Création & stockage Audit dans DB via repository ---
+        # --- Create & store Audit in DB via repository ---
         audit = self.audit_repo.create(
             user_id=user_id,
             site=site,
@@ -204,6 +205,6 @@ class Facade:
 
 
 # =======================================================
-# INSTANCE GLOBALE
+# GLOBAL INSTANCE
 # =======================================================
 facade = Facade()

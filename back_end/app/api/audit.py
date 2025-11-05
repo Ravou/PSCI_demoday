@@ -19,7 +19,7 @@ audit_model = api.model('Audit', {
 
 
 # -------------------------------
-# Liste ou création d’audits (par l’utilisateur connecté)
+# List or create audits (by connected user)
 # -------------------------------
 @api.route('/audits')
 class UserAudits(Resource):
@@ -28,7 +28,7 @@ class UserAudits(Resource):
     @api.response(201, 'Audit created successfully')
     def post(self):
         """Create a full audit for the logged-in user"""
-        current_user_id = get_jwt_identity()  # Récupère depuis le JWT
+        current_user_id = get_jwt_identity() 
 
         payload = api.payload
         target = payload['target']
@@ -54,7 +54,7 @@ class UserAudits(Resource):
 
 
 # -------------------------------
-# Audit spécifique (par site)
+# Audit specific (by site)
 # -------------------------------
 @api.route('/audits/<string:site>')
 class SingleAudit(Resource):

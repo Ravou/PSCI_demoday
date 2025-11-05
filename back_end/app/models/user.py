@@ -9,12 +9,12 @@ import bcrypt
 import uuid
 
 # -----------------------------
-# Définition de User
+# Définition of User
 # -----------------------------
 class User(BaseModel):
     __tablename__ = "users"
 
-    # UUID natif PostgreSQL pour l'ID
+    # UUID natif PostgreSQL for l'ID
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         primary_key=True,
@@ -39,7 +39,7 @@ class User(BaseModel):
     )
 
     # -----------------------------
-    # Initialisation
+    # Initialization 
     # -----------------------------
     def __init__(self, name: str, email: str, password: str, consent_ip: str, is_admin: bool = False):
         super().__init__()
@@ -53,7 +53,7 @@ class User(BaseModel):
         self.consent_summary = "Consent granted for site scraping and temporary data processing."
 
     # -----------------------------
-    # Mot de passe
+    # Password management
     # -----------------------------
     def _hash_password(self, password: str) -> str:
         return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
@@ -89,12 +89,9 @@ class User(BaseModel):
         }
 
     # -----------------------------
-    # Représentation
+    # Representation
     # -----------------------------
     def __repr__(self):
         return f"<User(id='{self.id}', email='{self.email}', admin={self.is_admin}, created='{self.account_created_at.isoformat()}')>"
 
-# -----------------------------
-# Import Audit après définition de User
-# -----------------------------
 from app.models.audit import Audit

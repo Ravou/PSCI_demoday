@@ -47,7 +47,7 @@ const Login = ({ onLoginSuccess }) => {
 
 
       if (onLoginSuccess) {
-        onLoginSuccess(userData);
+        onLoginSuccess({ id: userId, email, token});
       }
 
       navigate('/dashboard');

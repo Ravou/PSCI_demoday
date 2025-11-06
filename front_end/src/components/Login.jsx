@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+
 import { useNavigate } from 'react-router-dom';
+import { authAPI } from '../services/api';
 import './Login.css';
 
 const Login = ({ onLoginSuccess }) => {
@@ -16,23 +17,27 @@ const Login = ({ onLoginSuccess }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/users/login', {
-        email,
-        password,
-      });
+      const loginData = await authAPI.login(email, password);
+      console.log('Réponse API:', loginData);
 
-      console.log('Réponse API:', response.data); // Debug
+      const userId = loginData.user_id || loginData.id || loginData.userId;
+      const userName = loginData.name || loginData.user_name || 'User';
+      const userEmail = loginData.email;
 
-      // 🔥 CHANGEMENT: Adaptation aux champs exacts de ton API
-      // Ton backend retourne: { message, user_id, name, email }
+      if (!userId) {
+        setError('Erreur : ID utilisateur manquant');
+        setLoading(false);
+        return;
+      }
+
       const userData = {
-        id: response.data.user_id,      // ✅ Ton API retourne "user_id" pas "userid"
-        email: response.data.email,
-        name: response.data.name,
-        token: response.data.token || null, // Optionnel si tu n'as pas de JWT pour l'instant
+        id: String(userId),
+        email: userEmail,
+        name: userName,
+        token: loginData.token || null,
       };
 
-      // Stocke dans localStorage pour persistance
+      
       localStorage.setItem('user_id', userData.id);
       localStorage.setItem('user_name', userData.name);
       localStorage.setItem('user_email', userData.email);
@@ -40,22 +45,15 @@ const Login = ({ onLoginSuccess }) => {
         localStorage.setItem('auth_token', userData.token);
       }
 
-      // Appelle la fonction callback si fournie
+
       if (onLoginSuccess) {
         onLoginSuccess(userData);
       }
 
       navigate('/dashboard');
     } catch (err) {
-      console.error('Connection error:', err);
-      
-      //  CHANGEMENT: Gestion d'erreur adaptée à ton API
-      // Ton backend retourne { error: 'Invalid credentials' }
-      setError(
-        err.response?.data?.error || 
-        err.response?.data?.message || 
-        'Incorrect email or password'
-      );
+      console.error('Erreur login:', err);
+      setError(err.message || 'Email ou mot de passe incorrect');
     } finally {
       setLoading(false);
     }
@@ -69,7 +67,7 @@ const Login = ({ onLoginSuccess }) => {
             Connect to <span className="text-gradient">PSCI</span>
           </h1>
           <p className="login-subtitle">
-            Acces to your dashboard and manage your audits easily.
+            Access your dashboard and manage your audits easily.
           </p>
 
           {error && <div className="error-message">{error}</div>}
@@ -105,7 +103,7 @@ const Login = ({ onLoginSuccess }) => {
           </form>
 
           <p className="login-footer">
-              Don't have an account yet ?{' '}
+            Don't have an account yet?{' '}
             <a href="/register" className="login-link">Register</a>
           </p>
         </div>

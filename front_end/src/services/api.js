@@ -1,46 +1,56 @@
 // src/services/api.js
-const API_BASE_URL = 'http://127.0.0.1:5000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:5000/api';
 
-// Configuration des headers par défaut
-const defaultHeaders = {
-  'Content-Type': 'application/json',
+// Configuration des headers par défaut avec token si disponible
+const getHeaders = () => {
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+  
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  return headers;
 };
 
 // Fonction helper pour gérer les erreurs
 const handleResponse = async (response) => {
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Une erreur est survenue');
+    let errorMessage = 'Une erreur est survenue';
+    try {
+      const error = await response.json();
+      errorMessage = error.error || error.message || errorMessage;
+    } catch (e) {
+      // Si la réponse n'est pas JSON, utiliser le message par défaut
+    }
+    throw new Error(errorMessage);
   }
   return response.json();
+};
+
+// API Auth endpoints
+export const authAPI = {
+  // Login utilisateur - ✅ CORRECTION: /auth/login au lieu de /users/login
+  login: async (email, password) => {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ email, password })
+    });
+    return handleResponse(response);
+  }
 };
 
 // API User endpoints
 export const userAPI = {
   // Register un nouvel utilisateur
-  register: async (name, email, password) => {
+  register: async (name, email, password, consent_given = true) => {
     const response = await fetch(`${API_BASE_URL}/users/register`, {
       method: 'POST',
-      headers: defaultHeaders,
-      body: JSON.stringify({
-        name,
-        email,
-        password,
-        consent_given: true
-      })
-    });
-    return handleResponse(response);
-  },
-
-  // Login utilisateur
-  login: async (email, password) => {
-    const response = await fetch(`${API_BASE_URL}/users/login`, {
-      method: 'POST',
-      headers: defaultHeaders,
-      body: JSON.stringify({
-        email,
-        password
-      })
+      headers: getHeaders(),
+      body: JSON.stringify({ name, email, password, consent_given })
     });
     return handleResponse(response);
   },
@@ -49,7 +59,7 @@ export const userAPI = {
   getAllUsers: async () => {
     const response = await fetch(`${API_BASE_URL}/users/`, {
       method: 'GET',
-      headers: defaultHeaders,
+      headers: getHeaders(),
     });
     return handleResponse(response);
   },
@@ -58,22 +68,22 @@ export const userAPI = {
   getUserById: async (userId) => {
     const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
       method: 'GET',
-      headers: defaultHeaders,
+      headers: getHeaders(),
     });
     return handleResponse(response);
   },
 
   // Mettre à jour un utilisateur
-  updateUser: async (userId, name, email, password) => {
+  updateUser: async (userId, name, email, password = null) => {
+    const body = { name, email, consent_given: true };
+    if (password) {
+      body.password = password;
+    }
+    
     const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
       method: 'PUT',
-      headers: defaultHeaders,
-      body: JSON.stringify({
-        name,
-        email,
-        password,
-        consent_given: true
-      })
+      headers: getHeaders(),
+      body: JSON.stringify(body)
     });
     return handleResponse(response);
   },
@@ -82,18 +92,18 @@ export const userAPI = {
   deleteUser: async (userId) => {
     const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
       method: 'DELETE',
-      headers: defaultHeaders,
+      headers: getHeaders(),
     });
     return handleResponse(response);
   }
 };
 
-// API Audit endpoints (à développer plus tard)
+// API Audit endpoints
 export const auditAPI = {
   createAudit: async (userId, siteUrl, consentText) => {
     const response = await fetch(`${API_BASE_URL}/audit/${userId}/audits`, {
       method: 'POST',
-      headers: defaultHeaders,
+      headers: getHeaders(),
       body: JSON.stringify({
         site_url: siteUrl,
         consent_text: consentText,
@@ -108,9 +118,18 @@ export const auditAPI = {
   getAllAudits: async (userId) => {
     const response = await fetch(`${API_BASE_URL}/audit/${userId}/audits`, {
       method: 'GET',
-      headers: defaultHeaders,
+      headers: getHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  getAuditById: async (userId, auditId) => {
+    const response = await fetch(`${API_BASE_URL}/audit/${userId}/audits/${auditId}`, {
+      method: 'GET',
+      headers: getHeaders(),
     });
     return handleResponse(response);
   }
 };
 
+export default { authAPI, userAPI, auditAPI };

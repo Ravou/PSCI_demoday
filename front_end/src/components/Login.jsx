@@ -16,7 +16,7 @@ const Login = ({ onLoginSuccess }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/users/login', {
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
         email,
         password,
       });
@@ -25,24 +25,29 @@ const Login = ({ onLoginSuccess }) => {
 
       // 🔥 CHANGEMENT: Adaptation aux champs exacts de ton API
       // Ton backend retourne: { message, user_id, name, email }
-      const userData = {
-        id: response.data.user_id,      // ✅ Ton API retourne "user_id" pas "userid"
-        email: response.data.email,
-        name: response.data.name,
-        token: response.data.token || null, // Optionnel si tu n'as pas de JWT pour l'instant
-      };
+      const token = response.data.access_token;
+
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const userId = payload.sub;
+      const isAdmin = payload.is_admin;
 
       // Stocke dans localStorage pour persistance
-      localStorage.setItem('user_id', userData.id);
-      localStorage.setItem('user_name', userData.name);
-      localStorage.setItem('user_email', userData.email);
-      if (userData.token) {
-        localStorage.setItem('auth_token', userData.token);
-      }
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('user_id', userId);
+      localStorage.setItem('user_name', email.split('@')[0]);
+      localStorage.setItem('user_email', email);
+      localStorage.setItem('is_admin', isAdmin);
+      
+      console.log('Login enregistré dans localStorage :', {
+        user_id: userId,
+        user_email: email,
+        is_admin: isAdmin,
+        token,
+      }); // Debug
 
       // Appelle la fonction callback si fournie
       if (onLoginSuccess) {
-        onLoginSuccess(userData);
+        onLoginSuccess({ id: userId, email, token});
       }
 
       navigate('/dashboard');

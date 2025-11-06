@@ -36,11 +36,14 @@ const Dashboard = () => {
     loadAudits(userId);
   }, [navigate]);
 
-  const loadAudits = async (userId) => {
+  const loadAudits = async () => {
     try {
       setLoadingAudits(true);
       const response = await axios.get(
-        `http://localhost:5000/api/audit/${userId}/audits`
+        `http://localhost:5000/api/audit/audits`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` }
+        }
       );
       setAudits(response.data);
     } catch (err) {
@@ -56,28 +59,18 @@ const Dashboard = () => {
     setError('');
     setLoading(true);
 
-    if (!user) {
-      setError('User not logged in');
-      setLoading(false);
-      return;
-    }
-
     try {
+      const token = localStorage.getItem('auth_token');
       const response = await axios.post(
-        `http://localhost:5000/api/audit/${user.id}/audits`,
-        {
-          site_url: url,
-          consent_text: '',
-          run_nlp: true,
-          run_semantic_matching: true,
-          use_perplexity: false
-        }
+        `http://localhost:5000/api/audit/audits`,
+        { target: url, run_perplexity: true },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       console.log('Audit created:', response.data);
       alert('Audit was created successfully!');
       setUrl('');
-      loadAudits(user.id);
+      loadAudits();
     } catch (err) {
       console.error('Error creating audit:', err);
       setError(
@@ -91,7 +84,6 @@ const Dashboard = () => {
   };
 
 
-  
   const stats = {
     auditsCompleted: audits.filter(a => a.status === 'completed').length || audits.length,
     auditsInProgress: audits.filter(a => a.status === 'in_progress').length || 0,

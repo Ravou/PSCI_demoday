@@ -4,7 +4,9 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import Settings from './components/Settings';
-import Contact from './components/Contact'; 
+import Contact from './components/Contact';
+import AboutUs from './components/AboutUs';
+import Legal from './components/Legal';
 import LandingPage from './components/LandingPage';
 import './styles/theme.css';
 import './App.css';
@@ -70,7 +72,8 @@ function App() {
               {user && <Link to="/dashboard" className="nav-link">Dashboard</Link>}
               {user && <Link to="/settings" className="nav-link">Settings</Link>}
               <Link to="/contact" className="nav-link">Contact</Link> {/* ✅ AJOUTÉ */}
-              <a href="#features" className="nav-link">About Us</a>
+              <Link to="/about" className="nav-link">About Us</Link>
+
               </div>
 
             <div className="nav-right">
@@ -133,25 +136,25 @@ function App() {
                   <Settings /> : 
                   <Navigate to="/login" replace />
               } 
-            />
+            /> 
 
             {/* ✅ NOUVELLE ROUTE Contact - Accessible à tous */}
             <Route path="/contact" element={<Contact />} />
-            
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/legal" element={<Legal />} />
+
+            {/* Route catch-all */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
+        
 
         <footer className="footer" id="footer">
           <p>© 2025 Projet PSCI | All rights reserved</p>
           <div className="footer-links">
             <a href="mailto:contact@psci.com">contact@psci.com</a>
             <span> | </span>
-            <Link to="/contact">Contact</Link> {/* ✅ CHANGÉ */}
-            <span> | </span>
-            <a href="http://localhost:5000/api/" target="_blank" rel="noopener noreferrer">
-              API Docs
-            </a>
+            <Link to="/legal">Legal</Link> {/* Tous les documents légaux regroupés */}
           </div>
         </footer>
       </div>

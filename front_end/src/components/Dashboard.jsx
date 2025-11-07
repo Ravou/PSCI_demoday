@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Dashboard.css';
 
-// ✅ Import des images (place-les dans front_end/src/assets/)
+// ✅ Import des images
 import auditIcon from '../assets/images/audit.jpg';
 import auditProgressIcon from '../assets/images/auditprogress.jpg';
 import scoreIcon from '../assets/images/score.jpg';
@@ -14,7 +14,6 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
   const [audits, setAudits] = useState([]);
-  const [loadingAudits, setLoadingAudits] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,30 +26,21 @@ const Dashboard = () => {
       return;
     }
 
-    setUser({
-      id: userId,
-      name: userName,
-      email: userEmail
-    });
-
-    loadAudits(userId);
+    setUser({ id: userId, name: userName, email: userEmail });
+    loadAudits();
   }, [navigate]);
 
   const loadAudits = async () => {
     try {
-      setLoadingAudits(true);
+      const token = localStorage.getItem('auth_token');
       const response = await axios.get(
         `http://localhost:5000/api/audit/audits`,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setAudits(response.data);
     } catch (err) {
       console.error('Error loading audits:', err);
       setAudits([]);
-    } finally {
-      setLoadingAudits(false);
     }
   };
 
@@ -61,21 +51,19 @@ const Dashboard = () => {
 
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await axios.post(
+      await axios.post(
         `http://localhost:5000/api/audit/audits`,
-        { target: url, run_perplexity: true },
+        { target: url },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log('Audit created:', response.data);
-      alert('Audit was created successfully!');
       setUrl('');
-      loadAudits();
+      loadAudits(); // recharge les audits après création
     } catch (err) {
       console.error('Error creating audit:', err);
       setError(
-        err.response?.data?.error || 
-        err.response?.data?.message || 
+        err.response?.data?.error ||
+        err.response?.data?.message ||
         'Error creating audit'
       );
     } finally {
@@ -83,33 +71,22 @@ const Dashboard = () => {
     }
   };
 
+  if (!user) return <div className="loading-state">Loading...</div>;
 
+  // Calcul des stats
   const stats = {
     auditsCompleted: audits.filter(a => a.status === 'completed').length || audits.length,
     auditsInProgress: audits.filter(a => a.status === 'in_progress').length || 0,
-    averageScore: audits.length > 0 
-      ? Math.round(audits.reduce((acc, a) => acc + (a.score || 0), 0) / audits.length) 
+    averageScore: audits.length > 0
+      ? Math.round(audits.reduce((acc, a) => acc + (a.score || 0), 0) / audits.length)
       : 0
   };
 
-  if (!user) {
-    return <div className="loading-state">Loading...</div>;
-  }
+  const lastAudit = audits[audits.length - 1];
 
   return (
     <div className="dashboard">
-      {/* ✅ Header SANS boutons Settings et Logout */}
-      <div className="dashboard-header">
-        <div className="header-content">
-          <h1 className="dashboard-title">Dashboard</h1>
-          <p className="dashboard-subtitle">
-            Welcome, <span className="user-name">{user.name}</span> • {user.email}
-          </p>
-          </div>
-        </div>
-
-
-      {/* ✅ Stats Grid AVEC images */}
+      {/* Stats */}
       <div className="stats-grid">
         <div className="stat-card card">
           <img src={auditIcon} alt="Audit Completed" className="stat-image" />
@@ -136,37 +113,16 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* ✅ NOUVELLE SECTION : Bannière 24/7 Protection */}
-      <div className="protection-banner card">
-        <div className="banner-tag">24/7 PROTECTION WITH LIVE RECORDING</div>
-        <h2 className="banner-title">
-          Your safety is our mission. Your trust is our commitment.
-        </h2>
-        <p className="banner-subtitle">
-          Click below to schedule your free risk assessment and learn how we can help protect your world.
-        </p>
-        <button 
-          className="btn btn-primary btn-large"
-          onClick={() => navigate('/contact')}
-        >
-          START PROTECTING YOUR PRESENCE
-        </button>
-      </div>
+      {/* Audit Form */}
+      <div className="audit-form-container no-card">
+        <p className="audit-instruction">Check your website’s GDPR compliance</p>
 
-      {/* New Audit Form */}
-      <div className="card audit-form-container">
-        <h3 className="section-title">Launch New Audit</h3>
-        
-        {error && (
-          <div className="error-message">
-            {error}
-          </div>
-        )}
+        {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit} className="audit-form">
           <input
             type="url"
-            className="form-input"
+            className="form-input large-input"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://example.com"
@@ -174,7 +130,7 @@ const Dashboard = () => {
           />
           <button 
             type="submit" 
-            className="btn btn-primary"
+            className="btn btn-primary large-button"
             disabled={loading}
           >
             {loading ? 'Launching...' : '+ New Audit'}
@@ -182,51 +138,25 @@ const Dashboard = () => {
         </form>
       </div>
 
-      {/* Audit History */}
-      <div className="audit-history">
-        <h3 className="section-title"> Audit History</h3>
-
-        {loadingAudits ? (
-          <div className="empty-state">Loading audits...</div>
-        ) : audits.length === 0 ? (
-          <div className="empty-state">
-            Enter your website URL to run a compliance audit!
-          </div>
-        ) : (
-          <div className="history-list">
-            {audits.map((audit, index) => (
-              <div key={audit.id || index} className="history-item card">
-                <div className="history-info">
-                  <a 
-                    href={audit.site || audit.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="history-url"
-                  >
-                    {audit.site || audit.url}
-                  </a>
-                  <div className="history-meta">
-                    <span className="meta-icon"></span>
-                    <span>{new Date(audit.timestamp || audit.date).toLocaleString('en-US')}</span>
-                  </div>
-                </div>
-
-                <div className="history-result">
-                  <div className={`result-score ${(audit.score || 0) < 50 ? 'score-fail' : 'score-pass'}`}>
-                    {audit.score || 0}/100
-                  </div>
-                  <div className={`result-status ${(audit.score || 0) < 50 ? 'status-fail' : 'status-pass'}`}>
-                    {(audit.score || 0) < 50 ? '✗ Non-Compliant' : '✓ Compliant'}
-                  </div>
-                </div>
+      {/* Latest Audit Result */}
+      {lastAudit && lastAudit.content?.perplexity_report && (
+        <div className="audit-result">
+          <h3 className="section-title">Latest Audit Result</h3>
+          <div className="audit-details">
+            {lastAudit.content.perplexity_report.map((item, i) => (
+              <div key={i} className="audit-item card">
+                <h4>{item.point}</h4>
+                <p><strong>Status:</strong> {item.status}</p>
+                <p><strong>Evidence:</strong> {item.evidence}</p>
+                <p><strong>Recommendation:</strong> {item.recommendation}</p>
+                <p><strong>Articles:</strong> {item.articles}</p>
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Dashboard;
-

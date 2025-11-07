@@ -1,0 +1,87 @@
+.about-page {
+  min-height: calc(100vh - 160px); /* même que settings */
+  padding: var(--spacing-4xl) var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+
+  background: rgba(22, 27, 34, 0.6); /* même fond que settings-content */
+  backdrop-filter: blur(20px);
+  border: 2px solid var(--border-secondary);
+  border-radius: var(--radius-xl);
+}
+
+.about-container {
+  max-width: 900px;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.about-title {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 900;
+  color: #ffffff; /* titre en blanc */
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.about-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 30px;
+  text-align: center;
+  max-width: 800px;
+}
+
+.about-text {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.7;
+  margin-bottom: 25px;
+  max-width: 800px;
+  text-align: justify;
+}
+
+/* How it works block */
+.about-how {
+  width: 100%;
+  text-align: left; /* titre et étapes alignés à gauche */
+  margin-top: 40px;
+}
+
+.about-how-title {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--accent-primary); /* couleur verte accentuée */
+  margin-bottom: 15px;
+}
+
+.about-step {
+  margin-left: 20px; /* décalage à l’intérieur */
+  margin-bottom: 10px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .about-title { font-size: 2.5rem; }
+  .about-subtitle { font-size: 1.1rem; }
+  .about-how-title { font-size: 1.3rem; }
+}
+
+@media (max-width: 768px) {
+  .about-page { padding: var(--spacing-2xl) var(--spacing-md); }
+  .about-title { font-size: 2rem; }
+  .about-subtitle { font-size: 1rem; }
+  .about-how-title { font-size: 1.2rem; }
+  .about-step { margin-left: 10px; }
+}

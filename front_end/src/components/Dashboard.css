@@ -189,44 +189,92 @@
   font-family: 'Poppins', sans-serif;
 }
 
-/* ========== AUDIT FORM ========== */
+/* ===================================================================
+   AUDIT FORM (LARGE & SPACED)
+   =================================================================== */
 
 .audit-form-container {
-  margin-bottom: 50px;
+  margin: 80px auto;
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
+/* Instruction text above the form */
+.audit-instruction {
+  font-family: var(--font-display, 'Poppins', sans-serif); /* police cohérente avec le thème */
+  font-size: clamp(2rem, 4vw, 3rem);  /* taille responsive : min 2rem, max 3rem */
+  font-weight: 900;                   /* texte bien gras */
+  line-height: 1.2;                   /* espacement vertical optimal */
+  letter-spacing: -0.02em;            /* léger ajustement des lettres */
+  color: var(--texte-blanc, #ffffff); /* blanc doux */
+  margin-bottom: 25px;                /* espace sous la phrase */
+  text-align: center;                 /* centré au-dessus du formulaire */
+}
+
+/* Neon pulse animation */
+@keyframes neonPulse {
+  0% {
+    text-shadow: 0 0 5px #00ff88, 0 0 10px #00ff88, 0 0 15px #00ff88;
+    opacity: 0.85;
+  }
+  50% {
+    text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 30px #00ff88;
+    opacity: 1;
+  }
+  100% {
+    text-shadow: 0 0 5px #00ff88, 0 0 10px #00ff88, 0 0 15px #00ff88;
+    opacity: 0.85;
+  }
+}
+
+/* === FORM WRAPPER === */
 .audit-form {
   display: flex;
-  gap: 15px;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
   flex-wrap: wrap;
+  width: 100%;
+  padding: 25px 30px;
+  background: rgba(26, 31, 46, 0.6);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 255, 136, 0.05);
 }
 
+/* === INPUT URL === */
 .form-input {
-  flex: 1 1 300px;
-  padding: 14px 18px;
-  background: var(--gris-fonce, #1a1f2e);
-  border: 1px solid rgba(0, 255, 136, 0.2);
-  border-radius: 8px;
+  flex: 1 1 600px;
+  padding: 20px 24px;
+  font-size: 17px;
+  background: rgba(10, 14, 25, 0.95);
+  border: 1px solid rgba(0, 255, 136, 0.25);
+  border-radius: 10px;
   color: var(--texte-blanc, #ffffff);
-  font-size: 15px;
   outline: none;
   transition: all 0.3s ease;
 }
 
 .form-input:focus {
   border-color: var(--vert-neon, #00ff88);
-  box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
 }
 
 .form-input::placeholder {
   color: var(--texte-gris, #94a3b8);
 }
 
+/* === BUTTON === */
 .btn {
-  padding: 14px 40px;
+  padding: 18px 48px;
   border: none;
-  border-radius: 8px;
-  font-size: 15px;
+  border-radius: 10px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -236,13 +284,13 @@
 .btn-primary {
   background: var(--vert-neon, #00ff88);
   color: var(--gris-fonce, #0a0e1a);
-  box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+  box-shadow: 0 6px 25px rgba(0, 255, 136, 0.35);
 }
 
 .btn-primary:hover:not(:disabled) {
   background: #00dd77;
   transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(0, 255, 136, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 255, 136, 0.45);
 }
 
 .btn-primary:disabled {
@@ -250,8 +298,7 @@
   cursor: not-allowed;
 }
 
-/* ========== ERROR MESSAGE ========== */
-
+/* === ERROR MESSAGE === */
 .error-message {
   background: rgba(255, 107, 107, 0.1);
   border: 1px solid rgba(255, 107, 107, 0.3);
@@ -260,6 +307,121 @@
   color: #ff6b6b;
   margin-bottom: 20px;
   font-size: 14px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .audit-form {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+  }
+
+  .form-input {
+    width: 100%;
+    font-size: 16px;
+    padding: 16px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 15px;
+  }
+}
+
+/* ========== LATEST AUDIT RESULT (Vertical Layout Fix) ========== */
+
+.audit-result {
+  margin: 50px 0;
+  padding: 30px;
+  background: rgba(26, 31, 46, 0.6);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.audit-result h3.section-title {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: var(--texte-blanc, #ffffff);
+  font-weight: 700;
+}
+
+/* Container for all audit items (vertical stack) */
+.audit-details {
+  display: flex;
+  flex-direction: column; /* one card under the other */
+  gap: 20px;
+}
+
+/* Individual audit card */
+.audit-item {
+  display: flex;
+  flex-direction: column; /* make content vertical inside the card */
+  align-items: flex-start; /* align text on the left */
+  width: 100%;
+  background: rgba(0, 255, 136, 0.05);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  transition: all 0.3s ease;
+}
+
+.audit-item:hover {
+  border-color: rgba(0, 255, 136, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 255, 136, 0.1);
+}
+
+/* Card title */
+.audit-item h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--vert-neon, #00ff88);
+  margin-bottom: 10px;
+  width: 100%; /* ensures no horizontal overflow */
+  text-align: left;
+}
+
+/* Text lines (Status, Evidence, etc.) */
+.audit-item p {
+  width: 100%;
+  display: block;
+  font-size: 14px;
+  color: var(--texte-gris, #94a3b8);
+  margin: 6px 0;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+/* Emphasize labels like “Status:” */
+.audit-item p strong {
+  color: var(--texte-blanc, #ffffff);
+  font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .audit-result {
+    padding: 20px;
+  }
+
+  .audit-item {
+    padding: 16px;
+  }
+
+  .audit-item h4 {
+    font-size: 16px;
+  }
+
+  .audit-item p {
+    font-size: 13.5px;
+  }
 }
 
 /* ========== AUDIT HISTORY ========== */

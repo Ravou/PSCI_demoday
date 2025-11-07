@@ -93,6 +93,7 @@ const AuditForm = () => {
                       <p><strong>Status:</strong> {item.status}</p>
                       <p><strong>Evidence:</strong> {item.evidence}</p>
                       <p><strong>Recommendation:</strong> {item.recommendation}</p>
+                      <p><strong>Articles:</strong> {item.articles}</p>
                     </div>
                   ))}
                 </div>
@@ -124,4 +125,3 @@ const AuditForm = () => {
 };
 
 export default AuditForm;
-
